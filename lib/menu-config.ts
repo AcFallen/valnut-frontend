@@ -1,4 +1,12 @@
-import { LucideIcon, Home, Users, Settings, BarChart3, Package } from "lucide-react";
+import {
+  LucideIcon,
+  Home,
+  Users,
+  Settings,
+  BarChart3,
+  Package,
+  Building2,
+} from "lucide-react";
 
 export interface MenuItem {
   id: string;
@@ -16,7 +24,14 @@ export const menuItems: MenuItem[] = [
     label: "Dashboard",
     href: "/dashboard",
     icon: Home,
-    description: "Overview and main dashboard"
+    description: "Overview and main dashboard",
+  },
+  {
+    id: "tenants",
+    label: "Clientes",
+    href: "/tenants",
+    icon: Building2,
+    description: "Gestión de clientes",
   },
   {
     id: "patients",
@@ -28,48 +43,49 @@ export const menuItems: MenuItem[] = [
         id: "patients-list",
         label: "Lista de Pacientes",
         href: "/dashboard/patients",
-        description: "Ver todos los pacientes"
+        description: "Ver todos los pacientes",
       },
       {
         id: "patients-add",
         label: "Nuevo Paciente",
         href: "/dashboard/patients/new",
-        description: "Agregar nuevo paciente"
+        description: "Agregar nuevo paciente",
       },
       {
         id: "patients-appointments",
         label: "Citas",
         href: "/dashboard/patients/appointments",
-        description: "Gestionar citas médicas"
-      }
-    ]
-  },
-  {
-    id: "nutrition",
-    label: "Nutrición",
-    icon: Package,
-    description: "Planes y seguimiento nutricional",
-    children: [
-      {
-        id: "nutrition-plans",
-        label: "Planes Nutricionales",
-        href: "/dashboard/nutrition/plans",
-        description: "Crear y gestionar planes"
+        description: "Gestionar citas médicas",
       },
-      {
-        id: "nutrition-recipes",
-        label: "Recetas",
-        href: "/dashboard/nutrition/recipes",
-        description: "Base de datos de recetas"
-      },
-      {
-        id: "nutrition-supplements",
-        label: "Suplementos",
-        href: "/dashboard/nutrition/supplements",
-        description: "Gestionar suplementos"
-      }
-    ]
+    ],
   },
+
+  // {
+  //   id: "nutrition",
+  //   label: "Nutrición",
+  //   icon: Package,
+  //   description: "Planes y seguimiento nutricional",
+  //   children: [
+  //     {
+  //       id: "nutrition-plans",
+  //       label: "Planes Nutricionales",
+  //       href: "/dashboard/nutrition/plans",
+  //       description: "Crear y gestionar planes"
+  //     },
+  //     {
+  //       id: "nutrition-recipes",
+  //       label: "Recetas",
+  //       href: "/dashboard/nutrition/recipes",
+  //       description: "Base de datos de recetas"
+  //     },
+  //     {
+  //       id: "nutrition-supplements",
+  //       label: "Suplementos",
+  //       href: "/dashboard/nutrition/supplements",
+  //       description: "Gestionar suplementos"
+  //     }
+  //   ]
+  // },
   {
     id: "reports",
     label: "Reportes",
@@ -80,41 +96,41 @@ export const menuItems: MenuItem[] = [
         id: "reports-progress",
         label: "Progreso Pacientes",
         href: "/dashboard/reports/progress",
-        description: "Seguimiento del progreso"
+        description: "Seguimiento del progreso",
       },
       {
         id: "reports-analytics",
         label: "Análisis",
         href: "/dashboard/reports/analytics",
-        description: "Métricas y estadísticas"
-      }
-    ]
+        description: "Métricas y estadísticas",
+      },
+    ],
   },
 
-  {
-    id: "settings",
-    label: "Configuración",
-    icon: Settings,
-    description: "Configuración del sistema",
-    children: [
-      {
-        id: "settings-profile",
-        label: "Mi Perfil",
-        href: "/dashboard/settings/profile",
-        description: "Configuración personal"
-      },
-      {
-        id: "settings-clinic",
-        label: "Clínica",
-        href: "/dashboard/settings/clinic",
-        description: "Configuración de la clínica"
-      },
-      {
-        id: "settings-users",
-        label: "Usuarios",
-        href: "/dashboard/settings/users",
-        description: "Gestión de usuarios"
-      }
-    ]
-  }
+  // {
+  //   id: "settings",
+  //   label: "Configuración",
+  //   icon: Settings,
+  //   description: "Configuración del sistema",
+  //   children: [
+  //     {
+  //       id: "settings-profile",
+  //       label: "Mi Perfil",
+  //       href: "/dashboard/settings/profile",
+  //       description: "Configuración personal"
+  //     },
+  //     {
+  //       id: "settings-clinic",
+  //       label: "Clínica",
+  //       href: "/dashboard/settings/clinic",
+  //       description: "Configuración de la clínica"
+  //     },
+  //     {
+  //       id: "settings-users",
+  //       label: "Usuarios",
+  //       href: "/dashboard/settings/users",
+  //       description: "Gestión de usuarios"
+  //     }
+  //   ]
+  // }
 ];
