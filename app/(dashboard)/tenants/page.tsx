@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useTenants } from "@/hooks/useTenants"
-import { TenantStatus } from "@/types/tenant"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { useTenants } from "@/hooks/useTenants";
+import { TenantStatus } from "@/types/tenant";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -11,48 +11,53 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Building2, Filter, Loader2 } from "lucide-react"
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Building2, Filter, Loader2 } from "lucide-react";
 
-const statusMap: Record<TenantStatus, { label: string; variant: "default" | "secondary" | "destructive" }> = {
+const statusMap: Record<
+  TenantStatus,
+  { label: string; variant: "default" | "secondary" | "destructive" }
+> = {
   active: { label: "Activo", variant: "default" },
   inactive: { label: "Inactivo", variant: "secondary" },
   suspended: { label: "Suspendido", variant: "destructive" },
-}
+};
 
 export default function TenantsPage() {
-  const [statusFilter, setStatusFilter] = useState<TenantStatus | "all">("active")
-  
-  const queryParams = statusFilter === "all" ? {} : { status: statusFilter }
-  const { data: tenants, isLoading, error } = useTenants(queryParams)
+  const [statusFilter, setStatusFilter] = useState<TenantStatus | "all">(
+    "active"
+  );
+
+  const queryParams = statusFilter === "all" ? {} : { status: statusFilter };
+  const { data: tenants, isLoading, error } = useTenants(queryParams);
 
   const handleStatusChange = (value: string) => {
-    setStatusFilter(value as TenantStatus | "all")
-  }
+    setStatusFilter(value as TenantStatus | "all");
+  };
 
   if (error) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Tenants</h1>
+          <h1 className="text-3xl font-bold">Clientes</h1>
         </div>
         <Card>
           <CardContent className="pt-6">
             <div className="text-center text-red-600">
-              Error al cargar los tenants. Por favor intenta nuevamente.
+              Error al cargar los clientes. Por favor intenta nuevamente.
             </div>
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -61,7 +66,7 @@ export default function TenantsPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Building2 className="h-8 w-8" />
-          <h1 className="text-3xl font-bold">Tenants</h1>
+          <h1 className="text-3xl font-bold">Clientes</h1>
         </div>
       </div>
 
@@ -97,7 +102,7 @@ export default function TenantsPage() {
       <Card>
         <CardHeader>
           <CardTitle>
-            Lista de Tenants
+            Lista de Clientes
             {tenants && (
               <span className="ml-2 text-sm font-normal text-muted-foreground">
                 ({tenants.length} resultados)
@@ -151,7 +156,7 @@ export default function TenantsPage() {
                           {tenant.settings.timezone}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {new Date(tenant.createdAt).toLocaleDateString()}
+                          {new Date(tenant.createdAt).toLocaleDateString("es-ES")}
                         </TableCell>
                       </TableRow>
                     ))
@@ -159,7 +164,8 @@ export default function TenantsPage() {
                     <TableRow>
                       <TableCell colSpan={8} className="text-center py-8">
                         <div className="text-muted-foreground">
-                          No se encontraron tenants con los filtros seleccionados.
+                          No se encontraron clientes con los filtros
+                          seleccionados.
                         </div>
                       </TableCell>
                     </TableRow>
@@ -171,5 +177,5 @@ export default function TenantsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
