@@ -20,8 +20,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { CreateTenantDialog } from "@/components/tenants/create-tenant-dialog";
-import { Building2, Filter, Loader2 } from "lucide-react";
+import { Building2, Filter, Loader2, Edit, Trash2, UserPlus } from "lucide-react";
 
 const statusMap: Record<
   TenantStatus,
@@ -42,6 +49,18 @@ export default function TenantsPage() {
 
   const handleStatusChange = (value: string) => {
     setStatusFilter(value as TenantStatus | "all");
+  };
+
+  const handleUpdate = (id: string) => {
+    console.log("Update tenant:", id);
+  };
+
+  const handleDelete = (id: string) => {
+    console.log("Delete tenant:", id);
+  };
+
+  const handleAssignOwner = (id: string) => {
+    console.log("Assign owner to tenant:", id);
   };
 
   if (error) {
@@ -128,6 +147,7 @@ export default function TenantsPage() {
                     <TableHead>Teléfono</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead>Creado</TableHead>
+                    <TableHead className="text-center">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -155,11 +175,68 @@ export default function TenantsPage() {
                             "es-ES"
                           )}
                         </TableCell>
+                        <TableCell>
+                          <div className="flex justify-center gap-1">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleUpdate(tenant.id)}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Actualizar cliente</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleAssignOwner(tenant.id)}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <UserPlus className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Asignar propietario</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDelete(tenant.id)}
+                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Eliminar cliente</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
+                      <TableCell colSpan={6} className="text-center py-8">
                         <div className="text-muted-foreground">
                           No se encontraron clientes con los filtros
                           seleccionados.

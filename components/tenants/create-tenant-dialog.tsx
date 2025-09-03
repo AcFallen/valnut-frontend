@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus } from "lucide-react";
+import { Plus, Building, Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -67,7 +67,10 @@ export function CreateTenantDialog() {
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nombre</Label>
+            <Label htmlFor="name" className="flex items-center gap-2">
+              <Building className="h-4 w-4" />
+              Nombre
+            </Label>
             <Input
               id="name"
               placeholder="Consultorio Nutricional ABC"
@@ -79,7 +82,10 @@ export function CreateTenantDialog() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
@@ -92,7 +98,10 @@ export function CreateTenantDialog() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Teléfono</Label>
+            <Label htmlFor="phone" className="flex items-center gap-2">
+              <Phone className="h-4 w-4" />
+              Teléfono
+            </Label>
             <Input
               id="phone"
               placeholder="+1234567890"
@@ -104,7 +113,10 @@ export function CreateTenantDialog() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Dirección</Label>
+            <Label htmlFor="address" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Dirección
+            </Label>
             <Input
               id="address"
               placeholder="123 Main St, City, Country"
