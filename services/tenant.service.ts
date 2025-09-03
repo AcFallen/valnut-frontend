@@ -1,6 +1,6 @@
 import apiClient from "@/lib/api-client";
 import { ApiResponse } from "@/types/api";
-import { Tenant, TenantsQueryParams } from "@/types/tenant";
+import { Tenant, TenantsQueryParams, CreateTenantData } from "@/types/tenant";
 
 export const tenantService = {
   // Get all tenants with optional filters
@@ -31,7 +31,7 @@ export const tenantService = {
   },
 
   // Create new tenant
-  createTenant: async (tenant: Omit<Tenant, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Tenant>> => {
+  createTenant: async (tenant: CreateTenantData): Promise<ApiResponse<Tenant>> => {
     const response = await apiClient.post('/tenants', tenant);
     return response.data;
   },

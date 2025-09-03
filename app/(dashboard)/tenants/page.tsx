@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { CreateTenantDialog } from "@/components/tenants/create-tenant-dialog";
 import { Building2, Filter, Loader2 } from "lucide-react";
 
 const statusMap: Record<
@@ -68,6 +69,7 @@ export default function TenantsPage() {
           <Building2 className="h-8 w-8" />
           <h1 className="text-3xl font-bold">Clientes</h1>
         </div>
+        <CreateTenantDialog />
       </div>
 
       {/* Filters */}
@@ -125,9 +127,6 @@ export default function TenantsPage() {
                     <TableHead>Email</TableHead>
                     <TableHead>Teléfono</TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead>Moneda</TableHead>
-                    <TableHead>Idioma</TableHead>
-                    <TableHead>Zona Horaria</TableHead>
                     <TableHead>Creado</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -150,13 +149,11 @@ export default function TenantsPage() {
                             {statusMap[tenant.status].label}
                           </Badge>
                         </TableCell>
-                        <TableCell>{tenant.settings.currency}</TableCell>
-                        <TableCell>{tenant.settings.language}</TableCell>
-                        <TableCell className="text-sm">
-                          {tenant.settings.timezone}
-                        </TableCell>
+
                         <TableCell className="text-sm text-muted-foreground">
-                          {new Date(tenant.createdAt).toLocaleDateString("es-ES")}
+                          {new Date(tenant.createdAt).toLocaleDateString(
+                            "es-ES"
+                          )}
                         </TableCell>
                       </TableRow>
                     ))
