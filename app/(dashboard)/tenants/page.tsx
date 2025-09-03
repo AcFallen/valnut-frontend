@@ -28,6 +28,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CreateTenantDialog } from "@/components/tenants/create-tenant-dialog";
+import { EditTenantDialog } from "@/components/tenants/edit-tenant-dialog";
+import { DeleteTenantDialog } from "@/components/tenants/delete-tenant-dialog";
 import {
   Building2,
   Filter,
@@ -50,6 +52,11 @@ export default function TenantsPage() {
   const [statusFilter, setStatusFilter] = useState<TenantStatus | "all">(
     "active"
   );
+  const [editTenantId, setEditTenantId] = useState<string | null>(null);
+  const [deleteTenantId, setDeleteTenantId] = useState<string | null>(null);
+  const [deleteTenantName, setDeleteTenantName] = useState<string>("");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const queryParams = statusFilter === "all" ? {} : { status: statusFilter };
   const { data: tenants, isLoading, error } = useTenants(queryParams);
@@ -59,11 +66,14 @@ export default function TenantsPage() {
   };
 
   const handleUpdate = (id: string) => {
-    console.log("Update tenant:", id);
+    setEditTenantId(id);
+    setEditDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    console.log("Delete tenant:", id);
+  const handleDelete = (id: string, name: string) => {
+    setDeleteTenantId(id);
+    setDeleteTenantName(name);
+    setDeleteDialogOpen(true);
   };
 
   const handleAssignOwner = (id: string) => {
@@ -226,7 +236,7 @@ export default function TenantsPage() {
                                   <Button
                                     color="danger"
                                     size="sm"
-                                    onClick={() => handleDelete(tenant.id)}
+                                    onClick={() => handleDelete(tenant.id, tenant.name)}
                                     className="h-8 w-8 p-0"
                                   >
                                     <Trash2 className="h-4 w-4" />
@@ -257,6 +267,20 @@ export default function TenantsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Dialogs */}
+      <EditTenantDialog
+        tenantId={editTenantId}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+      
+      <DeleteTenantDialog
+        tenantId={deleteTenantId}
+        tenantName={deleteTenantName}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+      />
     </div>
   );
 }

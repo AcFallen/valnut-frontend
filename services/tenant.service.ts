@@ -37,8 +37,8 @@ export const tenantService = {
   },
 
   // Update tenant
-  updateTenant: async (id: string, tenant: Partial<Tenant>): Promise<ApiResponse<Tenant>> => {
-    const response = await apiClient.put(`/tenants/${id}`, tenant);
+  updateTenant: async (id: string, tenant: CreateTenantData): Promise<ApiResponse<Tenant>> => {
+    const response = await apiClient.patch(`/tenants/${id}`, tenant);
     return response.data;
   },
 

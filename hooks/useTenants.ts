@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { tenantService } from "@/services/tenant.service";
-import { TenantsQueryParams, Tenant } from "@/types/tenant";
+import { TenantsQueryParams, Tenant, CreateTenantData } from "@/types/tenant";
 
 // Query keys
 export const tenantQueryKeys = {
@@ -48,7 +48,7 @@ export function useUpdateTenant() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Tenant> }) =>
+    mutationFn: ({ id, data }: { id: string; data: CreateTenantData }) =>
       tenantService.updateTenant(id, data),
     onSuccess: (_, variables) => {
       // Invalidate specific tenant and lists
