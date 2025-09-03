@@ -21,6 +21,12 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
       },
+      color: {
+        info: "bg-teal-500 text-white shadow-xs hover:bg-teal-600 focus-visible:ring-teal-500/20",
+        danger: "bg-red-500 text-white shadow-xs hover:bg-red-600 focus-visible:ring-red-500/20",
+        success: "bg-green-500 text-white shadow-xs hover:bg-green-600 focus-visible:ring-green-500/20",
+        warning: "bg-orange-500 text-white shadow-xs hover:bg-orange-600 focus-visible:ring-orange-500/20",
+      },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
@@ -38,6 +44,7 @@ const buttonVariants = cva(
 function Button({
   className,
   variant,
+  color,
   size,
   asChild = false,
   ...props
@@ -50,7 +57,7 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, color, size, className }))}
       {...props}
     />
   )

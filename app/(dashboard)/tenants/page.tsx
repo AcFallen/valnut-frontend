@@ -28,7 +28,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CreateTenantDialog } from "@/components/tenants/create-tenant-dialog";
-import { Building2, Filter, Loader2, Edit, Trash2, UserPlus } from "lucide-react";
+import {
+  Building2,
+  Filter,
+  Loader2,
+  Edit,
+  Trash2,
+  UserPlus,
+} from "lucide-react";
 
 const statusMap: Record<
   TenantStatus,
@@ -181,7 +188,7 @@ export default function TenantsPage() {
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button
-                                    variant="ghost"
+                                    color="info"
                                     size="sm"
                                     onClick={() => handleUpdate(tenant.id)}
                                     className="h-8 w-8 p-0"
@@ -189,7 +196,7 @@ export default function TenantsPage() {
                                     <Edit className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>
+                                <TooltipContent color="info">
                                   <p>Actualizar cliente</p>
                                 </TooltipContent>
                               </Tooltip>
@@ -199,7 +206,7 @@ export default function TenantsPage() {
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button
-                                    variant="ghost"
+                                    color="warning"
                                     size="sm"
                                     onClick={() => handleAssignOwner(tenant.id)}
                                     className="h-8 w-8 p-0"
@@ -207,7 +214,7 @@ export default function TenantsPage() {
                                     <UserPlus className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>
+                                <TooltipContent color="warning">
                                   <p>Asignar propietario</p>
                                 </TooltipContent>
                               </Tooltip>
@@ -217,15 +224,15 @@ export default function TenantsPage() {
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button
-                                    variant="ghost"
+                                    color="danger"
                                     size="sm"
                                     onClick={() => handleDelete(tenant.id)}
-                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    className="h-8 w-8 p-0"
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>
+                                <TooltipContent color="danger">
                                   <p>Eliminar cliente</p>
                                 </TooltipContent>
                               </Tooltip>
