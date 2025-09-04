@@ -30,6 +30,7 @@ import {
 import { CreateTenantDialog } from "@/components/tenants/create-tenant-dialog";
 import { EditTenantDialog } from "@/components/tenants/edit-tenant-dialog";
 import { DeleteTenantDialog } from "@/components/tenants/delete-tenant-dialog";
+import { AssignOwnerDialog } from "@/components/tenants/assign-owner-dialog";
 import {
   Building2,
   Filter,
@@ -55,8 +56,10 @@ export default function TenantsPage() {
   const [editTenantId, setEditTenantId] = useState<string | null>(null);
   const [deleteTenantId, setDeleteTenantId] = useState<string | null>(null);
   const [deleteTenantName, setDeleteTenantName] = useState<string>("");
+  const [assignOwnerTenantId, setAssignOwnerTenantId] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [assignOwnerDialogOpen, setAssignOwnerDialogOpen] = useState(false);
 
   const queryParams = statusFilter === "all" ? {} : { status: statusFilter };
   const { data: tenants, isLoading, error } = useTenants(queryParams);
@@ -77,7 +80,8 @@ export default function TenantsPage() {
   };
 
   const handleAssignOwner = (id: string) => {
-    console.log("Assign owner to tenant:", id);
+    setAssignOwnerTenantId(id);
+    setAssignOwnerDialogOpen(true);
   };
 
   if (error) {
@@ -282,6 +286,12 @@ export default function TenantsPage() {
         tenantName={deleteTenantName}
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
+      />
+
+      <AssignOwnerDialog
+        tenantId={assignOwnerTenantId}
+        open={assignOwnerDialogOpen}
+        onOpenChange={setAssignOwnerDialogOpen}
       />
     </div>
   );

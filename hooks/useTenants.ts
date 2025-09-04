@@ -85,3 +85,18 @@ export function useDeleteTenant() {
     },
   });
 }
+
+// Assign tenant owner mutation
+export function useAssignTenantOwner() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { firstName: string; lastName: string; email: string } }) =>
+      tenantService.assignTenantOwner(id, data),
+    onSuccess: (_, variables) => {
+      // Invalidate specific tenant and lists
+      queryClient.invalidateQueries({ queryKey: tenantQueryKeys.detail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: tenantQueryKeys.lists() });
+    },
+  });
+}

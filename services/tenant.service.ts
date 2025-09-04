@@ -52,5 +52,11 @@ export const tenantService = {
   updateTenantStatus: async (id: string, status: Tenant['status']): Promise<ApiResponse<Tenant>> => {
     const response = await apiClient.patch(`/tenants/${id}/status`, { status });
     return response.data;
+  },
+
+  // Assign owner to tenant
+  assignTenantOwner: async (id: string, ownerData: { firstName: string; lastName: string; email: string }): Promise<ApiResponse<Tenant>> => {
+    const response = await apiClient.post(`/tenants/${id}/owner`, ownerData);
+    return response.data;
   }
 };
