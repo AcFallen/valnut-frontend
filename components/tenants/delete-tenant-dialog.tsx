@@ -20,12 +20,17 @@ interface DeleteTenantDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function DeleteTenantDialog({ tenantId, tenantName, open, onOpenChange }: DeleteTenantDialogProps) {
+export function DeleteTenantDialog({
+  tenantId,
+  tenantName,
+  open,
+  onOpenChange,
+}: DeleteTenantDialogProps) {
   const deleteTenantMutation = useDeleteTenant();
 
   const handleDelete = async () => {
     if (!tenantId) return;
-    
+
     try {
       await deleteTenantMutation.mutateAsync(tenantId);
       onOpenChange(false);
@@ -40,17 +45,18 @@ export function DeleteTenantDialog({ tenantId, tenantName, open, onOpenChange }:
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-500" />
-            Eliminar Cliente
+            Eliminar Consultorio
           </DialogTitle>
           <DialogDescription>
-            Esta acción no se puede deshacer. Se eliminará permanentemente el cliente y todos sus datos asociados.
+            Esta acción no se puede deshacer. Se eliminará permanentemente el
+            consultorio y todos sus datos asociados.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="py-4">
           <div className="rounded-lg bg-red-50 dark:bg-red-950/20 p-4 border border-red-200 dark:border-red-800">
             <p className="text-sm font-medium text-red-800 dark:text-red-200">
-              ¿Estás seguro de que deseas eliminar el cliente?
+              ¿Estás seguro de que deseas eliminar el consultorio?
             </p>
             <p className="text-sm text-red-600 dark:text-red-300 mt-1">
               <strong>{tenantName}</strong>
@@ -66,12 +72,14 @@ export function DeleteTenantDialog({ tenantId, tenantName, open, onOpenChange }:
           >
             Cancelar
           </Button>
-          <Button 
+          <Button
             onClick={handleDelete}
             disabled={deleteTenantMutation.isPending}
             color="danger"
           >
-            {deleteTenantMutation.isPending ? "Eliminando..." : "Eliminar Cliente"}
+            {deleteTenantMutation.isPending
+              ? "Eliminando..."
+              : "Eliminar Consultorio"}
           </Button>
         </div>
       </DialogContent>

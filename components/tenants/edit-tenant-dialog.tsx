@@ -78,16 +78,16 @@ export function EditTenantDialog({ tenantId, open, onOpenChange }: EditTenantDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Actualizar Cliente</DialogTitle>
+          <DialogTitle>Actualizar Consultorio</DialogTitle>
           <DialogDescription>
-            Modifica los datos del cliente seleccionado.
+            Modifica los datos del consultorio seleccionado.
           </DialogDescription>
         </DialogHeader>
         
         {isLoadingTenant ? (
           <div className="flex items-center justify-center py-8">
             <div className="text-sm text-muted-foreground">
-              Cargando datos del cliente...
+              Cargando datos del consultorio...
             </div>
           </div>
         ) : (
@@ -166,7 +166,7 @@ export function EditTenantDialog({ tenantId, open, onOpenChange }: EditTenantDia
                 disabled={updateTenantMutation.isPending}
                 color="info"
               >
-                {updateTenantMutation.isPending ? "Actualizando..." : "Actualizar Cliente"}
+                {updateTenantMutation.isPending ? "Actualizando..." : "Actualizar Consultorio"}
               </Button>
             </div>
           </form>

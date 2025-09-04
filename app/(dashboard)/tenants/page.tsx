@@ -84,12 +84,12 @@ export default function TenantsPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Clientes</h1>
+          <h1 className="text-3xl font-bold">Consultorios</h1>
         </div>
         <Card>
           <CardContent className="pt-6">
             <div className="text-center text-red-600">
-              Error al cargar los clientes. Por favor intenta nuevamente.
+              Error al cargar los consultorios. Por favor intenta nuevamente.
             </div>
           </CardContent>
         </Card>
@@ -103,7 +103,7 @@ export default function TenantsPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Building2 className="h-8 w-8" />
-          <h1 className="text-3xl font-bold">Clientes</h1>
+          <h1 className="text-3xl font-bold">Consultorios</h1>
         </div>
         <CreateTenantDialog />
       </div>
@@ -140,7 +140,7 @@ export default function TenantsPage() {
       <Card>
         <CardHeader>
           <CardTitle>
-            Lista de Clientes
+            Lista de Consultorios
             {tenants && (
               <span className="ml-2 text-sm font-normal text-muted-foreground">
                 ({tenants.length} resultados)
@@ -207,7 +207,7 @@ export default function TenantsPage() {
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent color="info">
-                                  <p>Actualizar cliente</p>
+                                  <p>Actualizar consultorio</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -236,14 +236,16 @@ export default function TenantsPage() {
                                   <Button
                                     color="danger"
                                     size="sm"
-                                    onClick={() => handleDelete(tenant.id, tenant.name)}
+                                    onClick={() =>
+                                      handleDelete(tenant.id, tenant.name)
+                                    }
                                     className="h-8 w-8 p-0"
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent color="danger">
-                                  <p>Eliminar cliente</p>
+                                  <p>Eliminar consultorio</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -255,7 +257,7 @@ export default function TenantsPage() {
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8">
                         <div className="text-muted-foreground">
-                          No se encontraron clientes con los filtros
+                          No se encontraron consultorios con los filtros
                           seleccionados.
                         </div>
                       </TableCell>
@@ -274,7 +276,7 @@ export default function TenantsPage() {
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
       />
-      
+
       <DeleteTenantDialog
         tenantId={deleteTenantId}
         tenantName={deleteTenantName}

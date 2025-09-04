@@ -28,37 +28,37 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: "tenants",
-    label: "Clientes",
+    label: "Consultorios",
     href: "/tenants",
     icon: Building2,
-    description: "Gestión de clientes",
+    description: "Gestión de Consultorios",
   },
-  {
-    id: "patients",
-    label: "Pacientes",
-    icon: Users,
-    description: "Gestión de pacientes",
-    children: [
-      {
-        id: "patients-list",
-        label: "Lista de Pacientes",
-        href: "/dashboard/patients",
-        description: "Ver todos los pacientes",
-      },
-      {
-        id: "patients-add",
-        label: "Nuevo Paciente",
-        href: "/dashboard/patients/new",
-        description: "Agregar nuevo paciente",
-      },
-      {
-        id: "patients-appointments",
-        label: "Citas",
-        href: "/dashboard/patients/appointments",
-        description: "Gestionar citas médicas",
-      },
-    ],
-  },
+  // {
+  //   id: "patients",
+  //   label: "Pacientes",
+  //   icon: Users,
+  //   description: "Gestión de pacientes",
+  //   children: [
+  //     {
+  //       id: "patients-list",
+  //       label: "Lista de Pacientes",
+  //       href: "/dashboard/patients",
+  //       description: "Ver todos los pacientes",
+  //     },
+  //     {
+  //       id: "patients-add",
+  //       label: "Nuevo Paciente",
+  //       href: "/dashboard/patients/new",
+  //       description: "Agregar nuevo paciente",
+  //     },
+  //     {
+  //       id: "patients-appointments",
+  //       label: "Citas",
+  //       href: "/dashboard/patients/appointments",
+  //       description: "Gestionar citas médicas",
+  //     },
+  //   ],
+  // },
 
   // {
   //   id: "nutrition",
@@ -86,26 +86,26 @@ export const menuItems: MenuItem[] = [
   //     }
   //   ]
   // },
-  {
-    id: "reports",
-    label: "Reportes",
-    icon: BarChart3,
-    description: "Análisis y reportes",
-    children: [
-      {
-        id: "reports-progress",
-        label: "Progreso Pacientes",
-        href: "/dashboard/reports/progress",
-        description: "Seguimiento del progreso",
-      },
-      {
-        id: "reports-analytics",
-        label: "Análisis",
-        href: "/dashboard/reports/analytics",
-        description: "Métricas y estadísticas",
-      },
-    ],
-  },
+  // {
+  //   id: "reports",
+  //   label: "Reportes",
+  //   icon: BarChart3,
+  //   description: "Análisis y reportes",
+  //   children: [
+  //     {
+  //       id: "reports-progress",
+  //       label: "Progreso Pacientes",
+  //       href: "/dashboard/reports/progress",
+  //       description: "Seguimiento del progreso",
+  //     },
+  //     {
+  //       id: "reports-analytics",
+  //       label: "Análisis",
+  //       href: "/dashboard/reports/analytics",
+  //       description: "Métricas y estadísticas",
+  //     },
+  //   ],
+  // },
 
   // {
   //   id: "settings",

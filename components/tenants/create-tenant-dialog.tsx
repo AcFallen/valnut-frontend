@@ -55,14 +55,14 @@ export function CreateTenantDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Crear Cliente
+          Crear Consultorio
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Crear Nuevo Cliente</DialogTitle>
+          <DialogTitle>Crear Nuevo Consultorio</DialogTitle>
           <DialogDescription>
-            Completa el siguiente formulario para crear un nuevo cliente.
+            Completa el siguiente formulario para crear un nuevo consultorio.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -136,7 +136,7 @@ export function CreateTenantDialog() {
               Cancelar
             </Button>
             <Button type="submit" disabled={createTenantMutation.isPending}>
-              {createTenantMutation.isPending ? "Creando..." : "Crear Cliente"}
+              {createTenantMutation.isPending ? "Creando..." : "Crear Consultorio"}
             </Button>
           </div>
         </form>
