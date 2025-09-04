@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "@/components/session-provider";
 import { QueryProvider } from "@/components/query-provider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,13 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               {children}
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  className: 'text-sm',
+                }}
+              />
             </ThemeProvider>
           </SessionProvider>
         </QueryProvider>

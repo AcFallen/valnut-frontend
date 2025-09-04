@@ -37,6 +37,7 @@ import { CreateTenantDialog } from "@/components/tenants/create-tenant-dialog";
 import { EditTenantDialog } from "@/components/tenants/edit-tenant-dialog";
 import { DeleteTenantDialog } from "@/components/tenants/delete-tenant-dialog";
 import { AssignOwnerDialog } from "@/components/tenants/assign-owner-dialog";
+import { AssignMembershipDialog } from "@/components/tenants/assign-membership-dialog";
 import {
   Building2,
   Filter,
@@ -50,6 +51,7 @@ import {
   Crown,
   Shield,
   Search,
+  CreditCard,
 } from "lucide-react";
 
 const statusMap: Record<
@@ -71,9 +73,11 @@ export default function TenantsPage() {
   const [deleteTenantId, setDeleteTenantId] = useState<string | null>(null);
   const [deleteTenantName, setDeleteTenantName] = useState<string>("");
   const [assignOwnerTenantId, setAssignOwnerTenantId] = useState<string | null>(null);
+  const [assignMembershipTenantId, setAssignMembershipTenantId] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [assignOwnerDialogOpen, setAssignOwnerDialogOpen] = useState(false);
+  const [assignMembershipDialogOpen, setAssignMembershipDialogOpen] = useState(false);
   const [expandedTenants, setExpandedTenants] = useState<Set<string>>(new Set());
 
   const queryParams = {
@@ -100,6 +104,11 @@ export default function TenantsPage() {
   const handleAssignOwner = (id: string) => {
     setAssignOwnerTenantId(id);
     setAssignOwnerDialogOpen(true);
+  };
+
+  const handleAssignMembership = (id: string) => {
+    setAssignMembershipTenantId(id);
+    setAssignMembershipDialogOpen(true);
   };
 
   const toggleExpanded = (tenantId: string) => {
@@ -341,6 +350,24 @@ export default function TenantsPage() {
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button
+                                      color="success"
+                                      size="sm"
+                                      onClick={() => handleAssignMembership(tenant.id)}
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <CreditCard className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent color="success">
+                                    <p>Asignar membresía</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
                                       color="danger"
                                       size="sm"
                                       onClick={() =>
@@ -486,6 +513,12 @@ export default function TenantsPage() {
         tenantId={assignOwnerTenantId}
         open={assignOwnerDialogOpen}
         onOpenChange={setAssignOwnerDialogOpen}
+      />
+
+      <AssignMembershipDialog
+        tenantId={assignMembershipTenantId}
+        open={assignMembershipDialogOpen}
+        onOpenChange={setAssignMembershipDialogOpen}
       />
     </div>
   );
