@@ -22,14 +22,16 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { menuItems, MenuItem } from "@/lib/menu-config";
+import { MenuItem } from "@/lib/menu-config";
 import { useNavbar } from "./navbar-provider";
+import { useFilteredMenu } from "@/hooks/useFilteredMenu";
 import { ModeToggle } from "./toggle-mode";
 
 export function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { isMobileMenuOpen, toggleMobileMenu, closeMobileMenu } = useNavbar();
+  const filteredMenuItems = useFilteredMenu();
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -160,7 +162,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center space-x-4">
             <NavigationMenu>
               <NavigationMenuList className="space-x-1">
-                {menuItems.map(renderNavigationItem)}
+                {filteredMenuItems.map(renderNavigationItem)}
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -221,7 +223,7 @@ export function Navbar() {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t bg-background">
             <div className="space-y-1 px-2 pb-3 pt-2">
-              {menuItems.map((item) => renderMobileMenuItem(item))}
+              {filteredMenuItems.map((item) => renderMobileMenuItem(item))}
             </div>
           </div>
         )}

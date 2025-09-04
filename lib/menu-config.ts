@@ -16,6 +16,7 @@ export interface MenuItem {
   description?: string;
   children?: MenuItem[];
   external?: boolean;
+  allowedUserTypes?: string[];
 }
 
 export const menuItems: MenuItem[] = [
@@ -25,6 +26,7 @@ export const menuItems: MenuItem[] = [
     href: "/dashboard",
     icon: Home,
     description: "Overview and main dashboard",
+    allowedUserTypes: ["system_admin", "tenant_owner", "tenant_user"],
   },
   {
     id: "tenants",
@@ -32,6 +34,7 @@ export const menuItems: MenuItem[] = [
     href: "/tenants",
     icon: Building2,
     description: "Gestión de Consultorios",
+    allowedUserTypes: ["system_admin"],
   },
   // {
   //   id: "patients",
