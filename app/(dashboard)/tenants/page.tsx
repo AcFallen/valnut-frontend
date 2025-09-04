@@ -219,49 +219,49 @@ export default function TenantsPage() {
               <span className="ml-2">Cargando tenants...</span>
             </div>
           ) : (
-            <div className="rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div className="rounded-lg border border-border shadow-sm overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50/50 border-b border-gray-200">
+                  <TableRow className="bg-muted/50 border-b">
                     <TableHead className="w-8"></TableHead>
-                    <TableHead className="font-semibold text-gray-700">Consultorio</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Contacto</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Estado</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Usuarios</TableHead>
-                    <TableHead className="text-center font-semibold text-gray-700">Acciones</TableHead>
+                    <TableHead className="font-semibold">Consultorio</TableHead>
+                    <TableHead className="font-semibold">Contacto</TableHead>
+                    <TableHead className="font-semibold">Estado</TableHead>
+                    <TableHead className="font-semibold">Usuarios</TableHead>
+                    <TableHead className="text-center font-semibold">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {tenants && tenants.length > 0 ? (
                     tenants.map((tenant) => (
                       <React.Fragment key={tenant.id}>
-                        <TableRow className="hover:bg-gray-50/50 border-b border-gray-100">
+                        <TableRow className="hover:bg-primary/5 border-b transition-colors">
                           <TableCell className="w-8">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => toggleExpanded(tenant.id)}
-                              className="h-8 w-8 p-0 hover:bg-gray-100"
+                              className="h-8 w-8 p-0 hover:bg-primary/10"
                             >
                               {expandedTenants.has(tenant.id) ? (
-                                <ChevronDown className="h-4 w-4 text-gray-600" />
+                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
                               ) : (
-                                <ChevronRight className="h-4 w-4 text-gray-600" />
+                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
                               )}
                             </Button>
                           </TableCell>
                           <TableCell className="font-medium">
                             <div className="space-y-1">
-                              <div className="font-semibold text-gray-900">{tenant.name}</div>
-                              <div className="text-sm text-gray-500 truncate max-w-[250px]">
+                              <div className="font-semibold text-foreground">{tenant.name}</div>
+                              <div className="text-sm text-muted-foreground truncate max-w-[250px]">
                                 {tenant.address}
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="space-y-1">
-                              <div className="text-sm font-medium text-gray-900">{tenant.email}</div>
-                              <div className="text-sm text-gray-500">{tenant.phone}</div>
+                              <div className="text-sm font-medium text-foreground">{tenant.email}</div>
+                              <div className="text-sm text-muted-foreground">{tenant.phone}</div>
                             </div>
                           </TableCell>
                           <TableCell>
@@ -274,24 +274,24 @@ export default function TenantsPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <div className="text-sm font-medium text-gray-700">
+                              <div className="text-sm font-medium text-foreground">
                                 {tenant.users.length} usuario{tenant.users.length !== 1 ? 's' : ''}
                               </div>
                               <div className="flex -space-x-1">
                                 {tenant.users.slice(0, 3).map((user) => (
                                   <Avatar
                                     key={user.id}
-                                    className="w-6 h-6 border-2 border-white"
+                                    className="w-6 h-6 border-2 border-background"
                                     title={`${user.profile.firstName} ${user.profile.lastName}`}
                                   >
-                                    <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-xs font-medium text-white">
+                                    <AvatarFallback className="bg-gradient-to-br from-primary/80 to-primary text-xs font-medium text-primary-foreground">
                                       {user.profile.firstName.charAt(0).toUpperCase()}
                                     </AvatarFallback>
                                   </Avatar>
                                 ))}
                                 {tenant.users.length > 3 && (
-                                  <Avatar className="w-6 h-6 border-2 border-white">
-                                    <AvatarFallback className="bg-gray-400 text-xs font-medium text-white">
+                                  <Avatar className="w-6 h-6 border-2 border-background">
+                                    <AvatarFallback className="bg-muted text-xs font-medium text-muted-foreground">
                                       +{tenant.users.length - 3}
                                     </AvatarFallback>
                                   </Avatar>
@@ -362,11 +362,11 @@ export default function TenantsPage() {
                         
                         {/* Expanded row with user details */}
                         {expandedTenants.has(tenant.id) && (
-                          <TableRow className="bg-gray-50/30">
+                          <TableRow className="bg-muted/20">
                             <TableCell colSpan={6} className="p-0">
-                              <div className="px-6 py-4 border-t border-gray-100">
+                              <div className="px-6 py-4 border-t">
                                 <div className="space-y-3">
-                                  <div className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                                  <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-3">
                                     <User className="h-4 w-4" />
                                     Usuarios del Consultorio
                                   </div>
@@ -375,36 +375,36 @@ export default function TenantsPage() {
                                     {tenant.users.map((user) => (
                                       <div 
                                         key={user.id} 
-                                        className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm"
+                                        className="bg-background rounded-lg border border-border p-4 shadow-sm hover:bg-primary/5 transition-colors"
                                       >
                                         <div className="flex items-start justify-between">
                                           <div className="flex items-start gap-3">
                                             <Avatar className="w-10 h-10">
-                                              <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-sm font-semibold text-white">
+                                              <AvatarFallback className="bg-gradient-to-br from-primary/80 to-primary text-sm font-semibold text-primary-foreground">
                                                 {user.profile.firstName.charAt(0).toUpperCase()}{user.profile.lastName.charAt(0).toUpperCase()}
                                               </AvatarFallback>
                                             </Avatar>
                                             
                                             <div className="flex-1 space-y-1">
                                               <div className="flex items-center gap-2">
-                                                <h4 className="font-medium text-gray-900">
+                                                <h4 className="font-medium text-foreground">
                                                   {user.profile.firstName} {user.profile.lastName}
                                                 </h4>
                                                 {getUserTypeIcon(user.userType)}
                                                 {getUserTypeBadge(user.userType)}
                                               </div>
                                               
-                                              <div className="text-sm text-gray-600">
+                                              <div className="text-sm text-muted-foreground">
                                                 {user.profile.email}
                                               </div>
                                               
                                               {user.profile.phone && (
-                                                <div className="text-sm text-gray-600">
+                                                <div className="text-sm text-muted-foreground">
                                                   {user.profile.phone}
                                                 </div>
                                               )}
                                               
-                                              <div className="text-xs text-gray-500">
+                                              <div className="text-xs text-muted-foreground">
                                                 @{user.username}
                                               </div>
                                             </div>
@@ -430,10 +430,10 @@ export default function TenantsPage() {
                                         </div>
                                         
                                         {user.roles.some(role => role.description) && (
-                                          <div className="mt-3 pt-3 border-t border-gray-100">
+                                          <div className="mt-3 pt-3 border-t border-border">
                                             {user.roles.map((role, roleIndex) => (
                                               role.description && (
-                                                <p key={roleIndex} className="text-xs text-gray-500">
+                                                <p key={roleIndex} className="text-xs text-muted-foreground">
                                                   <span className="font-medium">{role.name}:</span> {role.description}
                                                 </p>
                                               )
@@ -453,8 +453,8 @@ export default function TenantsPage() {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-12">
-                        <div className="flex flex-col items-center gap-2 text-gray-500">
-                          <Building2 className="h-8 w-8 text-gray-400" />
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                          <Building2 className="h-8 w-8 text-muted-foreground/60" />
                           <div className="text-sm font-medium">No se encontraron consultorios</div>
                           <div className="text-xs">No hay consultorios que coincidan con los filtros seleccionados.</div>
                         </div>
