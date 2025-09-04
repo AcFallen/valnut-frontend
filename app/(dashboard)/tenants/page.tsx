@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useTenants } from "@/hooks/useTenants";
+import { useDebounce } from "@/hooks/useDebounce";
 import { TenantStatus } from "@/types/tenant";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
@@ -47,6 +49,7 @@ import {
   User,
   Crown,
   Shield,
+  Search,
 } from "lucide-react";
 
 const statusMap: Record<
@@ -62,6 +65,8 @@ export default function TenantsPage() {
   const [statusFilter, setStatusFilter] = useState<TenantStatus | "all">(
     "active"
   );
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 350);
   const [editTenantId, setEditTenantId] = useState<string | null>(null);
   const [deleteTenantId, setDeleteTenantId] = useState<string | null>(null);
   const [deleteTenantName, setDeleteTenantName] = useState<string>("");
@@ -71,7 +76,10 @@ export default function TenantsPage() {
   const [assignOwnerDialogOpen, setAssignOwnerDialogOpen] = useState(false);
   const [expandedTenants, setExpandedTenants] = useState<Set<string>>(new Set());
 
-  const queryParams = statusFilter === "all" ? {} : { status: statusFilter };
+  const queryParams = {
+    ...(statusFilter !== "all" && { status: statusFilter }),
+    ...(debouncedSearchQuery.trim() && { search: debouncedSearchQuery.trim() })
+  };
   const { data: tenants, isLoading, error } = useTenants(queryParams);
 
   const handleStatusChange = (value: string) => {
@@ -162,6 +170,18 @@ export default function TenantsPage() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Buscar por nombre</label>
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Buscar consultorio..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Estado</label>
               <Select value={statusFilter} onValueChange={handleStatusChange}>
@@ -258,7 +278,7 @@ export default function TenantsPage() {
                                 {tenant.users.length} usuario{tenant.users.length !== 1 ? 's' : ''}
                               </div>
                               <div className="flex -space-x-1">
-                                {tenant.users.slice(0, 3).map((user, index) => (
+                                {tenant.users.slice(0, 3).map((user) => (
                                   <Avatar
                                     key={user.id}
                                     className="w-6 h-6 border-2 border-white"
