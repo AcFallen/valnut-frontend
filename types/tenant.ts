@@ -1,4 +1,26 @@
 export type TenantStatus = "active" | "inactive" | "suspended";
+export type UserType = "tenant_owner" | "tenant_user";
+
+export interface UserRole {
+  name: string;
+  description: string;
+  isTenantAdmin: boolean;
+}
+
+export interface UserProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+}
+
+export interface TenantUser {
+  id: string;
+  username: string;
+  userType: UserType;
+  profile: UserProfile;
+  roles: UserRole[];
+}
 
 export interface TenantSettings {
   currency: string;
@@ -13,10 +35,11 @@ export interface Tenant {
   phone: string;
   address: string;
   status: TenantStatus;
-  expirationDate: string | null;
-  settings: TenantSettings;
-  createdAt: string;
-  updatedAt: string;
+  users: TenantUser[];
+  expirationDate?: string | null;
+  settings?: TenantSettings;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Data for creating a new tenant
