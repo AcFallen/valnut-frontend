@@ -36,6 +36,15 @@ export const menuItems: MenuItem[] = [
     description: "Gestión de Consultorios",
     allowedUserTypes: ["system_admin"],
   },
+
+  {
+    id: "settings",
+    label: "Configuración",
+    href: "/settings",
+    icon: Settings,
+    description: "Configuración del sistema",
+    allowedUserTypes: ["tenant_owner"],
+  },
   // {
   //   id: "patients",
   //   label: "Pacientes",
@@ -109,31 +118,4 @@ export const menuItems: MenuItem[] = [
   //     },
   //   ],
   // },
-
-  // {
-  //   id: "settings",
-  //   label: "Configuración",
-  //   icon: Settings,
-  //   description: "Configuración del sistema",
-  //   children: [
-  //     {
-  //       id: "settings-profile",
-  //       label: "Mi Perfil",
-  //       href: "/dashboard/settings/profile",
-  //       description: "Configuración personal"
-  //     },
-  //     {
-  //       id: "settings-clinic",
-  //       label: "Clínica",
-  //       href: "/dashboard/settings/clinic",
-  //       description: "Configuración de la clínica"
-  //     },
-  //     {
-  //       id: "settings-users",
-  //       label: "Usuarios",
-  //       href: "/dashboard/settings/users",
-  //       description: "Gestión de usuarios"
-  //     }
-  //   ]
-  // }
 ];

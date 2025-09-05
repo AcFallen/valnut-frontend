@@ -13,6 +13,13 @@ export default withAuth(
       }
     }
 
+    // Protect /settings route - only tenant_owner can access
+    if (pathname.startsWith("/settings")) {
+      if (token?.userType !== "tenant_owner") {
+        return NextResponse.redirect(new URL("/dashboard", req.url))
+      }
+    }
+
     // Dashboard routes are accessible to all authenticated users
     if (pathname.startsWith("/dashboard")) {
       const allowedUserTypes = ["system_admin", "tenant_owner", "tenant_user"]
@@ -32,6 +39,7 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/(dashboard)/:path*",
-    "/tenants/:path*"
+    "/tenants/:path*",
+    "/settings/:path*"
   ]
 }
