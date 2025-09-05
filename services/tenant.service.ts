@@ -1,6 +1,6 @@
 import apiClient from "@/lib/api-client";
 import { ApiResponse } from "@/types/api";
-import { Tenant, TenantsQueryParams, CreateTenantData } from "@/types/tenant";
+import { Tenant, TenantsQueryParams, CreateTenantData, TenantResponse, TenantUser, UsersResponse } from "@/types/tenant";
 
 export const tenantService = {
   // Get all tenants with optional filters
@@ -57,6 +57,18 @@ export const tenantService = {
   // Assign owner to tenant
   assignTenantOwner: async (id: string, ownerData: { firstName: string; lastName: string; email: string }): Promise<ApiResponse<Tenant>> => {
     const response = await apiClient.post(`/tenants/${id}/owner`, ownerData);
+    return response.data;
+  },
+
+  // Get current tenant data (for settings page)
+  getCurrentTenant: async (): Promise<TenantResponse> => {
+    const response = await apiClient.get('/tenants/me');
+    return response.data;
+  },
+
+  // Get all users in tenant
+  getTenantUsers: async (): Promise<UsersResponse> => {
+    const response = await apiClient.get('/users');
     return response.data;
   }
 };

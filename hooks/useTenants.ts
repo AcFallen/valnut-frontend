@@ -9,6 +9,8 @@ export const tenantQueryKeys = {
   list: (params?: TenantsQueryParams) => [...tenantQueryKeys.lists(), params] as const,
   details: () => [...tenantQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...tenantQueryKeys.details(), id] as const,
+  current: () => [...tenantQueryKeys.all, 'current'] as const,
+  users: () => [...tenantQueryKeys.all, 'users'] as const,
 };
 
 // Get tenants list with filters
@@ -98,5 +100,23 @@ export function useAssignTenantOwner() {
       queryClient.invalidateQueries({ queryKey: tenantQueryKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: tenantQueryKeys.lists() });
     },
+  });
+}
+
+// Get current tenant (for settings)
+export function useCurrentTenant() {
+  return useQuery({
+    queryKey: tenantQueryKeys.current(),
+    queryFn: () => tenantService.getCurrentTenant(),
+    select: (response) => response.data,
+  });
+}
+
+// Get tenant users
+export function useTenantUsers() {
+  return useQuery({
+    queryKey: tenantQueryKeys.users(),
+    queryFn: () => tenantService.getTenantUsers(),
+    select: (response) => response.data,
   });
 }
