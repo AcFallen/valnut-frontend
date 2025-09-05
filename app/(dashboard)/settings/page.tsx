@@ -39,7 +39,7 @@ export default function SettingsPage() {
 
   if (isLoadingTenant) {
     return (
-      <div className="container mx-auto py-6 px-6">
+      <div>
         <div className="mb-8">
           <div className="flex items-center gap-3">
             <Settings className="h-8 w-8 text-primary" />
@@ -67,7 +67,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 px-6">
+    <div>
       <div className="mb-8">
         <div className="flex items-center gap-3">
           <Settings className="h-8 w-8 text-primary" />
