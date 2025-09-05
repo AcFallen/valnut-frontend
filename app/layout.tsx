@@ -41,10 +41,10 @@ export default function RootLayout({
             >
               {children}
               <Toaster
-                position="top-right"
+                position="top-center"
                 toastOptions={{
                   duration: 4000,
-                  className: 'text-sm',
+                  className: "text-md",
                 }}
               />
             </ThemeProvider>
