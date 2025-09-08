@@ -19,6 +19,7 @@ import {
   Phone,
   Users,
   AlertCircle,
+  Plus,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -45,6 +46,7 @@ interface PatientsTableProps {
   currentPage: number;
   search: string;
   onSearchChange: (search: string) => void;
+  onCreatePatient: () => void;
 }
 
 export function PatientsTable({
@@ -57,6 +59,7 @@ export function PatientsTable({
   currentPage,
   search,
   onSearchChange,
+  onCreatePatient,
 }: PatientsTableProps) {
   if (error) {
     return (
@@ -83,15 +86,21 @@ export function PatientsTable({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Lista de Pacientes
-          {data && (
-            <Badge variant="secondary" className="ml-2">
-              {data.total} total
-            </Badge>
-          )}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Lista de Pacientes
+            {data && (
+              <Badge variant="secondary" className="ml-2">
+                {data.total} total
+              </Badge>
+            )}
+          </CardTitle>
+          <Button onClick={onCreatePatient} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Crear Paciente
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         {/* Search Section */}

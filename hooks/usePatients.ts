@@ -1,5 +1,6 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { patientService, PatientsQueryParams } from "@/services/patient.service";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { patientService, PatientsQueryParams, CreatePatientData } from "@/services/patient.service";
+import { toast } from "react-hot-toast";
 
 // Query keys for patients
 export const patientQueryKeys = {
@@ -25,5 +26,32 @@ export function usePatientDetail(id: string | null) {
     queryFn: () => patientService.getPatientById(id!),
     select: (response) => response.data,
     enabled: !!id, // Only fetch when id is provided
+  });
+}
+
+// Create patient mutation
+export function useCreatePatient() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (patientData: CreatePatientData) => patientService.createPatient(patientData),
+    onSuccess: () => {
+      // Invalidate all patient queries to refresh the list
+      queryClient.invalidateQueries({ queryKey: patientQueryKeys.all });
+      toast.success("Paciente creado exitosamente");
+    },
+    onError: (error: any) => {
+      console.error("Error creating patient:", error);
+      
+      // Extract error message from server response
+      const errorMessage = 
+        error?.response?.data?.error || 
+        error?.response?.data?.message || 
+        error?.response?.data?.details?.message ||
+        error?.message ||
+        "Error al crear el paciente";
+      
+      toast.error(errorMessage);
+    },
   });
 }

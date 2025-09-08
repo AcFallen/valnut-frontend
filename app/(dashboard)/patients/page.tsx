@@ -6,11 +6,13 @@ import { usePatients, usePatientDetail } from "@/hooks/usePatients";
 import { useDebounce } from "@/hooks/useDebounce";
 import { PatientsTable } from "@/components/patients/patients-table";
 import { PatientDetailSidebar } from "@/components/patients/patient-detail-sidebar";
+import { CreatePatientDialog } from "@/components/patients/create-patient-dialog";
 
 export default function PatientsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [limit] = useState(10);
 
   const debouncedSearch = useDebounce(search, 500);
@@ -68,6 +70,7 @@ export default function PatientsPage() {
             currentPage={currentPage}
             search={search}
             onSearchChange={setSearch}
+            onCreatePatient={() => setIsCreateDialogOpen(true)}
           />
         </div>
 
@@ -80,6 +83,12 @@ export default function PatientsPage() {
           />
         </div>
       </div>
+
+      {/* Create Patient Dialog */}
+      <CreatePatientDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
     </div>
   );
 }

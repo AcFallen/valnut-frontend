@@ -74,6 +74,19 @@ export interface PatientsQueryParams {
   search?: string;
 }
 
+export interface CreatePatientData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  dateOfBirth?: string;
+  gender?: "male" | "female" | "other";
+  address?: string;
+  medicalHistory?: string;
+  allergies?: string;
+  notes?: string;
+}
+
 export const patientService = {
   // Get paginated patients list
   getPatients: async (params: PatientsQueryParams = {}): Promise<PaginatedPatientsResponse> => {
@@ -90,6 +103,12 @@ export const patientService = {
   // Get patient details by ID
   getPatientById: async (id: string): Promise<PatientDetailResponse> => {
     const response = await apiClient.get(`/patients/${id}`);
+    return response.data;
+  },
+
+  // Create new patient
+  createPatient: async (patientData: CreatePatientData): Promise<ApiResponse<PatientDetail>> => {
+    const response = await apiClient.post('/patients', patientData);
     return response.data;
   }
 };
