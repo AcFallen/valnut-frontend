@@ -73,6 +73,19 @@ export interface TenantSettings {
   timezone?: string;
 }
 
+// User interface for users within tenant data
+export interface TenantUserInList {
+  id: string;
+  username: string;
+  userType: UserType;
+  profile: UserProfile;
+  roles: Array<{
+    name: string;
+    description: string;
+    isTenantAdmin: boolean;
+  }>;
+}
+
 export interface Tenant {
   id: string;
   name: string;
@@ -86,6 +99,7 @@ export interface Tenant {
   updatedAt: string;
   tenantMemberships: TenantMembership[];
   currentMembership: TenantMembership;
+  users: TenantUserInList[];
 }
 
 // Data for creating a new tenant
