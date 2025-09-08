@@ -38,6 +38,14 @@ export const menuItems: MenuItem[] = [
   },
 
   {
+    id: "patients",
+    label: "Pacientes",
+    href: "/patients",
+    icon: Users,
+    description: "Gestión de pacientes",
+    allowedUserTypes: ["tenant_owner", "tenant_user"],
+  },
+  {
     id: "settings",
     label: "Configuración",
     href: "/settings",
