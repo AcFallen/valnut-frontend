@@ -44,3 +44,30 @@ export function useCreateTenantUser() {
     },
   });
 }
+
+// Delete user mutation
+export function useDeleteUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: string) => userService.deleteUser(userId),
+    onSuccess: () => {
+      // Refetch tenant users data to update the list
+      queryClient.invalidateQueries({ queryKey: tenantQueryKeys.users() });
+      toast.success("Usuario eliminado exitosamente");
+    },
+    onError: (error: any) => {
+      console.error("Error deleting user:", error);
+      
+      // Extraer el mensaje de error del servidor
+      const errorMessage = 
+        error?.response?.data?.error || 
+        error?.response?.data?.message || 
+        error?.response?.data?.details?.message ||
+        error?.message ||
+        "Error al eliminar el usuario";
+      
+      toast.error(errorMessage);
+    },
+  });
+}
