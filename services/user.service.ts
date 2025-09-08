@@ -39,5 +39,11 @@ export const userService = {
   createTenantUser: async (userData: CreateTenantUserData): Promise<TenantUserResponse> => {
     const response = await apiClient.post('/users/tenant-user', userData);
     return response.data;
+  },
+
+  // Delete user
+  deleteUser: async (userId: string): Promise<ApiResponse<null>> => {
+    const response = await apiClient.delete(`/users/${userId}`);
+    return response.data;
   }
 };

@@ -28,14 +28,67 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useCurrentTenant, useTenantUsers } from "@/hooks/useTenants";
+import { useDeleteUser } from "@/hooks/useUsers";
 import { CreateUserDialog } from "@/components/settings/create-user-dialog";
+import { DeleteUserButton } from "@/components/settings/delete-user-button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 export default function SettingsPage() {
   const { data: tenant, isLoading: isLoadingTenant } = useCurrentTenant();
   const { data: users, isLoading: isLoadingUsers } = useTenantUsers();
+  const deleteUserMutation = useDeleteUser();
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
+  const [deleteUserDialog, setDeleteUserDialog] = useState<{
+    isOpen: boolean;
+    userId: string | null;
+    userName: string | null;
+  }>({
+    isOpen: false,
+    userId: null,
+    userName: null,
+  });
+
+  const handleDeleteUser = (userId: string, userName: string) => {
+    setDeleteUserDialog({
+      isOpen: true,
+      userId,
+      userName,
+    });
+  };
+
+  const confirmDeleteUser = async () => {
+    if (deleteUserDialog.userId) {
+      try {
+        await deleteUserMutation.mutateAsync(deleteUserDialog.userId);
+        setDeleteUserDialog({
+          isOpen: false,
+          userId: null,
+          userName: null,
+        });
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+      }
+    }
+  };
+
+  const cancelDeleteUser = () => {
+    setDeleteUserDialog({
+      isOpen: false,
+      userId: null,
+      userName: null,
+    });
+  };
 
   if (isLoadingTenant) {
     return (
@@ -314,8 +367,12 @@ export default function SettingsPage() {
                         {user.userRoles.length > 0 && (
                           <div className="flex items-center gap-2">
                             <Shield className="h-3.5 w-3.5 text-gray-400" />
-                            <div className="flex gap-1">
-                              {user.userRoles.map((userRole) => (
+
+                            {user.userRoles.map((userRole) => (
+                              <div
+                                className="flex items-center justify-between gap-1 w-full"
+                                key={userRole.id}
+                              >
                                 <Badge
                                   key={userRole.id}
                                   variant="outline"
@@ -323,8 +380,20 @@ export default function SettingsPage() {
                                 >
                                   {userRole.role.name}
                                 </Badge>
-                              ))}
-                            </div>
+                                {user.userType === "tenant_user" && (
+                                  <div className="flex-shrink-0">
+                                    <DeleteUserButton
+                                      onDelete={() =>
+                                        handleDeleteUser(
+                                          user.id,
+                                          `${user.profile.firstName} ${user.profile.lastName}`
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -367,6 +436,33 @@ export default function SettingsPage() {
         open={isCreateUserDialogOpen}
         onOpenChange={setIsCreateUserDialogOpen}
       />
+
+      <AlertDialog
+        open={deleteUserDialog.isOpen}
+        onOpenChange={(open) => !open && cancelDeleteUser()}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará permanentemente el
+              usuario <strong>{deleteUserDialog.userName}</strong> del sistema.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDeleteUser}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteUser}
+              disabled={deleteUserMutation.isPending}
+              className="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
+            >
+              {deleteUserMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
