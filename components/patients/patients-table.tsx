@@ -23,6 +23,8 @@ import {
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import type { Patient } from "@/services/patient.service";
 
 interface PatientsTableProps {
@@ -41,6 +43,8 @@ interface PatientsTableProps {
   onPatientSelect: (patientId: string) => void;
   onPageChange: (page: number) => void;
   currentPage: number;
+  search: string;
+  onSearchChange: (search: string) => void;
 }
 
 export function PatientsTable({
@@ -51,6 +55,8 @@ export function PatientsTable({
   onPatientSelect,
   onPageChange,
   currentPage,
+  search,
+  onSearchChange,
 }: PatientsTableProps) {
   if (error) {
     return (
@@ -76,7 +82,7 @@ export function PatientsTable({
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
           Lista de Pacientes
@@ -88,12 +94,25 @@ export function PatientsTable({
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
+        {/* Search Section */}
+        <div className="px-6 py-4 border-b bg-muted/30">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar pacientes por nombre o email..."
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-10 bg-background"
+            />
+          </div>
+        </div>
+
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Paciente</TableHead>
-              <TableHead>Contacto</TableHead>
-              <TableHead>Fecha de Registro</TableHead>
+            <TableRow className="border-b">
+              <TableHead className="px-6 py-4 font-semibold">Paciente</TableHead>
+              <TableHead className="px-6 py-4 font-semibold">Contacto</TableHead>
+              <TableHead className="px-6 py-4 font-semibold">Fecha de Registro</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -101,19 +120,19 @@ export function PatientsTable({
               // Loading skeletons
               Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell>
+                  <TableCell className="px-6 py-4">
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-32" />
                       <Skeleton className="h-3 w-24" />
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-6 py-4">
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-40" />
                       <Skeleton className="h-3 w-28" />
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-6 py-4">
                     <Skeleton className="h-4 w-24" />
                   </TableCell>
                 </TableRow>
@@ -124,35 +143,39 @@ export function PatientsTable({
                 <TableRow
                   key={patient.id}
                   className={cn(
-                    "cursor-pointer transition-colors hover:bg-muted/50",
-                    selectedPatientId === patient.id && "bg-muted"
+                    "cursor-pointer transition-colors hover:bg-muted/50 border-b border-border/50",
+                    selectedPatientId === patient.id && "bg-muted/70 hover:bg-muted/70"
                   )}
                   onClick={() => onPatientSelect(patient.id)}
                 >
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">
+                  <TableCell className="px-6 py-4">
+                    <div className="space-y-1">
+                      <div className="font-semibold text-foreground">
                         {patient.firstName} {patient.lastName}
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-xs text-muted-foreground font-mono">
                         ID: {patient.id.split('-')[0]}...
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
+                  <TableCell className="px-6 py-4">
+                    <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm">
-                        <Mail className="h-3 w-3 text-muted-foreground" />
-                        <span className="truncate">{patient.email}</span>
+                        <div className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                          <Mail className="h-2.5 w-2.5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <span className="truncate text-foreground">{patient.email}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Phone className="h-3 w-3" />
-                        <span>{patient.phone}</span>
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-4 h-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                          <Phone className="h-2.5 w-2.5 text-green-600 dark:text-green-400" />
+                        </div>
+                        <span className="text-muted-foreground">{patient.phone}</span>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
+                  <TableCell className="px-6 py-4">
+                    <div className="text-sm text-foreground font-medium">
                       {format(new Date(patient.createdAt), "d MMM yyyy", {
                         locale: es,
                       })}
@@ -163,17 +186,17 @@ export function PatientsTable({
             ) : (
               // No patients found
               <TableRow>
-                <TableCell colSpan={3} className="text-center py-8">
+                <TableCell colSpan={3} className="text-center py-12 px-6">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                      <Users className="h-8 w-8 text-muted-foreground" />
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                      <Users className="h-10 w-10 text-muted-foreground" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-lg">
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-lg text-foreground">
                         No hay pacientes
                       </h3>
-                      <p className="text-muted-foreground mt-1">
-                        No se encontraron pacientes que coincidan con tu búsqueda
+                      <p className="text-muted-foreground text-sm max-w-sm">
+                        No se encontraron pacientes que coincidan con tu búsqueda.
                       </p>
                     </div>
                   </div>
@@ -185,9 +208,15 @@ export function PatientsTable({
 
         {/* Pagination */}
         {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t">
-            <div className="text-sm text-muted-foreground">
-              Página {data.page} de {data.totalPages} ({data.total} pacientes)
+          <div className="flex items-center justify-between px-6 py-4 border-t bg-muted/20">
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-muted-foreground">
+                Mostrando <span className="font-medium text-foreground">{data.data.length}</span> de{" "}
+                <span className="font-medium text-foreground">{data.total}</span> pacientes
+              </div>
+              <Badge variant="outline" className="text-xs">
+                Página {data.page}/{data.totalPages}
+              </Badge>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -195,6 +224,7 @@ export function PatientsTable({
                 size="sm"
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={!data.hasPrev}
+                className="gap-1"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Anterior
@@ -204,6 +234,7 @@ export function PatientsTable({
                 size="sm"
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={!data.hasNext}
+                className="gap-1"
               >
                 Siguiente
                 <ChevronRight className="h-4 w-4" />

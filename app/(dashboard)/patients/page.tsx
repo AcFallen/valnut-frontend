@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Users } from "lucide-react";
 import { usePatients, usePatientDetail } from "@/hooks/usePatients";
 import { useDebounce } from "@/hooks/useDebounce";
 import { PatientsTable } from "@/components/patients/patients-table";
@@ -58,22 +56,7 @@ export default function PatientsPage() {
       {/* Main Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Table */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Search */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar pacientes por nombre o email..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
+        <div className="lg:col-span-2">
           {/* Patients Table */}
           <PatientsTable
             data={patientsData}
@@ -83,6 +66,8 @@ export default function PatientsPage() {
             onPatientSelect={handlePatientSelect}
             onPageChange={handlePageChange}
             currentPage={currentPage}
+            search={search}
+            onSearchChange={setSearch}
           />
         </div>
 
