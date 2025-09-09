@@ -46,6 +46,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useUsersSelect } from "@/hooks/useUsers";
 import type { Appointment } from "@/services/appointment.service";
 
 interface AppointmentsTableProps {
@@ -66,12 +67,14 @@ interface AppointmentsTableProps {
   endDate: string;
   consultationType: string;
   statusFilter: string;
+  nutritionistId: string;
   onPageChange: (page: number) => void;
   onAppointmentDateChange: (date: string) => void;
   onStartDateChange: (date: string) => void;
   onEndDateChange: (date: string) => void;
   onConsultationTypeChange: (type: string) => void;
   onStatusFilterChange: (status: string) => void;
+  onNutritionistIdChange: (nutritionistId: string) => void;
   onCreateAppointment: () => void;
 }
 
@@ -114,15 +117,20 @@ export function AppointmentsTable({
   endDate,
   consultationType,
   statusFilter,
+  nutritionistId,
   onPageChange,
   onAppointmentDateChange,
   onStartDateChange,
   onEndDateChange,
   onConsultationTypeChange,
   onStatusFilterChange,
+  onNutritionistIdChange,
   onCreateAppointment,
 }: AppointmentsTableProps) {
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Fetch nutritionists for filter select
+  const { data: users } = useUsersSelect();
 
   // Helper function to parse date string without timezone issues
   const parseDateString = (dateString: string): Date | undefined => {
@@ -303,6 +311,29 @@ export function AppointmentsTable({
                 </Select>
               </div>
 
+              {/* Nutritionist Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Nutricionista</label>
+                <Select
+                  value={nutritionistId || "all"}
+                  onValueChange={(value) =>
+                    onNutritionistIdChange(value === "all" ? "" : value)
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Todos los nutricionistas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos los nutricionistas</SelectItem>
+                    {users?.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Appointment Date Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Fecha Específica</label>
@@ -422,6 +453,7 @@ export function AppointmentsTable({
                   onClick={() => {
                     onStatusFilterChange("");
                     onConsultationTypeChange("");
+                    onNutritionistIdChange("");
                     onAppointmentDateChange("");
                     onStartDateChange("");
                     onEndDateChange("");

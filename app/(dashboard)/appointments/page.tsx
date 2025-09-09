@@ -3,14 +3,13 @@
 import { useState } from "react";
 import { Calendar, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDebounce } from "@/hooks/useDebounce";
 import { useAppointments } from "@/hooks/useAppointments";
 import { ScheduleAppointmentDialog } from "@/components/appointments/schedule-appointment-dialog";
 import { AppointmentsTable } from "@/components/appointments/appointments-table";
 
 export default function AppointmentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [search, setSearch] = useState("");
+  const [nutritionistId, setNutritionistId] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -19,7 +18,6 @@ export default function AppointmentsPage() {
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [limit] = useState(10);
 
-  const debouncedSearch = useDebounce(search, 500);
 
   const {
     data: appointmentsData,
@@ -28,7 +26,7 @@ export default function AppointmentsPage() {
   } = useAppointments({
     page: currentPage,
     limit,
-    ...(debouncedSearch && { search: debouncedSearch }),
+    ...(nutritionistId && { nutritionistId }),
     ...(appointmentDate && { appointmentDate }),
     ...(startDate && { startDate }),
     ...(endDate && { endDate }),
@@ -40,9 +38,9 @@ export default function AppointmentsPage() {
     setCurrentPage(page);
   };
 
-  const handleSearchChange = (newSearch: string) => {
-    setSearch(newSearch);
-    setCurrentPage(1); // Reset to first page when searching
+  const handleNutritionistIdChange = (id: string) => {
+    setNutritionistId(id);
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
   const handleAppointmentDateChange = (date: string) => {
@@ -98,12 +96,14 @@ export default function AppointmentsPage() {
         endDate={endDate}
         consultationType={consultationType}
         statusFilter={statusFilter}
+        nutritionistId={nutritionistId}
         onPageChange={handlePageChange}
         onAppointmentDateChange={handleAppointmentDateChange}
         onStartDateChange={handleStartDateChange}
         onEndDateChange={handleEndDateChange}
         onConsultationTypeChange={handleConsultationTypeChange}
         onStatusFilterChange={handleStatusFilterChange}
+        onNutritionistIdChange={handleNutritionistIdChange}
         onCreateAppointment={() => setIsScheduleDialogOpen(true)}
       />
 

@@ -80,6 +80,7 @@ export interface AppointmentsQueryParams {
     | "completed"
     | "cancelled"
     | "no_show";
+  nutritionistId?: string;
 }
 
 export interface CreateAppointmentData {
@@ -143,6 +144,8 @@ export const appointmentService = {
     if (params.consultationType)
       searchParams.append("consultationType", params.consultationType);
     if (params.status) searchParams.append("status", params.status);
+    if (params.nutritionistId)
+      searchParams.append("nutritionistId", params.nutritionistId);
 
     const response = await apiClient.get(
       `/appointments?${searchParams.toString()}`
