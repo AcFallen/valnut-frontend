@@ -1,13 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { appointmentService, AppointmentsQueryParams, CreateAppointmentData, UpdateAppointmentData, CalendarQueryParams } from "@/services/appointment.service";
+import {
+  appointmentService,
+  AppointmentsQueryParams,
+  CreateAppointmentData,
+  UpdateAppointmentData,
+  CalendarQueryParams,
+} from "@/services/appointment.service";
 import { toast } from "react-hot-toast";
 
 // Query keys for appointments
 export const appointmentQueryKeys = {
-  all: ['appointments'] as const,
-  list: (params: AppointmentsQueryParams) => [...appointmentQueryKeys.all, 'list', params] as const,
-  detail: (id: string) => [...appointmentQueryKeys.all, 'detail', id] as const,
-  calendar: (params: CalendarQueryParams) => [...appointmentQueryKeys.all, 'calendar', params] as const,
+  all: ["appointments"] as const,
+  list: (params: AppointmentsQueryParams) =>
+    [...appointmentQueryKeys.all, "list", params] as const,
+  detail: (id: string) => [...appointmentQueryKeys.all, "detail", id] as const,
+  calendar: (params: CalendarQueryParams) =>
+    [...appointmentQueryKeys.all, "calendar", params] as const,
 };
 
 // Get paginated appointments with filters
@@ -35,7 +43,8 @@ export function useCreateAppointment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (appointmentData: CreateAppointmentData) => appointmentService.createAppointment(appointmentData),
+    mutationFn: (appointmentData: CreateAppointmentData) =>
+      appointmentService.createAppointment(appointmentData),
     onSuccess: () => {
       // Invalidate all appointment queries to refresh the list
       queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.all });
@@ -43,15 +52,15 @@ export function useCreateAppointment() {
     },
     onError: (error: any) => {
       console.error("Error creating appointment:", error);
-      
+
       // Extract error message from server response
-      const errorMessage = 
-        error?.response?.data?.error || 
-        error?.response?.data?.message || 
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al crear la cita";
-      
+
       toast.error(errorMessage);
     },
   });
@@ -62,25 +71,32 @@ export function useUpdateAppointment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, appointmentData }: { id: string; appointmentData: UpdateAppointmentData }) => 
-      appointmentService.updateAppointment(id, appointmentData),
+    mutationFn: ({
+      id,
+      appointmentData,
+    }: {
+      id: string;
+      appointmentData: UpdateAppointmentData;
+    }) => appointmentService.updateAppointment(id, appointmentData),
     onSuccess: (data, variables) => {
       // Invalidate all appointment queries to refresh the list and details
       queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.all });
-      queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.detail(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: appointmentQueryKeys.detail(variables.id),
+      });
       toast.success("Cita actualizada exitosamente");
     },
     onError: (error: any) => {
       console.error("Error updating appointment:", error);
-      
+
       // Extract error message from server response
-      const errorMessage = 
-        error?.response?.data?.error || 
-        error?.response?.data?.message || 
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al actualizar la cita";
-      
+
       toast.error(errorMessage);
     },
   });
@@ -99,15 +115,15 @@ export function useDeleteAppointment() {
     },
     onError: (error: any) => {
       console.error("Error deleting appointment:", error);
-      
+
       // Extract error message from server response
-      const errorMessage = 
-        error?.response?.data?.error || 
-        error?.response?.data?.message || 
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al eliminar la cita";
-      
+
       toast.error(errorMessage);
     },
   });
@@ -120,5 +136,6 @@ export function useAppointmentCalendar(params: CalendarQueryParams = {}) {
     queryFn: () => appointmentService.getCalendarEvents(params),
     select: (response) => response.data,
     staleTime: 30000, // Consider data fresh for 30 seconds
+    enabled: !!(params.start && params.end), // Only fetch when we have start and end dates
   });
 }

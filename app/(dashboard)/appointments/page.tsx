@@ -3,20 +3,10 @@
 import { useState } from "react";
 import { Calendar, Plus, Table, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  useAppointments,
-  useAppointmentCalendar,
-} from "@/hooks/useAppointments";
+import { useAppointments } from "@/hooks/useAppointments";
 import { ScheduleAppointmentDialog } from "@/components/appointments/schedule-appointment-dialog";
 import { AppointmentsTable } from "@/components/appointments/appointments-table";
 import { AppointmentsCalendar } from "@/components/appointments/appointments-calendar";
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-} from "date-fns";
 
 export default function AppointmentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,12 +20,6 @@ export default function AppointmentsPage() {
   const [limit] = useState(10);
   const [view, setView] = useState<"table" | "calendar">("table");
 
-  // Calendar date range - current week from Monday to Sunday
-  const today = new Date();
-  const rangeStart = startOfWeek(today, { weekStartsOn: 1 }); // Start of this week (Monday)
-  const rangeEnd = endOfWeek(today, { weekStartsOn: 1 }); // End of this week (Sunday)
-  const calendarStart = format(rangeStart, "yyyy-MM-dd");
-  const calendarEnd = format(rangeEnd, "yyyy-MM-dd");
 
   const {
     data: appointmentsData,
@@ -50,17 +34,6 @@ export default function AppointmentsPage() {
     ...(endDate && { endDate }),
     ...(consultationType && { consultationType: consultationType as any }),
     ...(statusFilter && { status: statusFilter as any }),
-  });
-
-  // Calendar events
-  const {
-    data: calendarEvents,
-    isLoading: isLoadingCalendar,
-    error: calendarError,
-  } = useAppointmentCalendar({
-    start: calendarStart,
-    end: calendarEnd,
-    ...(nutritionistId && { nutritionistId }),
   });
 
   const handlePageChange = (page: number) => {
@@ -158,18 +131,13 @@ export default function AppointmentsPage() {
         />
       ) : (
         <AppointmentsCalendar
-          events={calendarEvents || []}
-          isLoading={isLoadingCalendar}
           nutritionistId={nutritionistId}
           onNutritionistIdChange={handleNutritionistIdChange}
           onCreateAppointment={() => setIsScheduleDialogOpen(true)}
           onDateSelect={(selectInfo: any) => {
-            // When user selects a date in calendar, open appointment dialog
-            // You can also set the selected date in the dialog
             setIsScheduleDialogOpen(true);
           }}
           onEventClick={(clickInfo: any) => {
-            // Handle appointment click - maybe show details or edit dialog
             console.log("Event clicked:", clickInfo.event);
           }}
         />

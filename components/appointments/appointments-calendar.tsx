@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useUsersSelect } from "@/hooks/useUsers";
+import { useAppointmentCalendar } from "@/hooks/useAppointments";
 import {
   Select,
   SelectContent,
@@ -25,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import "./calendar-styles.css";
+import { format, startOfWeek, endOfWeek } from "date-fns";
 
 interface CalendarEvent {
   id: string;
@@ -49,8 +51,6 @@ interface CalendarEvent {
 }
 
 interface AppointmentsCalendarProps {
-  events: CalendarEvent[];
-  isLoading: boolean;
   nutritionistId?: string;
   onDateSelect?: (selectInfo: any) => void;
   onEventClick?: (clickInfo: any) => void;
@@ -59,7 +59,6 @@ interface AppointmentsCalendarProps {
   onCreateAppointment?: () => void;
   className?: string;
 }
-
 
 const statusLabels = {
   scheduled: "Programada",
@@ -71,8 +70,6 @@ const statusLabels = {
 };
 
 export function AppointmentsCalendar({
-  events,
-  isLoading,
   nutritionistId,
   onDateSelect,
   onEventClick,
@@ -84,9 +81,32 @@ export function AppointmentsCalendar({
   const [view, setView] = useState("timeGridWeek");
   const calendarRef = useRef<FullCalendar>(null);
 
+  // Internal date range states
+  const [calendarStart, setCalendarStart] = useState("");
+  const [calendarEnd, setCalendarEnd] = useState("");
+
+  // Initialize calendar range on mount
+  useEffect(() => {
+    const today = new Date();
+    const rangeStart = startOfWeek(today, { weekStartsOn: 1 });
+    const rangeEnd = endOfWeek(today, { weekStartsOn: 1 });
+    setCalendarStart(format(rangeStart, "yyyy-MM-dd"));
+    setCalendarEnd(format(rangeEnd, "yyyy-MM-dd"));
+  }, []);
+
+  // Fetch calendar events internally
+  const {
+    data: events,
+    isLoading,
+    error,
+  } = useAppointmentCalendar({
+    start: calendarStart,
+    end: calendarEnd,
+    ...(nutritionistId && { nutritionistId }),
+  });
+
   // Fetch nutritionists for filter
   const { data: users } = useUsersSelect();
-
 
   // Update calendar view when state changes - use setTimeout to avoid flushSync error
   useEffect(() => {
@@ -100,14 +120,33 @@ export function AppointmentsCalendar({
     }
   }, [view]);
 
-  // Navigate to first event date when events are loaded - use setTimeout to avoid flushSync error
+  // Navigate to first event date only on initial load - use ref to track if already initialized
+  const hasNavigatedToFirstEvent = useRef(false);
+  const isInitialLoad = useRef(true);
+  const lastKnownDateRange = useRef<{ start: string; end: string } | null>(
+    null
+  );
+
   useEffect(() => {
-    if (calendarRef.current && events && events.length > 0) {
+    if (
+      calendarRef.current &&
+      events &&
+      events.length > 0 &&
+      !hasNavigatedToFirstEvent.current &&
+      isInitialLoad.current
+    ) {
       setTimeout(() => {
-        if (calendarRef.current && events && events.length > 0) {
+        if (
+          calendarRef.current &&
+          events &&
+          events.length > 0 &&
+          !hasNavigatedToFirstEvent.current &&
+          isInitialLoad.current
+        ) {
           const calendarApi = calendarRef.current.getApi();
           const firstEventDate = new Date(events[0].start);
           calendarApi.gotoDate(firstEventDate);
+          hasNavigatedToFirstEvent.current = true;
         }
       }, 100);
     }
@@ -134,6 +173,33 @@ export function AppointmentsCalendar({
     [onEventChange]
   );
 
+  const handleDatesSet = useCallback(
+    (dateInfo: any) => {
+      const start = format(new Date(dateInfo.startStr), "yyyy-MM-dd");
+      const end = format(new Date(dateInfo.endStr), "yyyy-MM-dd");
+
+      // Check if this is a manual navigation (different from last known range)
+      const lastRange = lastKnownDateRange.current;
+      const isManualNavigation =
+        lastRange && (lastRange.start !== start || lastRange.end !== end);
+
+      // Update last known range
+      lastKnownDateRange.current = { start, end };
+
+      // Mark that user has started navigating manually if this is a manual change
+      if (isManualNavigation) {
+        isInitialLoad.current = false;
+      }
+
+      // Update internal date range to fetch new data
+      if (calendarStart !== start || calendarEnd !== end) {
+        setCalendarStart(start);
+        setCalendarEnd(end);
+      }
+    },
+    [calendarStart, calendarEnd]
+  );
+
   const eventContent = (eventInfo: any) => {
     const { extendedProps } = eventInfo.event;
     return (
@@ -149,16 +215,24 @@ export function AppointmentsCalendar({
               </div>
             </div>
           </TooltipTrigger>
-          <TooltipContent 
-            side="top" 
+          <TooltipContent
+            side="top"
             className="bg-background border border-border text-foreground shadow-md p-2 text-xs max-w-xs"
           >
             <div className="space-y-1">
               <div className="font-medium">{extendedProps.patientName}</div>
-              <div className="text-muted-foreground">{extendedProps.nutritionistName}</div>
-              <div className="text-muted-foreground">{extendedProps.duration} min</div>
               <div className="text-muted-foreground">
-                {statusLabels[extendedProps.status as keyof typeof statusLabels]}
+                {extendedProps.nutritionistName}
+              </div>
+              <div className="text-muted-foreground">
+                {extendedProps.duration} min
+              </div>
+              <div className="text-muted-foreground">
+                {
+                  statusLabels[
+                    extendedProps.status as keyof typeof statusLabels
+                  ]
+                }
               </div>
             </div>
           </TooltipContent>
@@ -166,23 +240,6 @@ export function AppointmentsCalendar({
       </TooltipProvider>
     );
   };
-
-  if (isLoading) {
-    return (
-      <Card className={cn("w-full", className)}>
-        <CardContent className="p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-muted rounded w-1/3"></div>
-            <div className="grid grid-cols-7 gap-2">
-              {Array.from({ length: 35 }).map((_, i) => (
-                <div key={i} className="h-20 bg-muted rounded"></div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card className={cn("w-full", className)}>
@@ -250,40 +307,63 @@ export function AppointmentsCalendar({
             </div>
           </div>
         )}
-        
+
         {/* Color Legend */}
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground pb-3 border-b">
           <span className="font-medium">Estados:</span>
           <div className="flex items-center gap-1">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#3b82f6' }}></div>
+            <div
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: "#3b82f6" }}
+            ></div>
             <span>Programada</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#059669' }}></div>
+            <div
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: "#059669" }}
+            ></div>
             <span>Confirmada</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#f59e0b' }}></div>
+            <div
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: "#f59e0b" }}
+            ></div>
             <span>En progreso</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#22c55e' }}></div>
+            <div
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: "#22c55e" }}
+            ></div>
             <span>Completada</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#dc2626' }}></div>
+            <div
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: "#dc2626" }}
+            ></div>
             <span>Cancelada</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#64748b' }}></div>
+            <div
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: "#64748b" }}
+            ></div>
             <span>No asistió</span>
           </div>
         </div>
-        
+
         <div className="calendar-container">
           <FullCalendar
             ref={calendarRef}
-            plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+            plugins={[
+              dayGridPlugin,
+              timeGridPlugin,
+              listPlugin,
+              interactionPlugin,
+            ]}
             headerToolbar={{
               left: "prev,next today",
               center: "title",
@@ -291,7 +371,7 @@ export function AppointmentsCalendar({
             }}
             initialView={view}
             locale="es"
-            firstDay={1} // Lunes como primer día de la semana
+            firstDay={1}
             buttonText={{
               today: "Hoy",
               month: "Mes",
@@ -299,7 +379,7 @@ export function AppointmentsCalendar({
               day: "Día",
               list: "Lista",
             }}
-            events={events}
+            events={events || []}
             editable={false}
             selectable={!!onDateSelect}
             selectMirror={true}
@@ -309,6 +389,7 @@ export function AppointmentsCalendar({
             eventClick={handleEventClick}
             eventChange={handleEventChange}
             eventContent={eventContent}
+            datesSet={handleDatesSet}
             height="auto"
             slotMinTime="07:00:00"
             slotMaxTime="22:00:00"
