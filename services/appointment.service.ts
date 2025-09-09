@@ -83,6 +83,42 @@ export interface AppointmentsQueryParams {
   nutritionistId?: string;
 }
 
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  allDay: boolean;
+  backgroundColor: string;
+  borderColor: string;
+  textColor: string;
+  extendedProps: {
+    appointmentId: string;
+    patientId: string;
+    patientName: string;
+    nutritionistId: string;
+    nutritionistName: string;
+    consultationType: string;
+    status: string;
+    notes?: string;
+    duration: number;
+  };
+}
+
+export interface CalendarEventsResponse {
+  success: boolean;
+  data: CalendarEvent[];
+  code: number;
+  message: string;
+}
+
+export interface CalendarQueryParams {
+  start?: string; // YYYY-MM-DD
+  end?: string; // YYYY-MM-DD
+  nutritionistId?: string;
+  patientId?: string;
+}
+
 export interface CreateAppointmentData {
   appointmentDate: string;
   appointmentTime: string;
@@ -185,5 +221,71 @@ export const appointmentService = {
   deleteAppointment: async (id: string): Promise<ApiResponse<void>> => {
     const response = await apiClient.delete(`/appointments/${id}`);
     return response.data;
+  },
+
+  // Get calendar events
+  getCalendarEvents: async (
+    params: CalendarQueryParams = {}
+  ): Promise<CalendarEventsResponse> => {
+    const searchParams = new URLSearchParams();
+
+    if (params.start) searchParams.append("start", params.start);
+    if (params.end) searchParams.append("end", params.end);
+    if (params.nutritionistId)
+      searchParams.append("nutritionistId", params.nutritionistId);
+    if (params.patientId) searchParams.append("patientId", params.patientId);
+
+    const response = await apiClient.get(
+      `/appointments/calendar?${searchParams.toString()}`
+    );
+    
+    // Transform appointments to calendar events
+    const appointments = response.data.data;
+    const transformedEvents = appointments.map((appointment: Appointment) => {
+      const startDateTime = `${appointment.appointmentDate}T${appointment.appointmentTime}`;
+      const startDate = new Date(startDateTime);
+      const endDate = new Date(startDate.getTime() + appointment.durationMinutes * 60000);
+      
+      // Status-based colors with intuitive color coding
+      const statusColors = {
+        scheduled: { bg: '#3b82f6', border: '#1d4ed8' },     // Azul - Programada
+        confirmed: { bg: '#059669', border: '#047857' },     // Verde oscuro - Confirmada
+        in_progress: { bg: '#f59e0b', border: '#d97706' },   // Amarillo/Naranja - En progreso
+        completed: { bg: '#22c55e', border: '#15803d' },     // Verde claro - Completada
+        cancelled: { bg: '#dc2626', border: '#b91c1c' },     // Rojo - Cancelada
+        no_show: { bg: '#64748b', border: '#475569' }        // Gris azulado - No asistió
+      };
+
+      const colors = statusColors[appointment.status as keyof typeof statusColors] || statusColors.scheduled;
+
+      return {
+        id: appointment.id,
+        title: `${appointment.patient.firstName} ${appointment.patient.lastName}`,
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
+        allDay: false,
+        backgroundColor: colors.bg,
+        borderColor: colors.border,
+        textColor: '#ffffff',
+        extendedProps: {
+          appointmentId: appointment.id,
+          patientId: appointment.patient.id,
+          patientName: `${appointment.patient.firstName} ${appointment.patient.lastName}`,
+          nutritionistId: appointment.nutritionist.id,
+          nutritionistName: `${appointment.nutritionist.profile.firstName} ${appointment.nutritionist.profile.lastName}`,
+          consultationType: appointment.consultationType,
+          status: appointment.status,
+          notes: appointment.notes || '',
+          duration: appointment.durationMinutes
+        }
+      };
+    });
+
+    return {
+      success: response.data.success,
+      data: transformedEvents,
+      code: response.data.code,
+      message: response.data.message
+    };
   },
 };

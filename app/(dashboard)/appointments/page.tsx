@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, Plus } from "lucide-react";
+import { Calendar, Plus, Table, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAppointments } from "@/hooks/useAppointments";
+import { useAppointments, useAppointmentCalendar } from "@/hooks/useAppointments";
 import { ScheduleAppointmentDialog } from "@/components/appointments/schedule-appointment-dialog";
 import { AppointmentsTable } from "@/components/appointments/appointments-table";
+import { AppointmentsCalendar } from "@/components/appointments/appointments-calendar";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 
 export default function AppointmentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,6 +19,14 @@ export default function AppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [limit] = useState(10);
+  const [view, setView] = useState<"table" | "calendar">("table");
+
+  // Calendar date range - expanded to show more events
+  const today = new Date();
+  const rangeStart = new Date(today.getFullYear() - 1, 0, 1); // Start of last year
+  const rangeEnd = new Date(today.getFullYear() + 1, 11, 31); // End of next year
+  const calendarStart = format(rangeStart, "yyyy-MM-dd");
+  const calendarEnd = format(rangeEnd, "yyyy-MM-dd");
 
 
   const {
@@ -32,6 +42,17 @@ export default function AppointmentsPage() {
     ...(endDate && { endDate }),
     ...(consultationType && { consultationType: consultationType as any }),
     ...(statusFilter && { status: statusFilter as any }),
+  });
+
+  // Calendar events
+  const {
+    data: calendarEvents,
+    isLoading: isLoadingCalendar,
+    error: calendarError,
+  } = useAppointmentCalendar({
+    start: calendarStart,
+    end: calendarEnd,
+    ...(nutritionistId && { nutritionistId }),
   });
 
   const handlePageChange = (page: number) => {
@@ -83,29 +104,68 @@ export default function AppointmentsPage() {
             </p>
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={view === "table" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setView("table")}
+            className="flex items-center gap-2"
+          >
+            <Table className="h-4 w-4" />
+            Tabla
+          </Button>
+          <Button
+            variant={view === "calendar" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setView("calendar")}
+            className="flex items-center gap-2"
+          >
+            <Grid className="h-4 w-4" />
+            Calendario
+          </Button>
+        </div>
       </div>
 
-      {/* Appointments Table */}
-      <AppointmentsTable
-        data={appointmentsData}
-        isLoading={isLoadingAppointments}
-        error={appointmentsError}
-        currentPage={currentPage}
-        appointmentDate={appointmentDate}
-        startDate={startDate}
-        endDate={endDate}
-        consultationType={consultationType}
-        statusFilter={statusFilter}
-        nutritionistId={nutritionistId}
-        onPageChange={handlePageChange}
-        onAppointmentDateChange={handleAppointmentDateChange}
-        onStartDateChange={handleStartDateChange}
-        onEndDateChange={handleEndDateChange}
-        onConsultationTypeChange={handleConsultationTypeChange}
-        onStatusFilterChange={handleStatusFilterChange}
-        onNutritionistIdChange={handleNutritionistIdChange}
-        onCreateAppointment={() => setIsScheduleDialogOpen(true)}
-      />
+      {/* Content based on view */}
+      {view === "table" ? (
+        <AppointmentsTable
+          data={appointmentsData}
+          isLoading={isLoadingAppointments}
+          error={appointmentsError}
+          currentPage={currentPage}
+          appointmentDate={appointmentDate}
+          startDate={startDate}
+          endDate={endDate}
+          consultationType={consultationType}
+          statusFilter={statusFilter}
+          nutritionistId={nutritionistId}
+          onPageChange={handlePageChange}
+          onAppointmentDateChange={handleAppointmentDateChange}
+          onStartDateChange={handleStartDateChange}
+          onEndDateChange={handleEndDateChange}
+          onConsultationTypeChange={handleConsultationTypeChange}
+          onStatusFilterChange={handleStatusFilterChange}
+          onNutritionistIdChange={handleNutritionistIdChange}
+          onCreateAppointment={() => setIsScheduleDialogOpen(true)}
+        />
+      ) : (
+        <AppointmentsCalendar
+          events={calendarEvents || []}
+          isLoading={isLoadingCalendar}
+          nutritionistId={nutritionistId}
+          onNutritionistIdChange={handleNutritionistIdChange}
+          onCreateAppointment={() => setIsScheduleDialogOpen(true)}
+          onDateSelect={(selectInfo: any) => {
+            // When user selects a date in calendar, open appointment dialog
+            // You can also set the selected date in the dialog
+            setIsScheduleDialogOpen(true);
+          }}
+          onEventClick={(clickInfo: any) => {
+            // Handle appointment click - maybe show details or edit dialog
+            console.log("Event clicked:", clickInfo.event);
+          }}
+        />
+      )}
 
       {/* Schedule Appointment Dialog */}
       <ScheduleAppointmentDialog

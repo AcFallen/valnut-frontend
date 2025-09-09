@@ -1,0 +1,104 @@
+/* FullCalendar Styles for Dark/Light Theme Support */
+
+.calendar-container .fc {
+  @apply text-foreground;
+}
+
+.calendar-container .fc-theme-standard .fc-list {
+  @apply border-border;
+}
+
+.calendar-container .fc-theme-standard td,
+.calendar-container .fc-theme-standard th {
+  @apply border-border;
+}
+
+.calendar-container .fc-theme-standard .fc-scrollgrid {
+  @apply border-border;
+}
+
+.calendar-container .fc-col-header-cell {
+  @apply bg-muted/50 text-muted-foreground font-medium;
+}
+
+.calendar-container .fc-daygrid-day {
+  @apply bg-background;
+}
+
+.calendar-container .fc-daygrid-day:hover {
+  @apply bg-muted/50;
+}
+
+.calendar-container .fc-day-today {
+  @apply bg-primary/10 !important;
+}
+
+.calendar-container .fc-button-primary {
+  @apply bg-primary border-primary text-primary-foreground hover:bg-primary/90;
+}
+
+.calendar-container .fc-button-primary:not(:disabled):active,
+.calendar-container .fc-button-primary:not(:disabled).fc-button-active {
+  @apply bg-primary/90 border-primary;
+}
+
+.calendar-container .fc-toolbar-title {
+  @apply text-xl font-semibold text-foreground;
+}
+
+.calendar-container .fc-event {
+  @apply border-0 rounded-md text-sm font-medium;
+}
+
+.calendar-container .fc-event:hover {
+  @apply opacity-90;
+}
+
+.calendar-container .fc-list-event:hover {
+  @apply bg-muted/50;
+}
+
+.calendar-container .fc-list-event-title {
+  @apply text-foreground;
+}
+
+.calendar-container .fc-list-event-time {
+  @apply text-muted-foreground;
+}
+
+.calendar-container .fc-more-link {
+  @apply text-primary hover:text-primary/90;
+}
+
+.calendar-container .fc-popover {
+  @apply bg-background border-border shadow-lg rounded-lg;
+}
+
+.calendar-container .fc-popover-title {
+  @apply bg-muted/50 text-foreground font-medium;
+}
+
+/* Timeline and current time indicator */
+.calendar-container .fc-now-indicator-line {
+  @apply border-primary;
+}
+
+.calendar-container .fc-now-indicator-arrow {
+  @apply border-primary;
+}
+
+/* Business hours styling */
+.calendar-container .fc-non-business {
+  @apply bg-muted/30;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .calendar-container .fc-toolbar {
+    @apply flex-col gap-2;
+  }
+  
+  .calendar-container .fc-toolbar-chunk {
+    @apply flex justify-center;
+  }
+}

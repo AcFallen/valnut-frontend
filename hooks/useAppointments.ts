@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { appointmentService, AppointmentsQueryParams, CreateAppointmentData, UpdateAppointmentData } from "@/services/appointment.service";
+import { appointmentService, AppointmentsQueryParams, CreateAppointmentData, UpdateAppointmentData, CalendarQueryParams } from "@/services/appointment.service";
 import { toast } from "react-hot-toast";
 
 // Query keys for appointments
@@ -7,6 +7,7 @@ export const appointmentQueryKeys = {
   all: ['appointments'] as const,
   list: (params: AppointmentsQueryParams) => [...appointmentQueryKeys.all, 'list', params] as const,
   detail: (id: string) => [...appointmentQueryKeys.all, 'detail', id] as const,
+  calendar: (params: CalendarQueryParams) => [...appointmentQueryKeys.all, 'calendar', params] as const,
 };
 
 // Get paginated appointments with filters
@@ -109,5 +110,15 @@ export function useDeleteAppointment() {
       
       toast.error(errorMessage);
     },
+  });
+}
+
+// Get calendar events
+export function useAppointmentCalendar(params: CalendarQueryParams = {}) {
+  return useQuery({
+    queryKey: appointmentQueryKeys.calendar(params),
+    queryFn: () => appointmentService.getCalendarEvents(params),
+    select: (response) => response.data,
+    staleTime: 30000, // Consider data fresh for 30 seconds
   });
 }
