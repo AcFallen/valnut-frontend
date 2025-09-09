@@ -10,12 +10,6 @@ import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useUsersSelect } from "@/hooks/useUsers";
 import { useAppointmentCalendar } from "@/hooks/useAppointments";
@@ -61,15 +55,6 @@ interface AppointmentsCalendarProps {
   className?: string;
 }
 
-const statusLabels = {
-  scheduled: "Programada",
-  confirmed: "Confirmada",
-  in_progress: "En progreso",
-  completed: "Completada",
-  cancelled: "Cancelada",
-  no_show: "No asistió",
-  rescheduled: "Reagendada",
-};
 
 export function AppointmentsCalendar({
   nutritionistId,
@@ -98,11 +83,7 @@ export function AppointmentsCalendar({
   }, []);
 
   // Fetch calendar events internally
-  const {
-    data: events,
-    isLoading,
-    error,
-  } = useAppointmentCalendar({
+  const { data: events } = useAppointmentCalendar({
     start: calendarStart,
     end: calendarEnd,
     ...(nutritionistId && { nutritionistId }),
