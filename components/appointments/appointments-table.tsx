@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { format, parse } from "date-fns";
+import { useState, useEffect } from "react";
+import { format, parse, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import {
   Calendar,
@@ -43,6 +43,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import type { Appointment } from "@/services/appointment.service";
 
 interface AppointmentsTableProps {
@@ -85,9 +92,12 @@ const statusLabels = {
 
 const statusColors = {
   scheduled: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  confirmed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  in_progress: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  completed: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+  confirmed:
+    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  in_progress:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  completed:
+    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
   cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
   no_show: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
 };
@@ -122,6 +132,43 @@ export function AppointmentsTable({
 }: AppointmentsTableProps) {
   const [showFilters, setShowFilters] = useState(false);
 
+  // Helper function to parse date string without timezone issues
+  const parseDateString = (dateString: string): Date | undefined => {
+    if (!dateString) return undefined;
+
+    // For YYYY-MM-DD format, create date directly without timezone conversion
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [year, month, day] = dateString.split("-").map(Number);
+      return new Date(year, month - 1, day); // month is 0-indexed
+    }
+
+    return undefined;
+  };
+
+  // Date states for calendar pickers
+  const [appointmentDateValue, setAppointmentDateValue] = useState<
+    Date | undefined
+  >(parseDateString(appointmentDate));
+  const [startDateValue, setStartDateValue] = useState<Date | undefined>(
+    parseDateString(startDate)
+  );
+  const [endDateValue, setEndDateValue] = useState<Date | undefined>(
+    parseDateString(endDate)
+  );
+
+  // Sync local date states with props
+  useEffect(() => {
+    setAppointmentDateValue(parseDateString(appointmentDate));
+  }, [appointmentDate]);
+
+  useEffect(() => {
+    setStartDateValue(parseDateString(startDate));
+  }, [startDate]);
+
+  useEffect(() => {
+    setEndDateValue(parseDateString(endDate));
+  }, [endDate]);
+
   const formatTime = (timeString: string) => {
     try {
       const time = parse(timeString, "HH:mm:ss", new Date());
@@ -133,7 +180,15 @@ export function AppointmentsTable({
 
   const formatDate = (dateString: string) => {
     try {
-      const date = new Date(dateString);
+      // Parse the date string as-is without timezone conversion
+      // If it's in YYYY-MM-DD format, parse it directly
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = dateString.split("-").map(Number);
+        const date = new Date(year, month - 1, day); // month is 0-indexed
+        return format(date, "d MMM yyyy", { locale: es });
+      }
+      // If it's a full ISO string, use parseISO
+      const date = parseISO(dateString);
       return format(date, "d MMM yyyy", { locale: es });
     } catch {
       return dateString;
@@ -149,7 +204,9 @@ export function AppointmentsTable({
               <Calendar className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-lg">Error al cargar las citas</h3>
+              <h3 className="font-semibold text-lg">
+                Error al cargar las citas
+              </h3>
               <p className="text-muted-foreground mt-1">
                 Ha ocurrido un error al cargar las citas. Intenta de nuevo.
               </p>
@@ -219,8 +276,13 @@ export function AppointmentsTable({
               {/* Status Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Estado</label>
-                <Select value={statusFilter || "all"} onValueChange={(value) => onStatusFilterChange(value === "all" ? "" : value)}>
-                  <SelectTrigger>
+                <Select
+                  value={statusFilter || "all"}
+                  onValueChange={(value) =>
+                    onStatusFilterChange(value === "all" ? "" : value)
+                  }
+                >
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Todos los estados" />
                   </SelectTrigger>
                   <SelectContent>
@@ -238,16 +300,25 @@ export function AppointmentsTable({
               {/* Consultation Type Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Tipo de Consulta</label>
-                <Select value={consultationType || "all"} onValueChange={(value) => onConsultationTypeChange(value === "all" ? "" : value)}>
-                  <SelectTrigger>
+                <Select
+                  value={consultationType || "all"}
+                  onValueChange={(value) =>
+                    onConsultationTypeChange(value === "all" ? "" : value)
+                  }
+                >
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Todos los tipos" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos los tipos</SelectItem>
                     <SelectItem value="initial">Consulta Inicial</SelectItem>
                     <SelectItem value="followup">Seguimiento</SelectItem>
-                    <SelectItem value="nutritional_plan">Plan Nutricional</SelectItem>
-                    <SelectItem value="medical_checkup">Revisión Médica</SelectItem>
+                    <SelectItem value="nutritional_plan">
+                      Plan Nutricional
+                    </SelectItem>
+                    <SelectItem value="medical_checkup">
+                      Revisión Médica
+                    </SelectItem>
                     <SelectItem value="emergency">Emergencia</SelectItem>
                   </SelectContent>
                 </Select>
@@ -256,41 +327,118 @@ export function AppointmentsTable({
               {/* Appointment Date Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Fecha Específica</label>
-                <Input
-                  type="date"
-                  value={appointmentDate}
-                  onChange={(e) => onAppointmentDateChange(e.target.value)}
-                  placeholder="Seleccionar fecha"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !appointmentDateValue && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {appointmentDateValue
+                        ? format(
+                            appointmentDateValue,
+                            "d 'de' MMMM 'de' yyyy",
+                            { locale: es }
+                          )
+                        : "Seleccionar fecha"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={appointmentDateValue}
+                      onSelect={(date) => {
+                        setAppointmentDateValue(date);
+                        onAppointmentDateChange(
+                          date ? format(date, "yyyy-MM-dd") : ""
+                        );
+                      }}
+                      captionLayout="dropdown"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Start Date Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Fecha Desde</label>
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => onStartDateChange(e.target.value)}
-                  placeholder="Fecha de inicio"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !startDateValue && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {startDateValue
+                        ? format(startDateValue, "d 'de' MMMM 'de' yyyy", {
+                            locale: es,
+                          })
+                        : "Fecha de inicio"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={startDateValue}
+                      onSelect={(date) => {
+                        setStartDateValue(date);
+                        onStartDateChange(
+                          date ? format(date, "yyyy-MM-dd") : ""
+                        );
+                      }}
+                      captionLayout="dropdown"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* End Date Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Fecha Hasta</label>
-                <Input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => onEndDateChange(e.target.value)}
-                  placeholder="Fecha de fin"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !endDateValue && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {endDateValue
+                        ? format(endDateValue, "d 'de' MMMM 'de' yyyy", {
+                            locale: es,
+                          })
+                        : "Fecha de fin"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={endDateValue}
+                      onSelect={(date) => {
+                        setEndDateValue(date);
+                        onEndDateChange(date ? format(date, "yyyy-MM-dd") : "");
+                      }}
+                      captionLayout="dropdown"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Clear Filters Button */}
               <div className="space-y-2">
-                <label className="text-sm font-medium invisible">Acciones</label>
-                <Button 
-                  variant="outline" 
+                <label className="text-sm font-medium invisible">
+                  Acciones
+                </label>
+                <Button
+                  variant="outline"
                   className="w-full"
                   onClick={() => {
                     onStatusFilterChange("");
@@ -298,6 +446,10 @@ export function AppointmentsTable({
                     onAppointmentDateChange("");
                     onStartDateChange("");
                     onEndDateChange("");
+                    // Reset local date states
+                    setAppointmentDateValue(undefined);
+                    setStartDateValue(undefined);
+                    setEndDateValue(undefined);
                   }}
                 >
                   Limpiar Filtros
@@ -387,7 +539,8 @@ export function AppointmentsTable({
                         </div>
                         <div>
                           <p className="font-medium text-sm">
-                            {appointment.patient.firstName} {appointment.patient.lastName}
+                            {appointment.patient.firstName}{" "}
+                            {appointment.patient.lastName}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {appointment.patient.email}
@@ -402,7 +555,8 @@ export function AppointmentsTable({
                         </div>
                         <div>
                           <p className="font-medium text-sm">
-                            {appointment.nutritionist.profile.firstName} {appointment.nutritionist.profile.lastName}
+                            {appointment.nutritionist.profile.firstName}{" "}
+                            {appointment.nutritionist.profile.lastName}
                           </p>
                         </div>
                       </div>
@@ -421,12 +575,16 @@ export function AppointmentsTable({
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="text-xs">
-                        {consultationTypeLabels[appointment.consultationType] || appointment.consultationType}
+                        {consultationTypeLabels[appointment.consultationType] ||
+                          appointment.consultationType}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={`text-xs ${statusColors[appointment.status] || "bg-gray-100 text-gray-800"}`}
+                        className={`text-xs ${
+                          statusColors[appointment.status] ||
+                          "bg-gray-100 text-gray-800"
+                        }`}
                       >
                         {statusLabels[appointment.status] || appointment.status}
                       </Badge>
@@ -436,10 +594,18 @@ export function AppointmentsTable({
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                       </div>

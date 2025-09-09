@@ -1,13 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { patientService, PatientsQueryParams, CreatePatientData, UpdatePatientData } from "@/services/patient.service";
+import {
+  patientService,
+  PatientsQueryParams,
+  CreatePatientData,
+  UpdatePatientData,
+} from "@/services/patient.service";
 import { toast } from "react-hot-toast";
 
 // Query keys for patients
 export const patientQueryKeys = {
-  all: ['patients'] as const,
-  list: (params: PatientsQueryParams) => [...patientQueryKeys.all, 'list', params] as const,
-  detail: (id: string) => [...patientQueryKeys.all, 'detail', id] as const,
-  select: () => [...patientQueryKeys.all, 'select'] as const,
+  all: ["patients"] as const,
+  list: (params: PatientsQueryParams) =>
+    [...patientQueryKeys.all, "list", params] as const,
+  detail: (id: string) => [...patientQueryKeys.all, "detail", id] as const,
+  select: () => [...patientQueryKeys.all, "select"] as const,
 };
 
 // Get paginated patients with search
@@ -45,7 +51,8 @@ export function useCreatePatient() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (patientData: CreatePatientData) => patientService.createPatient(patientData),
+    mutationFn: (patientData: CreatePatientData) =>
+      patientService.createPatient(patientData),
     onSuccess: () => {
       // Invalidate all patient queries to refresh the list
       queryClient.invalidateQueries({ queryKey: patientQueryKeys.all });
@@ -53,15 +60,15 @@ export function useCreatePatient() {
     },
     onError: (error: any) => {
       console.error("Error creating patient:", error);
-      
+
       // Extract error message from server response
-      const errorMessage = 
-        error?.response?.data?.error || 
-        error?.response?.data?.message || 
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al crear el paciente";
-      
+
       toast.error(errorMessage);
     },
   });
@@ -72,25 +79,32 @@ export function useUpdatePatient() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, patientData }: { id: string; patientData: UpdatePatientData }) => 
-      patientService.updatePatient(id, patientData),
+    mutationFn: ({
+      id,
+      patientData,
+    }: {
+      id: string;
+      patientData: UpdatePatientData;
+    }) => patientService.updatePatient(id, patientData),
     onSuccess: (data, variables) => {
       // Invalidate all patient queries to refresh the list and details
       queryClient.invalidateQueries({ queryKey: patientQueryKeys.all });
-      queryClient.invalidateQueries({ queryKey: patientQueryKeys.detail(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: patientQueryKeys.detail(variables.id),
+      });
       toast.success("Paciente actualizado exitosamente");
     },
     onError: (error: any) => {
       console.error("Error updating patient:", error);
-      
+
       // Extract error message from server response
-      const errorMessage = 
-        error?.response?.data?.error || 
-        error?.response?.data?.message || 
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al actualizar el paciente";
-      
+
       toast.error(errorMessage);
     },
   });
@@ -109,15 +123,15 @@ export function useDeletePatient() {
     },
     onError: (error: any) => {
       console.error("Error deleting patient:", error);
-      
+
       // Extract error message from server response
-      const errorMessage = 
-        error?.response?.data?.error || 
-        error?.response?.data?.message || 
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al eliminar el paciente";
-      
+
       toast.error(errorMessage);
     },
   });

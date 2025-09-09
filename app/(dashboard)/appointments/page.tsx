@@ -28,12 +28,12 @@ export default function AppointmentsPage() {
   } = useAppointments({
     page: currentPage,
     limit,
-    search: debouncedSearch || undefined,
-    appointmentDate: appointmentDate || undefined,
-    startDate: startDate || undefined,
-    endDate: endDate || undefined,
-    consultationType: consultationType || undefined,
-    status: statusFilter || undefined,
+    ...(debouncedSearch && { search: debouncedSearch }),
+    ...(appointmentDate && { appointmentDate }),
+    ...(startDate && { startDate }),
+    ...(endDate && { endDate }),
+    ...(consultationType && { consultationType: consultationType as any }),
+    ...(statusFilter && { status: statusFilter as any }),
   });
 
   const handlePageChange = (page: number) => {
@@ -85,10 +85,6 @@ export default function AppointmentsPage() {
             </p>
           </div>
         </div>
-        <Button onClick={() => setIsScheduleDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Agendar Cita
-        </Button>
       </div>
 
       {/* Appointments Table */}

@@ -134,46 +134,6 @@ export function ScheduleAppointmentDialog({
       label: user.name,
     })) || [];
 
-  // Custom styles for react-select to match shadcn theme
-  // const selectStyles = {
-  //   control: (provided: any, state: any) => ({
-  //     ...provided,
-  //     minHeight: '36px',
-  //     border: state.isFocused ? '2px solid hsl(var(--ring))' : '1px solid hsl(var(--border))',
-  //     borderRadius: '6px',
-  //     backgroundColor: 'hsl(var(--background))',
-  //     boxShadow: 'none',
-  //     '&:hover': {
-  //       borderColor: 'hsl(var(--border))',
-  //     },
-  //   }),
-  //   menu: (provided: any) => ({
-  //     ...provided,
-  //     backgroundColor: 'hsl(var(--popover))',
-  //     border: '1px solid hsl(var(--border))',
-  //     borderRadius: '6px',
-  //   }),
-  //   option: (provided: any, state: any) => ({
-  //     ...provided,
-  //     backgroundColor: state.isSelected
-  //       ? 'hsl(var(--accent))'
-  //       : state.isFocused
-  //       ? 'hsl(var(--accent) / 0.5)'
-  //       : 'transparent',
-  //     color: 'hsl(var(--foreground))',
-  //     '&:hover': {
-  //       backgroundColor: 'hsl(var(--accent))',
-  //     },
-  //   }),
-  //   placeholder: (provided: any) => ({
-  //     ...provided,
-  //     color: 'hsl(var(--muted-foreground))',
-  //   }),
-  //   singleValue: (provided: any) => ({
-  //     ...provided,
-  //     color: 'hsl(var(--foreground))',
-  //   }),
-  // };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -224,7 +184,11 @@ export function ScheduleAppointmentDialog({
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < new Date()}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // Set to start of day
+                            return date < today;
+                          }}
                           captionLayout="dropdown"
                         />
                       </PopoverContent>
@@ -267,7 +231,7 @@ export function ScheduleAppointmentDialog({
                       value={field.value?.toString()}
                       onValueChange={(value) => field.onChange(parseInt(value))}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Seleccionar duración" />
                       </SelectTrigger>
                       <SelectContent>
@@ -307,7 +271,7 @@ export function ScheduleAppointmentDialog({
                     <Select
                       {...field}
                       options={patientOptions}
-                      placeholder="Buscar y seleccionar paciente..."
+                      placeholder="Buscar paciente..."
                       isSearchable
                       isClearable
                       onChange={(option) => field.onChange(option?.value || "")}
@@ -335,7 +299,7 @@ export function ScheduleAppointmentDialog({
                     <Select
                       {...field}
                       options={nutritionistOptions}
-                      placeholder="Buscar y seleccionar nutricionista..."
+                      placeholder="Buscar nutricionista..."
                       isSearchable
                       isClearable
                       onChange={(option) => field.onChange(option?.value || "")}

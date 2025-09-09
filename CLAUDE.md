@@ -16,56 +16,62 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 ## Architecture & Key Technologies
 
 ### UI Framework
-- **Shadcn/ui**: Component library configured with "new-york" style
-- **Tailwind CSS v4**: Utility-first CSS framework
-- **Radix UI**: Unstyled, accessible components (dropdown-menu, label, slot)
+- **Shadcn/ui**: Component library configured with "new-york" style and slate color palette
+- **Tailwind CSS v4**: Utility-first CSS framework with CSS variables
+- **Radix UI**: Unstyled, accessible components (extensive set including dialog, select, popover, etc.)
 - **Lucide React**: Icon library
-- **next-themes**: Theme provider for dark/light mode support
+- **next-themes**: Theme provider for dark/light/system mode support
+- **Framer Motion**: Animation library for page transitions and micro-interactions
+
+### Authentication & Authorization
+- **NextAuth.js**: JWT-based authentication with credentials provider
+- **Role-based access control**: Three user types with different permissions:
+  - `system_admin`: Access to tenant management (`/tenants`)
+  - `tenant_owner`: Access to settings (`/settings`)
+  - `tenant_owner` & `tenant_user`: Access to patients (`/patients`) and appointments (`/appointments`)
+- **Protected routes**: Middleware enforces authentication and authorization
 
 ### Project Structure
-- **App Router**: Uses Next.js 13+ app directory structure with grouped routes
-- **TypeScript paths**: `@/*` aliases to root directory
-- **Component organization**:
-  - `components/ui/` - Shadcn/ui components (Button, Card, Input, Label, DropdownMenu, Avatar, Badge, Select, Table)
-  - `components/` - Shared components (ThemeProvider, Navbar, providers)
-  - `components/{module}/` - Module-specific components grouped by feature (e.g., `components/tenants/`)
-  - `lib/` - Utilities (cn function, api-client with auth interceptors)
-  - `hooks/` - Custom React hooks for data fetching (useTenants)
-  - `services/` - API service layers (tenant.service.ts)
-  - `types/` - TypeScript type definitions
-
-### Component Organization Guidelines
-- **Modular Structure**: Components should be organized by feature/module in dedicated folders
-- **Naming Convention**: Use descriptive names that include the module context
-- **Examples**:
-  - Tenant-related components: `components/tenants/create-tenant-dialog.tsx`
-  - User-related components: `components/users/user-profile-form.tsx`
-  - Dashboard components: `components/dashboard/stats-card.tsx`
-- **Shared Components**: Generic reusable components stay in the root `components/` directory
-- **UI Components**: Shadcn/ui components remain in `components/ui/`
-
-### Styling & Theme
-- **CSS Variables**: Tailwind configured to use CSS variables
-- **Dark mode**: System-aware theme switching via next-themes
-- **Fonts**: Geist Sans and Geist Mono from Google Fonts
-- **Base color**: Slate color palette
+- **App Router**: Uses Next.js 13+ app directory with grouped routes `(dashboard)`
+- **TypeScript paths**: `@/*` aliases configured for all major directories
+- **Modular component organization**:
+  - `components/ui/` - Shadcn/ui base components
+  - `components/{module}/` - Feature-specific components (tenants, patients, appointments, settings)
+  - `components/` - Shared components (navbar, providers, forms)
+- **Service layer architecture**:
+  - `services/` - API service classes for each domain
+  - `hooks/` - Custom React Query hooks for data fetching
+  - `types/` - TypeScript interfaces and type definitions
+  - `lib/` - Utilities and configurations
 
 ### Data Management & State
-- **TanStack Query**: Server state management with React Query v5
-- **Axios**: HTTP client with request/response interceptors for auth
-- **NextAuth.js**: Authentication with JWT strategy and credentials provider
+- **TanStack Query v5**: Server state management with React Query
+- **Axios**: HTTP client with automatic token injection and 401 handling
+- **API client**: Centralized in `lib/api-client.ts` with auth interceptors
+- **Form handling**: React Hook Form with Zod validation
+- **Toast notifications**: react-hot-toast positioned at top-center
 
-### Current Features
-- NextAuth authentication with username/password login
-- Dashboard layout with navigation (`/dashboard`)
-- Tenant management system (`/tenants`)
-- Theme switching (light/dark/system)
-- Protected routes with authentication middleware
+### Current Application Modules
+- **Dashboard**: Main navigation hub with animated route transitions
+- **Tenant Management**: Multi-tenant system with ownership and membership assignment
+- **Patient Management**: Patient records with CRUD operations and detailed sidebar
+- **Appointment Scheduling**: Appointment management with patient-nutritionist pairing
+- **User Settings**: User management within tenant context
+- **Theme System**: System-aware theme switching with persistent preferences
+
+### Key Patterns
+- **Provider hierarchy**: QueryProvider > SessionProvider > ThemeProvider structure
+- **Route protection**: Middleware-based with role checking (`middleware.ts`)
+- **Component composition**: Dialog-based modals for CRUD operations
+- **State management**: Server state via React Query, UI state via React hooks
+- **Error handling**: Centralized in API client with automatic login redirect
+- **Animation**: Framer Motion for smooth page transitions in dashboard layout
 
 ## Development Notes
 
-- Uses TypeScript with strict mode enabled
-- Tailwind merge utility (`cn`) in `lib/utils.ts` for conditional classes
-- Theme provider wraps the entire application in `app/layout.tsx`
-- Components follow Shadcn/ui patterns and conventions
-- Uses `suppressHydrationWarning` on html element for theme handling
+- API base URL configurable via `NEXT_PUBLIC_API_BASE_URL` environment variable
+- TypeScript strict mode enabled with comprehensive type coverage
+- Shadcn/ui components follow consistent patterns for customization
+- Form validation uses Zod schemas with React Hook Form
+- Table components include pagination, filtering, and search functionality
+- Uses react-hot-toast for consistent notification styling
