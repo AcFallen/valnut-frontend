@@ -37,6 +37,8 @@ import {
   Mail,
   Phone,
   Calendar as CalendarIconSmall,
+  MessageCircle,
+  ExternalLink,
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
@@ -178,6 +180,14 @@ export function EditAppointmentDialog({
       reset();
     }
     onOpenChange(newOpen);
+  };
+
+  // Generate WhatsApp link
+  const generateWhatsAppLink = (phone: string, patientName: string) => {
+    const cleanPhone = phone.replace(/[^\d+]/g, "");
+    const message = `Hola ${patientName}, espero que te encuentres bien. Te escribo desde la consulta de nutrición para coordinar algunos detalles sobre tu cita. ¿Cómo estás?`;
+    const encodedMessage = encodeURIComponent(message);
+    return `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
   };
 
   // Transform users data for react-select (nutritionists)
