@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as TooltipPrimitive from "@radix-ui/react-tooltip"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const tooltipVariants = cva(
   "bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance",
@@ -22,7 +22,7 @@ const tooltipVariants = cva(
       color: "default",
     },
   }
-)
+);
 
 function TooltipProvider({
   delayDuration = 0,
@@ -34,7 +34,7 @@ function TooltipProvider({
       delayDuration={delayDuration}
       {...props}
     />
-  )
+  );
 }
 
 function Tooltip({
@@ -44,13 +44,13 @@ function Tooltip({
     <TooltipProvider>
       <TooltipPrimitive.Root data-slot="tooltip" {...props} />
     </TooltipProvider>
-  )
+  );
 }
 
 function TooltipTrigger({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
 }
 
 function TooltipContent({
@@ -59,38 +59,35 @@ function TooltipContent({
   sideOffset = 0,
   children,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Content> & 
+}: React.ComponentProps<typeof TooltipPrimitive.Content> &
   VariantProps<typeof tooltipVariants>) {
-  
   const arrowColorMap = {
     default: "bg-primary fill-primary",
     info: "bg-teal-500 fill-teal-500",
-    danger: "bg-red-500 fill-red-500", 
+    danger: "bg-red-500 fill-red-500",
     success: "bg-green-500 fill-green-500",
     warning: "bg-orange-500 fill-orange-500",
-  }
+  };
 
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
         data-slot="tooltip-content"
         sideOffset={sideOffset}
-        className={cn(
-          tooltipVariants({ color }),
-          className
-        )}
+        className={cn(tooltipVariants({ color }), className)}
         {...props}
       >
         {children}
-        <TooltipPrimitive.Arrow 
+        <TooltipPrimitive.Arrow
           className={cn(
             "z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]",
-            arrowColorMap[color || "default"]
-          )} 
+            arrowColorMap[color || "default"],
+            className
+          )}
         />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
-  )
+  );
 }
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
