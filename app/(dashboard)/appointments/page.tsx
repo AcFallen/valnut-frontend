@@ -20,6 +20,11 @@ export default function AppointmentsPage() {
   const [limit] = useState(10);
   const [view, setView] = useState<"table" | "calendar">("table");
 
+  // Selected date and time for calendar
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | null>(
+    null
+  );
+  const [selectedCalendarTime, setSelectedCalendarTime] = useState<string>("");
 
   const {
     data: appointmentsData,
@@ -68,6 +73,24 @@ export default function AppointmentsPage() {
   const handleStatusFilterChange = (status: string) => {
     setStatusFilter(status);
     setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  // Handle calendar date selection
+  const handleCalendarDateSelect = (selectInfo: any) => {
+    if (selectInfo.selectedDate && selectInfo.selectedTime) {
+      setSelectedCalendarDate(selectInfo.selectedDate);
+      setSelectedCalendarTime(selectInfo.selectedTime);
+    }
+    setIsScheduleDialogOpen(true);
+  };
+
+  // Clear selected date/time when dialog closes
+  const handleScheduleDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      setSelectedCalendarDate(null);
+      setSelectedCalendarTime("");
+    }
+    setIsScheduleDialogOpen(open);
   };
 
   return (
@@ -134,9 +157,7 @@ export default function AppointmentsPage() {
           nutritionistId={nutritionistId}
           onNutritionistIdChange={handleNutritionistIdChange}
           onCreateAppointment={() => setIsScheduleDialogOpen(true)}
-          onDateSelect={(selectInfo: any) => {
-            setIsScheduleDialogOpen(true);
-          }}
+          onDateSelect={handleCalendarDateSelect}
           onEventClick={(clickInfo: any) => {
             console.log("Event clicked:", clickInfo.event);
           }}
@@ -146,7 +167,9 @@ export default function AppointmentsPage() {
       {/* Schedule Appointment Dialog */}
       <ScheduleAppointmentDialog
         open={isScheduleDialogOpen}
-        onOpenChange={setIsScheduleDialogOpen}
+        onOpenChange={handleScheduleDialogOpenChange}
+        preSelectedDate={selectedCalendarDate}
+        preSelectedTime={selectedCalendarTime}
       />
     </div>
   );

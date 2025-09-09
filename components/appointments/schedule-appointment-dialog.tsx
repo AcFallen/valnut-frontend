@@ -3,6 +3,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useEffect } from "react";
 import Select from "react-select";
 import {
   Dialog,
@@ -68,11 +69,15 @@ type ScheduleAppointmentFormData = z.infer<typeof scheduleAppointmentSchema>;
 interface ScheduleAppointmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  preSelectedDate?: Date | null;
+  preSelectedTime?: string;
 }
 
 export function ScheduleAppointmentDialog({
   open,
   onOpenChange,
+  preSelectedDate,
+  preSelectedTime,
 }: ScheduleAppointmentDialogProps) {
   const createAppointmentMutation = useCreateAppointment();
 
@@ -85,14 +90,16 @@ export function ScheduleAppointmentDialog({
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<ScheduleAppointmentFormData>({
     resolver: zodResolver(scheduleAppointmentSchema),
     defaultValues: {
-      appointmentTime: "",
+      appointmentTime: preSelectedTime || "",
       consultationType: "initial",
       durationMinutes: 60,
       notes: "",
+      ...(preSelectedDate && { appointmentDate: preSelectedDate }),
     },
   });
 
@@ -134,6 +141,15 @@ export function ScheduleAppointmentDialog({
       label: user.name,
     })) || [];
 
+  // Update form values when pre-selected date/time changes
+  useEffect(() => {
+    if (preSelectedDate) {
+      setValue("appointmentDate", preSelectedDate);
+    }
+    if (preSelectedTime) {
+      setValue("appointmentTime", preSelectedTime);
+    }
+  }, [preSelectedDate, preSelectedTime, setValue]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>

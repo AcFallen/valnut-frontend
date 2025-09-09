@@ -154,7 +154,17 @@ export function AppointmentsCalendar({
 
   const handleDateSelect = useCallback(
     (selectInfo: any) => {
-      onDateSelect?.(selectInfo);
+      // Extract date and time from the selection
+      const selectedDate = new Date(selectInfo.start);
+      const selectedDateString = format(selectedDate, "yyyy-MM-dd");
+      const selectedTime = format(selectedDate, "HH:mm");
+
+      onDateSelect?.({
+        ...selectInfo,
+        selectedDate: selectedDate,
+        selectedDateString,
+        selectedTime,
+      });
     },
     [onDateSelect]
   );
