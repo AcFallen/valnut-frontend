@@ -186,7 +186,16 @@ export function AppointmentsCalendar({
 
   const handleEventClick = useCallback(
     (clickInfo: any) => {
-      onEventClick?.(clickInfo);
+      // Add appointment ID to the click info for easier access
+      const appointmentId = clickInfo.event.extendedProps?.appointmentId;
+      const enhancedClickInfo = {
+        ...clickInfo,
+        appointmentId,
+        event: clickInfo.event,
+        extendedProps: clickInfo.event.extendedProps,
+      };
+
+      onEventClick?.(enhancedClickInfo);
     },
     [onEventClick]
   );
@@ -204,18 +213,18 @@ export function AppointmentsCalendar({
       const newStart = new Date(dropInfo.event.start);
       const newAppointmentDate = format(newStart, "yyyy-MM-dd");
       const newAppointmentTime = format(newStart, "HH:mm");
-      
+
       const appointmentId = dropInfo.event.extendedProps.appointmentId;
-      
+
       // Call the reschedule handler
       if (onEventChange) {
         onEventChange({
-          type: 'reschedule',
+          type: "reschedule",
           appointmentId,
           newAppointmentDate,
           newAppointmentTime,
           originalEvent: dropInfo.event,
-          revert: dropInfo.revert
+          revert: dropInfo.revert,
         });
       }
     },
@@ -252,41 +261,12 @@ export function AppointmentsCalendar({
   const eventContent = (eventInfo: any) => {
     const { extendedProps } = eventInfo.event;
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="p-1 text-xs">
-              <div className="font-medium truncate">
-                {extendedProps.patientName}
-              </div>
-              <div className="text-xs opacity-90 truncate">
-                {extendedProps.nutritionistName}
-              </div>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent
-            side="top"
-            className="bg-background border border-border text-foreground shadow-md p-2 text-xs max-w-xs"
-          >
-            <div className="space-y-1">
-              <div className="font-medium">{extendedProps.patientName}</div>
-              <div className="text-muted-foreground">
-                {extendedProps.nutritionistName}
-              </div>
-              <div className="text-muted-foreground">
-                {extendedProps.duration} min
-              </div>
-              <div className="text-muted-foreground">
-                {
-                  statusLabels[
-                    extendedProps.status as keyof typeof statusLabels
-                  ]
-                }
-              </div>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <div className="p-1 text-xs">
+        <div className="font-medium truncate">{extendedProps.patientName}</div>
+        <div className="text-xs opacity-90 truncate">
+          {extendedProps.nutritionistName}
+        </div>
+      </div>
     );
   };
 

@@ -216,7 +216,11 @@ export default function AppointmentsPage() {
           onCreateAppointment={() => setIsScheduleDialogOpen(true)}
           onDateSelect={handleCalendarDateSelect}
           onEventClick={(clickInfo: any) => {
-            console.log("Event clicked:", clickInfo.event);
+            // Get appointment ID from enhanced click info and open edit dialog
+            const appointmentId = clickInfo.appointmentId || clickInfo.event.extendedProps?.appointmentId;
+            if (appointmentId) {
+              handleEditAppointment(appointmentId);
+            }
           }}
           onEventChange={handleCalendarEventChange}
         />

@@ -47,11 +47,11 @@
 }
 
 .calendar-container .fc-event {
-  @apply border-0 rounded-md text-sm font-medium;
+  @apply border-0 rounded-md text-sm font-medium cursor-pointer transition-all duration-200;
 }
 
 .calendar-container .fc-event:hover {
-  @apply opacity-90;
+  @apply opacity-90 scale-[1.02] shadow-md ring-1 ring-primary/20;
 }
 
 .calendar-container .fc-list-event:hover {
