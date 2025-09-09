@@ -1,13 +1,41 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { userService, CreateTenantUserData } from "@/services/user.service";
+import {
+  userService,
+  CreateTenantUserData,
+  UsersQueryParams,
+} from "@/services/user.service";
 import { tenantQueryKeys } from "./useTenants";
 import { toast } from "react-hot-toast";
 
 // Query keys for users
 export const userQueryKeys = {
-  all: ['users'] as const,
-  roles: () => [...userQueryKeys.all, 'roles'] as const,
+  all: ["users"] as const,
+  list: (params: UsersQueryParams) =>
+    [...userQueryKeys.all, "list", params] as const,
+  nutritionists: () => [...userQueryKeys.all, "nutritionists"] as const,
+  select: () => [...userQueryKeys.all, "select"] as const,
+  roles: () => [...userQueryKeys.all, "roles"] as const,
 };
+
+// Get paginated users with filters
+export function useUsers(params: UsersQueryParams = {}) {
+  return useQuery({
+    queryKey: userQueryKeys.list(params),
+    queryFn: () => userService.getUsers(params),
+    select: (response) => response.data,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+  });
+}
+
+// Get users for select dropdown
+export function useUsersSelect() {
+  return useQuery({
+    queryKey: userQueryKeys.select(),
+    queryFn: () => userService.getUsersSelect(),
+    select: (response) => response.data,
+    staleTime: 300000, // Consider data fresh for 5 minutes
+  });
+}
 
 // Get all available roles
 export function useRoles() {
@@ -15,6 +43,7 @@ export function useRoles() {
     queryKey: userQueryKeys.roles(),
     queryFn: () => userService.getRoles(),
     select: (response) => response.data,
+    staleTime: 600000, // Consider data fresh for 10 minutes
   });
 }
 
@@ -23,7 +52,8 @@ export function useCreateTenantUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userData: CreateTenantUserData) => userService.createTenantUser(userData),
+    mutationFn: (userData: CreateTenantUserData) =>
+      userService.createTenantUser(userData),
     onSuccess: () => {
       // Refetch tenant users data to update the list
       queryClient.invalidateQueries({ queryKey: tenantQueryKeys.users() });
@@ -31,15 +61,15 @@ export function useCreateTenantUser() {
     },
     onError: (error: any) => {
       console.error("Error creating user:", error);
-      
+
       // Extraer el mensaje de error del servidor
-      const errorMessage = 
-        error?.response?.data?.error || 
-        error?.response?.data?.message || 
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al crear el usuario";
-      
+
       toast.error(errorMessage);
     },
   });
@@ -58,15 +88,15 @@ export function useDeleteUser() {
     },
     onError: (error: any) => {
       console.error("Error deleting user:", error);
-      
+
       // Extraer el mensaje de error del servidor
-      const errorMessage = 
-        error?.response?.data?.error || 
-        error?.response?.data?.message || 
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al eliminar el usuario";
-      
+
       toast.error(errorMessage);
     },
   });

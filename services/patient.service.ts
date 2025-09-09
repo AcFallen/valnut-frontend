@@ -100,6 +100,18 @@ export interface UpdatePatientData {
   notes?: string;
 }
 
+export interface PatientSelectOption {
+  id: string;
+  name: string;
+}
+
+export interface PatientSelectResponse {
+  success: boolean;
+  data: PatientSelectOption[];
+  code: number;
+  message: string;
+}
+
 export const patientService = {
   // Get paginated patients list
   getPatients: async (params: PatientsQueryParams = {}): Promise<PaginatedPatientsResponse> => {
@@ -134,6 +146,12 @@ export const patientService = {
   // Delete patient by ID
   deletePatient: async (id: string): Promise<ApiResponse<void>> => {
     const response = await apiClient.delete(`/patients/${id}`);
+    return response.data;
+  },
+
+  // Get patients for select dropdown
+  getPatientsSelect: async (): Promise<PatientSelectResponse> => {
+    const response = await apiClient.get('/patients/select');
     return response.data;
   }
 };

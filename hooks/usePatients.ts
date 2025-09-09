@@ -7,6 +7,7 @@ export const patientQueryKeys = {
   all: ['patients'] as const,
   list: (params: PatientsQueryParams) => [...patientQueryKeys.all, 'list', params] as const,
   detail: (id: string) => [...patientQueryKeys.all, 'detail', id] as const,
+  select: () => [...patientQueryKeys.all, 'select'] as const,
 };
 
 // Get paginated patients with search
@@ -26,6 +27,16 @@ export function usePatientDetail(id: string | null) {
     queryFn: () => patientService.getPatientById(id!),
     select: (response) => response.data,
     enabled: !!id, // Only fetch when id is provided
+  });
+}
+
+// Get patients for select dropdown
+export function usePatientsSelect() {
+  return useQuery({
+    queryKey: patientQueryKeys.select(),
+    queryFn: () => patientService.getPatientsSelect(),
+    select: (response) => response.data,
+    staleTime: 300000, // Consider data fresh for 5 minutes
   });
 }
 

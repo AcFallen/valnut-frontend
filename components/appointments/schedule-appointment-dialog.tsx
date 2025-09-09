@@ -1,0 +1,438 @@
+"use client";
+
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import Select from "react-select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select as ShadcnSelect,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, Loader2, Clock, User, UserCheck } from "lucide-react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { useCreateAppointment } from "@/hooks/useAppointments";
+import { usePatientsSelect } from "@/hooks/usePatients";
+import { useUsersSelect } from "@/hooks/useUsers";
+import type { CreateAppointmentData } from "@/services/appointment.service";
+
+const scheduleAppointmentSchema = z.object({
+  appointmentDate: z.date({
+    error: "La fecha de la cita es requerida",
+  }),
+  appointmentTime: z
+    .string()
+    .min(1, "La hora de la cita es requerida")
+    .regex(
+      /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+      "Formato de hora inválido (HH:MM)"
+    ),
+  consultationType: z.enum(
+    ["initial", "followup", "nutritional_plan", "medical_checkup", "emergency"],
+    {
+      message: "El tipo de consulta es requerido",
+    }
+  ),
+  durationMinutes: z
+    .number()
+    .min(15, "La duración mínima es 15 minutos")
+    .max(240, "La duración máxima es 4 horas"),
+  patientId: z.string().min(1, "Debe seleccionar un paciente"),
+  nutritionistId: z.string().min(1, "Debe seleccionar un nutricionista"),
+  notes: z.string().optional(),
+});
+
+type ScheduleAppointmentFormData = z.infer<typeof scheduleAppointmentSchema>;
+
+interface ScheduleAppointmentDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function ScheduleAppointmentDialog({
+  open,
+  onOpenChange,
+}: ScheduleAppointmentDialogProps) {
+  const createAppointmentMutation = useCreateAppointment();
+
+  // Fetch patients and nutritionists for selects
+  const { data: patients } = usePatientsSelect();
+  const { data: users } = useUsersSelect();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<ScheduleAppointmentFormData>({
+    resolver: zodResolver(scheduleAppointmentSchema),
+    defaultValues: {
+      appointmentTime: "",
+      consultationType: "initial",
+      durationMinutes: 60,
+      notes: "",
+    },
+  });
+
+  const onSubmit = async (data: ScheduleAppointmentFormData) => {
+    try {
+      const submitData: CreateAppointmentData = {
+        ...data,
+        appointmentDate: format(data.appointmentDate, "yyyy-MM-dd"),
+        status: "scheduled",
+      };
+
+      await createAppointmentMutation.mutateAsync(submitData);
+      reset();
+      onOpenChange(false);
+    } catch (error) {
+      // Error handling is done in the mutation
+      console.error("Error creating appointment:", error);
+    }
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      reset();
+    }
+    onOpenChange(newOpen);
+  };
+
+  // Transform patients data for react-select
+  const patientOptions =
+    patients?.map((patient) => ({
+      value: patient.id,
+      label: patient.name,
+    })) || [];
+
+  // Transform users data for react-select (nutritionists)
+  const nutritionistOptions =
+    users?.map((user) => ({
+      value: user.id,
+      label: user.name,
+    })) || [];
+
+  // Custom styles for react-select to match shadcn theme
+  // const selectStyles = {
+  //   control: (provided: any, state: any) => ({
+  //     ...provided,
+  //     minHeight: '36px',
+  //     border: state.isFocused ? '2px solid hsl(var(--ring))' : '1px solid hsl(var(--border))',
+  //     borderRadius: '6px',
+  //     backgroundColor: 'hsl(var(--background))',
+  //     boxShadow: 'none',
+  //     '&:hover': {
+  //       borderColor: 'hsl(var(--border))',
+  //     },
+  //   }),
+  //   menu: (provided: any) => ({
+  //     ...provided,
+  //     backgroundColor: 'hsl(var(--popover))',
+  //     border: '1px solid hsl(var(--border))',
+  //     borderRadius: '6px',
+  //   }),
+  //   option: (provided: any, state: any) => ({
+  //     ...provided,
+  //     backgroundColor: state.isSelected
+  //       ? 'hsl(var(--accent))'
+  //       : state.isFocused
+  //       ? 'hsl(var(--accent) / 0.5)'
+  //       : 'transparent',
+  //     color: 'hsl(var(--foreground))',
+  //     '&:hover': {
+  //       backgroundColor: 'hsl(var(--accent))',
+  //     },
+  //   }),
+  //   placeholder: (provided: any) => ({
+  //     ...provided,
+  //     color: 'hsl(var(--muted-foreground))',
+  //   }),
+  //   singleValue: (provided: any) => ({
+  //     ...provided,
+  //     color: 'hsl(var(--foreground))',
+  //   }),
+  // };
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-2xl max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle>Agendar Nueva Cita</DialogTitle>
+          <DialogDescription>
+            Completa la información para agendar una cita con el paciente. Los
+            campos marcados con * son obligatorios.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Date and Time Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <CalendarIcon className="h-5 w-5" />
+              Fecha y Hora
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>
+                  Fecha <span className="text-red-500">*</span>
+                </Label>
+                <Controller
+                  name="appointmentDate"
+                  control={control}
+                  render={({ field }) => (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value
+                            ? format(field.value, "d 'de' MMMM 'de' yyyy", {
+                                locale: es,
+                              })
+                            : "Seleccionar fecha"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date < new Date()}
+                          captionLayout="dropdown"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                />
+                {errors.appointmentDate && (
+                  <p className="text-sm text-red-500">
+                    {errors.appointmentDate.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="appointmentTime">
+                  Hora <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="appointmentTime"
+                  type="time"
+                  {...register("appointmentTime")}
+                  aria-invalid={!!errors.appointmentTime}
+                />
+                {errors.appointmentTime && (
+                  <p className="text-sm text-red-500">
+                    {errors.appointmentTime.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  Duración (minutos) <span className="text-red-500">*</span>
+                </Label>
+                <Controller
+                  name="durationMinutes"
+                  control={control}
+                  render={({ field }) => (
+                    <ShadcnSelect
+                      value={field.value?.toString()}
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar duración" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30 minutos</SelectItem>
+                        <SelectItem value="45">45 minutos</SelectItem>
+                        <SelectItem value="60">1 hora</SelectItem>
+                        <SelectItem value="90">1.5 horas</SelectItem>
+                        <SelectItem value="120">2 horas</SelectItem>
+                      </SelectContent>
+                    </ShadcnSelect>
+                  )}
+                />
+                {errors.durationMinutes && (
+                  <p className="text-sm text-red-500">
+                    {errors.durationMinutes.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* People Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Participantes
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>
+                  Paciente <span className="text-red-500">*</span>
+                </Label>
+                <Controller
+                  name="patientId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={patientOptions}
+                      placeholder="Buscar y seleccionar paciente..."
+                      isSearchable
+                      isClearable
+                      onChange={(option) => field.onChange(option?.value || "")}
+                      value={patientOptions.find(
+                        (option) => option.value === field.value
+                      )}
+                    />
+                  )}
+                />
+                {errors.patientId && (
+                  <p className="text-sm text-red-500">
+                    {errors.patientId.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  Nutricionista <span className="text-red-500">*</span>
+                </Label>
+                <Controller
+                  name="nutritionistId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={nutritionistOptions}
+                      placeholder="Buscar y seleccionar nutricionista..."
+                      isSearchable
+                      isClearable
+                      onChange={(option) => field.onChange(option?.value || "")}
+                      value={nutritionistOptions.find(
+                        (option) => option.value === field.value
+                      )}
+                    />
+                  )}
+                />
+                {errors.nutritionistId && (
+                  <p className="text-sm text-red-500">
+                    {errors.nutritionistId.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Consultation Details */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <UserCheck className="h-5 w-5" />
+              Detalles de la Consulta
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+              <div className="space-y-2">
+                <Label>
+                  Tipo de Consulta <span className="text-red-500">*</span>
+                </Label>
+                <Controller
+                  name="consultationType"
+                  control={control}
+                  render={({ field }) => (
+                    <ShadcnSelect
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar tipo de consulta" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="initial">
+                          Consulta Inicial
+                        </SelectItem>
+                        <SelectItem value="followup">Seguimiento</SelectItem>
+                        <SelectItem value="nutritional_plan">
+                          Plan Nutricional
+                        </SelectItem>
+                        <SelectItem value="medical_checkup">
+                          Revisión Médica
+                        </SelectItem>
+                        <SelectItem value="emergency">Emergencia</SelectItem>
+                      </SelectContent>
+                    </ShadcnSelect>
+                  )}
+                />
+                {errors.consultationType && (
+                  <p className="text-sm text-red-500">
+                    {errors.consultationType.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes">Notas Adicionales</Label>
+                <Textarea
+                  id="notes"
+                  {...register("notes")}
+                  placeholder="Información adicional sobre la cita, objetivos específicos, etc."
+                  rows={3}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Dialog Actions */}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOpenChange(false)}
+              disabled={createAppointmentMutation.isPending}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              disabled={createAppointmentMutation.isPending}
+            >
+              {createAppointmentMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Agendar Cita
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
