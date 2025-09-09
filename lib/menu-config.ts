@@ -6,6 +6,7 @@ import {
   BarChart3,
   Package,
   Building2,
+  Calendar,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -43,6 +44,14 @@ export const menuItems: MenuItem[] = [
     href: "/patients",
     icon: Users,
     description: "Gestión de pacientes",
+    allowedUserTypes: ["tenant_owner", "tenant_user"],
+  },
+  {
+    id: "appointments",
+    label: "Citas",
+    href: "/appointments",
+    icon: Calendar,
+    description: "Gestión de citas",
     allowedUserTypes: ["tenant_owner", "tenant_user"],
   },
   {

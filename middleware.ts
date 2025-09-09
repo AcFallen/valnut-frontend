@@ -28,6 +28,14 @@ export default withAuth(
       }
     }
 
+    // Protect /appointments route - tenant_owner and tenant_user can access
+    if (pathname.startsWith("/appointments")) {
+      const allowedUserTypes = ["tenant_owner", "tenant_user"]
+      if (!token?.userType || !allowedUserTypes.includes(token.userType as string)) {
+        return NextResponse.redirect(new URL("/dashboard", req.url))
+      }
+    }
+
     // Dashboard routes are accessible to all authenticated users
     if (pathname.startsWith("/dashboard")) {
       const allowedUserTypes = ["system_admin", "tenant_owner", "tenant_user"]
@@ -49,6 +57,7 @@ export const config = {
     "/(dashboard)/:path*",
     "/tenants/:path*",
     "/settings/:path*",
-    "/patients/:path*"
+    "/patients/:path*",
+    "/appointments/:path*"
   ]
 }
