@@ -9,6 +9,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 import {
   Tooltip,
   TooltipContent,
@@ -80,6 +81,7 @@ export function AppointmentsCalendar({
 }: AppointmentsCalendarProps) {
   const [view, setView] = useState("timeGridWeek");
   const calendarRef = useRef<FullCalendar>(null);
+  const { data: session } = useSession();
 
   // Internal date range states
   const [calendarStart, setCalendarStart] = useState("");
@@ -107,6 +109,18 @@ export function AppointmentsCalendar({
 
   // Fetch nutritionists for filter
   const { data: users } = useUsersSelect();
+
+  // Determine if user can see all nutritionists based on role
+  const isTenantOwner = session?.user?.userType === "tenant_owner";
+  const currentUserId = session?.user?.id;
+
+  // Set default nutritionist filter based on user role
+  useEffect(() => {
+    if (!isTenantOwner && currentUserId && !nutritionistId) {
+      // If user is tenant_user and no nutritionist is selected, default to their own ID
+      onNutritionistIdChange?.(currentUserId);
+    }
+  }, [isTenantOwner, currentUserId, nutritionistId, onNutritionistIdChange]);
 
   // Update calendar view when state changes - use setTimeout to avoid flushSync error
   useEffect(() => {
@@ -301,17 +315,27 @@ export function AppointmentsCalendar({
                 onValueChange={(value) =>
                   onNutritionistIdChange(value === "all" ? "" : value)
                 }
+                disabled={!isTenantOwner} // Disable for tenant_user
               >
                 <SelectTrigger className="w-64">
                   <SelectValue placeholder="Todos los nutricionistas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los nutricionistas</SelectItem>
-                  {users?.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {user.name}
+                  {/* Only show "All" option for tenant owners */}
+                  {isTenantOwner && (
+                    <SelectItem value="all">
+                      Todos los nutricionistas
                     </SelectItem>
-                  ))}
+                  )}
+                  {users
+                    ?.filter((user) =>
+                      isTenantOwner ? true : user.id === currentUserId
+                    )
+                    ?.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>

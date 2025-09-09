@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useUsersSelect } from "@/hooks/useUsers";
+import { useSession } from "next-auth/react";
 import type { Appointment } from "@/services/appointment.service";
 
 interface AppointmentsTableProps {
@@ -128,9 +129,14 @@ export function AppointmentsTable({
   onCreateAppointment,
 }: AppointmentsTableProps) {
   const [showFilters, setShowFilters] = useState(false);
-  
+  const { data: session } = useSession();
+
   // Fetch nutritionists for filter select
   const { data: users } = useUsersSelect();
+
+  // Determine if user can see all nutritionists based on role
+  const isTenantOwner = session?.user?.userType === "tenant_owner";
+  const currentUserId = session?.user?.id;
 
   // Helper function to parse date string without timezone issues
   const parseDateString = (dateString: string): Date | undefined => {
@@ -319,17 +325,27 @@ export function AppointmentsTable({
                   onValueChange={(value) =>
                     onNutritionistIdChange(value === "all" ? "" : value)
                   }
+                  disabled={!isTenantOwner} // Disable for tenant_user
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Todos los nutricionistas" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todos los nutricionistas</SelectItem>
-                    {users?.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.name}
+                    {/* Only show "All" option for tenant owners */}
+                    {isTenantOwner && (
+                      <SelectItem value="all">
+                        Todos los nutricionistas
                       </SelectItem>
-                    ))}
+                    )}
+                    {users
+                      ?.filter((user) =>
+                        isTenantOwner ? true : user.id === currentUserId
+                      )
+                      ?.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>

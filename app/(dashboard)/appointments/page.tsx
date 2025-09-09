@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, Plus, Table, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppointments } from "@/hooks/useAppointments";
 import { ScheduleAppointmentDialog } from "@/components/appointments/schedule-appointment-dialog";
 import { AppointmentsTable } from "@/components/appointments/appointments-table";
 import { AppointmentsCalendar } from "@/components/appointments/appointments-calendar";
+import { useSession } from "next-auth/react";
 
 export default function AppointmentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,12 +20,26 @@ export default function AppointmentsPage() {
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [limit] = useState(10);
   const [view, setView] = useState<"table" | "calendar">("table");
+  const { data: session } = useSession();
 
   // Selected date and time for calendar
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | null>(
     null
   );
   const [selectedCalendarTime, setSelectedCalendarTime] = useState<string>("");
+
+  // Set default nutritionist filter based on user role
+  useEffect(() => {
+    if (session?.user) {
+      const isTenantOwner = session.user.userType === "tenant_owner";
+      const currentUserId = session.user.id;
+
+      // If user is tenant_user, default to their own ID
+      if (!isTenantOwner && currentUserId && !nutritionistId) {
+        setNutritionistId(currentUserId);
+      }
+    }
+  }, [session?.user, nutritionistId]);
 
   const {
     data: appointmentsData,
