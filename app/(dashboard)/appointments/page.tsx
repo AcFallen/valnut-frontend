@@ -93,14 +93,12 @@ export default function AppointmentsPage() {
         isLoading={isLoadingAppointments}
         error={appointmentsError}
         currentPage={currentPage}
-        search={search}
         appointmentDate={appointmentDate}
         startDate={startDate}
         endDate={endDate}
         consultationType={consultationType}
         statusFilter={statusFilter}
         onPageChange={handlePageChange}
-        onSearchChange={handleSearchChange}
         onAppointmentDateChange={handleAppointmentDateChange}
         onStartDateChange={handleStartDateChange}
         onEndDateChange={handleEndDateChange}

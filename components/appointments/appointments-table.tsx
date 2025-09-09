@@ -6,19 +6,15 @@ import { es } from "date-fns/locale";
 import {
   Calendar,
   Clock,
-  Search,
   User,
-  UserCheck,
   Eye,
   Edit,
-  Trash2,
   ChevronLeft,
   ChevronRight,
   Filter,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -65,14 +61,12 @@ interface AppointmentsTableProps {
   isLoading: boolean;
   error: any;
   currentPage: number;
-  search: string;
   appointmentDate: string;
   startDate: string;
   endDate: string;
   consultationType: string;
   statusFilter: string;
   onPageChange: (page: number) => void;
-  onSearchChange: (search: string) => void;
   onAppointmentDateChange: (date: string) => void;
   onStartDateChange: (date: string) => void;
   onEndDateChange: (date: string) => void;
@@ -115,14 +109,12 @@ export function AppointmentsTable({
   isLoading,
   error,
   currentPage,
-  search,
   appointmentDate,
   startDate,
   endDate,
   consultationType,
   statusFilter,
   onPageChange,
-  onSearchChange,
   onAppointmentDateChange,
   onStartDateChange,
   onEndDateChange,
@@ -225,10 +217,20 @@ export function AppointmentsTable({
             <Calendar className="h-5 w-5" />
             Lista de Citas
           </div>
-          <Button onClick={onCreateAppointment}>
-            <Calendar className="h-4 w-4 mr-2" />
-            Nueva Cita
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Filtros
+            </Button>
+            <Button onClick={onCreateAppointment}>
+              <Calendar className="h-4 w-4 mr-2" />
+              Nueva Cita
+            </Button>
+          </div>
         </CardTitle>
         <CardDescription>
           {data ? `${data.total} cita(s) encontrada(s)` : "Cargando citas..."}
@@ -236,32 +238,9 @@ export function AppointmentsTable({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Search and Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Buscar por paciente o nutricionista..."
-                value={search}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2"
-          >
-            <Filter className="h-4 w-4" />
-            Filtros
-          </Button>
-        </div>
-
         {/* Filters Panel */}
         {showFilters && (
-          <div className="border rounded-lg p-4 space-y-4 bg-muted/50">
+          <div className="border rounded-lg p-4 space-y-4 ">
             <div className="flex items-center justify-between">
               <h4 className="font-medium">Filtros</h4>
               <Button
@@ -550,9 +529,6 @@ export function AppointmentsTable({
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                          <UserCheck className="h-3 w-3 text-white" />
-                        </div>
                         <div>
                           <p className="font-medium text-sm">
                             {appointment.nutritionist.profile.firstName}{" "}
