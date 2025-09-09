@@ -29,7 +29,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Loader2, User, UserCheck } from "lucide-react";
+import {
+  CalendarIcon,
+  Loader2,
+  User,
+  UserCheck,
+  Mail,
+  Phone,
+  Calendar as CalendarIconSmall,
+} from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -38,7 +46,6 @@ import {
   useUpdateAppointment,
   useAppointmentDetail,
 } from "@/hooks/useAppointments";
-import { usePatientsSelect } from "@/hooks/usePatients";
 import { useUsersSelect } from "@/hooks/useUsers";
 import type { UpdateAppointmentData } from "@/services/appointment.service";
 
@@ -63,7 +70,7 @@ const editAppointmentSchema = z.object({
     .number()
     .min(15, "La duración mínima es 15 minutos")
     .max(240, "La duración máxima es 4 horas"),
-  patientId: z.string().min(1, "Debe seleccionar un paciente"),
+  patientId: z.string().optional(),
   nutritionistId: z.string().min(1, "Debe seleccionar un nutricionista"),
   status: z.enum(
     [
@@ -101,8 +108,7 @@ export function EditAppointmentDialog({
   const { data: appointmentData, isLoading: isLoadingAppointment } =
     useAppointmentDetail(appointmentId);
 
-  // Fetch patients and nutritionists for selects
-  const { data: patients } = usePatientsSelect();
+  // Fetch nutritionists for selects
   const { data: users } = useUsersSelect();
 
   const {
@@ -110,7 +116,6 @@ export function EditAppointmentDialog({
     handleSubmit,
     control,
     reset,
-    watch,
     formState: { errors },
   } = useForm<EditAppointmentFormData>({
     resolver: zodResolver(editAppointmentSchema),
@@ -136,10 +141,8 @@ export function EditAppointmentDialog({
         appointmentTime: appointmentData.appointmentTime.slice(0, 5), // Remove seconds
         consultationType: appointmentData.consultationType,
         durationMinutes: appointmentData.durationMinutes,
-        patientId: appointmentData.patient.id,
         nutritionistId: appointmentData.nutritionist.id,
         status: appointmentData.status,
-
         notes: appointmentData.notes || "",
       });
     }
@@ -154,7 +157,6 @@ export function EditAppointmentDialog({
         appointmentTime: data.appointmentTime,
         consultationType: data.consultationType,
         durationMinutes: data.durationMinutes,
-        patientId: data.patientId,
         nutritionistId: data.nutritionistId,
         status: data.status,
         notes: data.notes,
@@ -177,13 +179,6 @@ export function EditAppointmentDialog({
     }
     onOpenChange(newOpen);
   };
-
-  // Transform patients data for react-select
-  const patientOptions =
-    patients?.map((patient) => ({
-      value: patient.id,
-      label: patient.name,
-    })) || [];
 
   // Transform users data for react-select (nutritionists)
   const nutritionistOptions =
@@ -324,74 +319,100 @@ export function EditAppointmentDialog({
 
               {/* People Section */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Participantes
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>
-                      Paciente <span className="text-red-500">*</span>
+                {/* Patient Information - Read Only */}
+                {appointmentData && (
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      Información del Paciente
                     </Label>
-                    <Controller
-                      name="patientId"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          {...field}
-                          options={patientOptions}
-                          placeholder="Buscar paciente..."
-                          isSearchable
-                          isClearable
-                          onChange={(option) =>
-                            field.onChange(option?.value || "")
-                          }
-                          value={
-                            patientOptions.find(
-                              (option) => option.value === field.value
-                            ) || null
-                          }
-                        />
-                      )}
-                    />
-                    {errors.patientId && (
-                      <p className="text-sm text-red-500">
-                        {errors.patientId.message}
-                      </p>
-                    )}
+                    <div className="bg-muted/30 rounded-lg p-4 border">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                          <User className="h-5 w-5 text-white" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div>
+                            <h4 className="font-semibold text-foreground">
+                              {appointmentData.patient.firstName}{" "}
+                              {appointmentData.patient.lastName}
+                            </h4>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-3 w-3" />
+                              <span>{appointmentData.patient.email}</span>
+                            </div>
+                            {appointmentData.patient.phone && (
+                              <div className="flex items-center gap-2">
+                                <Phone className="h-3 w-3" />
+                                <span>{appointmentData.patient.phone}</span>
+                              </div>
+                            )}
+                            {appointmentData.patient.dateOfBirth && (
+                              <div className="flex items-center gap-2">
+                                <CalendarIconSmall className="h-3 w-3" />
+                                <span>
+                                  {format(
+                                    parseISO(
+                                      appointmentData.patient.dateOfBirth
+                                    ),
+                                    "d 'de' MMMM 'de' yyyy",
+                                    { locale: es }
+                                  )}
+                                </span>
+                              </div>
+                            )}
+                            {appointmentData.patient.gender && (
+                              <div className="flex items-center gap-2">
+                                <User className="h-3 w-3" />
+                                <span className="capitalize">
+                                  {appointmentData.patient.gender === "male"
+                                    ? "Masculino"
+                                    : appointmentData.patient.gender ===
+                                      "female"
+                                    ? "Femenino"
+                                    : appointmentData.patient.gender}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                )}
 
-                  <div className="space-y-2">
-                    <Label>
-                      Nutricionista <span className="text-red-500">*</span>
-                    </Label>
-                    <Controller
-                      name="nutritionistId"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          {...field}
-                          options={nutritionistOptions}
-                          placeholder="Buscar nutricionista..."
-                          isSearchable
-                          isClearable
-                          onChange={(option) =>
-                            field.onChange(option?.value || "")
-                          }
-                          value={
-                            nutritionistOptions.find(
-                              (option) => option.value === field.value
-                            ) || null
-                          }
-                        />
-                      )}
-                    />
-                    {errors.nutritionistId && (
-                      <p className="text-sm text-red-500">
-                        {errors.nutritionistId.message}
-                      </p>
+                {/* Nutritionist Selection */}
+                <div className="space-y-2">
+                  <Label>
+                    Nutricionista <span className="text-red-500">*</span>
+                  </Label>
+                  <Controller
+                    name="nutritionistId"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={nutritionistOptions}
+                        placeholder="Buscar nutricionista..."
+                        isSearchable
+                        isClearable
+                        onChange={(option) =>
+                          field.onChange(option?.value || "")
+                        }
+                        value={
+                          nutritionistOptions.find(
+                            (option) => option.value === field.value
+                          ) || null
+                        }
+                      />
                     )}
-                  </div>
+                  />
+                  {errors.nutritionistId && (
+                    <p className="text-sm text-red-500">
+                      {errors.nutritionistId.message}
+                    </p>
+                  )}
                 </div>
               </div>
 

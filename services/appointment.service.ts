@@ -28,7 +28,9 @@ export interface Appointment {
     firstName: string;
     lastName: string;
     email: string;
-    phone: string;
+    phone?: string;
+    dateOfBirth?: string;
+    gender?: "male" | "female" | "other";
   };
   nutritionist: {
     id: string;
