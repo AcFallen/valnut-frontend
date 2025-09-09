@@ -4,6 +4,7 @@ import {
   AppointmentsQueryParams,
   CreateAppointmentData,
   UpdateAppointmentData,
+  RescheduleAppointmentData,
   CalendarQueryParams,
 } from "@/services/appointment.service";
 import { toast } from "react-hot-toast";
@@ -123,6 +124,42 @@ export function useDeleteAppointment() {
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al eliminar la cita";
+
+      toast.error(errorMessage);
+    },
+  });
+}
+
+// Reschedule appointment mutation
+export function useRescheduleAppointment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      rescheduleData,
+    }: {
+      id: string;
+      rescheduleData: RescheduleAppointmentData;
+    }) => appointmentService.rescheduleAppointment(id, rescheduleData),
+    onSuccess: (_, variables) => {
+      // Invalidate all appointment queries to refresh the list and calendar
+      queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.all });
+      queryClient.invalidateQueries({
+        queryKey: appointmentQueryKeys.detail(variables.id),
+      });
+      toast.success("Cita reagendada exitosamente");
+    },
+    onError: (error: any) => {
+      console.error("Error rescheduling appointment:", error);
+
+      // Extract error message from server response
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error?.response?.data?.details?.message ||
+        error?.message ||
+        "Error al reagendar la cita";
 
       toast.error(errorMessage);
     },

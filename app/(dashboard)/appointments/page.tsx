@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Calendar, Plus, Table, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAppointments } from "@/hooks/useAppointments";
+import { useAppointments, useRescheduleAppointment } from "@/hooks/useAppointments";
 import { ScheduleAppointmentDialog } from "@/components/appointments/schedule-appointment-dialog";
 import { AppointmentsTable } from "@/components/appointments/appointments-table";
 import { AppointmentsCalendar } from "@/components/appointments/appointments-calendar";
@@ -21,6 +21,9 @@ export default function AppointmentsPage() {
   const [limit] = useState(10);
   const [view, setView] = useState<"table" | "calendar">("table");
   const { data: session } = useSession();
+
+  // Reschedule mutation
+  const rescheduleAppointmentMutation = useRescheduleAppointment();
 
   // Selected date and time for calendar
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | null>(
@@ -108,6 +111,27 @@ export default function AppointmentsPage() {
     setIsScheduleDialogOpen(open);
   };
 
+  // Handle reschedule events from calendar
+  const handleCalendarEventChange = (changeInfo: any) => {
+    if (changeInfo.type === 'reschedule') {
+      const { appointmentId, newAppointmentDate, newAppointmentTime, revert } = changeInfo;
+      
+      rescheduleAppointmentMutation.mutateAsync({
+        id: appointmentId,
+        rescheduleData: {
+          newAppointmentDate,
+          newAppointmentTime,
+        },
+      }).catch((error) => {
+        console.error("Reschedule failed:", error);
+        // Revert the calendar change if the API call fails
+        if (revert) {
+          revert();
+        }
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -176,6 +200,7 @@ export default function AppointmentsPage() {
           onEventClick={(clickInfo: any) => {
             console.log("Event clicked:", clickInfo.event);
           }}
+          onEventChange={handleCalendarEventChange}
         />
       )}
 

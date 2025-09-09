@@ -17,7 +17,8 @@ export interface Appointment {
     | "in_progress"
     | "completed"
     | "cancelled"
-    | "no_show";
+    | "no_show"
+    | "rescheduled";
   notes: string | null;
   durationMinutes: number;
   createdAt: string;
@@ -79,7 +80,8 @@ export interface AppointmentsQueryParams {
     | "in_progress"
     | "completed"
     | "cancelled"
-    | "no_show";
+    | "no_show"
+    | "rescheduled";
   nutritionistId?: string;
 }
 
@@ -134,7 +136,8 @@ export interface CreateAppointmentData {
     | "in_progress"
     | "completed"
     | "cancelled"
-    | "no_show";
+    | "no_show"
+    | "rescheduled";
   notes?: string;
   durationMinutes: number;
   patientId: string;
@@ -156,11 +159,17 @@ export interface UpdateAppointmentData {
     | "in_progress"
     | "completed"
     | "cancelled"
-    | "no_show";
+    | "no_show"
+    | "rescheduled";
   notes?: string;
   durationMinutes?: number;
   patientId?: string;
   nutritionistId?: string;
+}
+
+export interface RescheduleAppointmentData {
+  newAppointmentDate: string;
+  newAppointmentTime: string;
 }
 
 export const appointmentService = {
@@ -223,6 +232,18 @@ export const appointmentService = {
     return response.data;
   },
 
+  // Reschedule appointment by ID
+  rescheduleAppointment: async (
+    id: string,
+    rescheduleData: RescheduleAppointmentData
+  ): Promise<ApiResponse<Appointment>> => {
+    const response = await apiClient.patch(
+      `/appointments/${id}/reschedule`,
+      rescheduleData
+    );
+    return response.data;
+  },
+
   // Get calendar events
   getCalendarEvents: async (
     params: CalendarQueryParams = {}
@@ -253,7 +274,8 @@ export const appointmentService = {
         in_progress: { bg: '#f59e0b', border: '#d97706' },   // Amarillo/Naranja - En progreso
         completed: { bg: '#22c55e', border: '#15803d' },     // Verde claro - Completada
         cancelled: { bg: '#dc2626', border: '#b91c1c' },     // Rojo - Cancelada
-        no_show: { bg: '#64748b', border: '#475569' }        // Gris azulado - No asistió
+        no_show: { bg: '#64748b', border: '#475569' },       // Gris azulado - No asistió
+        rescheduled: { bg: '#8b5cf6', border: '#7c3aed' }    // Morado - Reagendada
       };
 
       const colors = statusColors[appointment.status as keyof typeof statusColors] || statusColors.scheduled;

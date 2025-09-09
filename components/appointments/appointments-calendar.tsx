@@ -68,6 +68,7 @@ const statusLabels = {
   completed: "Completada",
   cancelled: "Cancelada",
   no_show: "No asistió",
+  rescheduled: "Reagendada",
 };
 
 export function AppointmentsCalendar({
@@ -193,6 +194,30 @@ export function AppointmentsCalendar({
   const handleEventChange = useCallback(
     (changeInfo: any) => {
       onEventChange?.(changeInfo);
+    },
+    [onEventChange]
+  );
+
+  const handleEventDrop = useCallback(
+    (dropInfo: any) => {
+      // Extract the new date and time from the dropped event
+      const newStart = new Date(dropInfo.event.start);
+      const newAppointmentDate = format(newStart, "yyyy-MM-dd");
+      const newAppointmentTime = format(newStart, "HH:mm");
+      
+      const appointmentId = dropInfo.event.extendedProps.appointmentId;
+      
+      // Call the reschedule handler
+      if (onEventChange) {
+        onEventChange({
+          type: 'reschedule',
+          appointmentId,
+          newAppointmentDate,
+          newAppointmentTime,
+          originalEvent: dropInfo.event,
+          revert: dropInfo.revert
+        });
+      }
     },
     [onEventChange]
   );
@@ -387,6 +412,13 @@ export function AppointmentsCalendar({
             ></div>
             <span>No asistió</span>
           </div>
+          <div className="flex items-center gap-1">
+            <div
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: "#8b5cf6" }}
+            ></div>
+            <span>Reagendada</span>
+          </div>
         </div>
 
         <div className="calendar-container">
@@ -414,7 +446,7 @@ export function AppointmentsCalendar({
               list: "Lista",
             }}
             events={events || []}
-            editable={false}
+            editable={true}
             selectable={!!onDateSelect}
             selectMirror={true}
             dayMaxEvents={true}
@@ -422,6 +454,7 @@ export function AppointmentsCalendar({
             select={handleDateSelect}
             eventClick={handleEventClick}
             eventChange={handleEventChange}
+            eventDrop={handleEventDrop}
             eventContent={eventContent}
             datesSet={handleDatesSet}
             height="auto"

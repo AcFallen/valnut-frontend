@@ -86,6 +86,7 @@ const statusLabels = {
   completed: "Completada",
   cancelled: "Cancelada",
   no_show: "No asistió",
+  rescheduled: "Reprogramada",
 };
 
 const statusColors = {
@@ -98,6 +99,8 @@ const statusColors = {
     "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
   cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
   no_show: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
+  rescheduled:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
 };
 
 const consultationTypeLabels = {
