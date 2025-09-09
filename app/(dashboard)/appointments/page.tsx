@@ -5,6 +5,7 @@ import { Calendar, Plus, Table, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppointments, useRescheduleAppointment } from "@/hooks/useAppointments";
 import { ScheduleAppointmentDialog } from "@/components/appointments/schedule-appointment-dialog";
+import { EditAppointmentDialog } from "@/components/appointments/edit-appointment-dialog";
 import { AppointmentsTable } from "@/components/appointments/appointments-table";
 import { AppointmentsCalendar } from "@/components/appointments/appointments-calendar";
 import { useSession } from "next-auth/react";
@@ -18,6 +19,8 @@ export default function AppointmentsPage() {
   const [consultationType, setConsultationType] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [limit] = useState(10);
   const [view, setView] = useState<"table" | "calendar">("table");
   const { data: session } = useSession();
@@ -111,6 +114,20 @@ export default function AppointmentsPage() {
     setIsScheduleDialogOpen(open);
   };
 
+  // Handle edit appointment
+  const handleEditAppointment = (appointmentId: string) => {
+    setSelectedAppointmentId(appointmentId);
+    setIsEditDialogOpen(true);
+  };
+
+  // Handle edit dialog close
+  const handleEditDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      setSelectedAppointmentId(null);
+    }
+    setIsEditDialogOpen(open);
+  };
+
   // Handle reschedule events from calendar
   const handleCalendarEventChange = (changeInfo: any) => {
     if (changeInfo.type === 'reschedule') {
@@ -135,7 +152,7 @@ export default function AppointmentsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4  items-center md:flex-row md:justify-between">
         <div className="flex items-center gap-3">
           <Calendar className="h-8 w-8 text-primary" />
           <div>
@@ -190,6 +207,7 @@ export default function AppointmentsPage() {
           onStatusFilterChange={handleStatusFilterChange}
           onNutritionistIdChange={handleNutritionistIdChange}
           onCreateAppointment={() => setIsScheduleDialogOpen(true)}
+          onEditAppointment={handleEditAppointment}
         />
       ) : (
         <AppointmentsCalendar
@@ -210,6 +228,13 @@ export default function AppointmentsPage() {
         onOpenChange={handleScheduleDialogOpenChange}
         preSelectedDate={selectedCalendarDate}
         preSelectedTime={selectedCalendarTime}
+      />
+
+      {/* Edit Appointment Dialog */}
+      <EditAppointmentDialog
+        open={isEditDialogOpen}
+        onOpenChange={handleEditDialogOpenChange}
+        appointmentId={selectedAppointmentId}
       />
     </div>
   );

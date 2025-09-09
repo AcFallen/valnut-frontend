@@ -7,7 +7,6 @@ import {
   Calendar,
   Clock,
   User,
-  Eye,
   Edit,
   ChevronLeft,
   ChevronRight,
@@ -49,6 +48,11 @@ import { cn } from "@/lib/utils";
 import { useUsersSelect } from "@/hooks/useUsers";
 import { useSession } from "next-auth/react";
 import type { Appointment } from "@/services/appointment.service";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AppointmentsTableProps {
   data?: {
@@ -77,6 +81,7 @@ interface AppointmentsTableProps {
   onStatusFilterChange: (status: string) => void;
   onNutritionistIdChange: (nutritionistId: string) => void;
   onCreateAppointment: () => void;
+  onEditAppointment: (appointmentId: string) => void;
 }
 
 const statusLabels = {
@@ -130,6 +135,7 @@ export function AppointmentsTable({
   onStatusFilterChange,
   onNutritionistIdChange,
   onCreateAppointment,
+  onEditAppointment,
 }: AppointmentsTableProps) {
   const [showFilters, setShowFilters] = useState(false);
   const { data: session } = useSession();
@@ -621,20 +627,20 @@ export function AppointmentsTable({
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              className="h-8 w-8 p-0 bg-teal-600 hover:bg-teal-700 text-white"
+                              onClick={() => onEditAppointment(appointment.id)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-teal-600 text-white fill-teal-600">
+                            <p>Editar cita</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </TableCell>
                   </TableRow>

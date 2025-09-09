@@ -29,10 +29,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Loader2, Clock, User, UserCheck } from "lucide-react";
+import { CalendarIcon, Loader2, User, UserCheck } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCreateAppointment } from "@/hooks/useAppointments";
 import { usePatientsSelect } from "@/hooks/usePatients";
 import { useUsersSelect } from "@/hooks/useUsers";
@@ -153,7 +154,7 @@ export function ScheduleAppointmentDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh]">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Agendar Nueva Cita</DialogTitle>
           <DialogDescription>
@@ -162,15 +163,16 @@ export function ScheduleAppointmentDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <ScrollArea className="max-h-[60vh] overflow-auto">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pr-4">
           {/* Date and Time Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <CalendarIcon className="h-5 w-5" />
               Fecha y Hora
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="space-y-2 md:col-span-2">
                 <Label>
                   Fecha <span className="text-red-500">*</span>
                 </Label>
@@ -218,7 +220,7 @@ export function ScheduleAppointmentDialog({
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 ">
                 <Label htmlFor="appointmentTime">
                   Hora <span className="text-red-500">*</span>
                 </Label>
@@ -411,7 +413,8 @@ export function ScheduleAppointmentDialog({
               Agendar Cita
             </Button>
           </div>
-        </form>
+          </form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
