@@ -5,12 +5,21 @@ export interface Appointment {
   id: string;
   appointmentDate: string;
   appointmentTime: string;
-  consultationType: string;
-  status: string;
+  consultationType:
+    | "initial"
+    | "followup"
+    | "nutritional_plan"
+    | "medical_checkup"
+    | "emergency";
+  status:
+    | "scheduled"
+    | "confirmed"
+    | "in_progress"
+    | "completed"
+    | "cancelled"
+    | "no_show";
   notes: string | null;
   durationMinutes: number;
-  patientId: string;
-  nutritionistId: string;
   createdAt: string;
   updatedAt: string;
   patient: {
@@ -22,9 +31,10 @@ export interface Appointment {
   };
   nutritionist: {
     id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
+    profile: {
+      firstName: string;
+      lastName: string;
+    };
   };
 }
 
@@ -54,15 +64,40 @@ export interface AppointmentsQueryParams {
   page?: number;
   limit?: number;
   search?: string;
-  status?: string;
-  date?: string;
+  appointmentDate?: string;
+  startDate?: string;
+  endDate?: string;
+  consultationType?:
+    | "initial"
+    | "followup"
+    | "nutritional_plan"
+    | "medical_checkup"
+    | "emergency";
+  status?:
+    | "scheduled"
+    | "confirmed"
+    | "in_progress"
+    | "completed"
+    | "cancelled"
+    | "no_show";
 }
 
 export interface CreateAppointmentData {
   appointmentDate: string;
   appointmentTime: string;
-  consultationType: "initial" | "followup" | "nutritional_plan" | "medical_checkup" | "emergency";
-  status?: "scheduled" | "confirmed" | "in_progress" | "completed" | "cancelled" | "no_show";
+  consultationType:
+    | "initial"
+    | "followup"
+    | "nutritional_plan"
+    | "medical_checkup"
+    | "emergency";
+  status?:
+    | "scheduled"
+    | "confirmed"
+    | "in_progress"
+    | "completed"
+    | "cancelled"
+    | "no_show";
   notes?: string;
   durationMinutes: number;
   patientId: string;
@@ -72,8 +107,19 @@ export interface CreateAppointmentData {
 export interface UpdateAppointmentData {
   appointmentDate?: string;
   appointmentTime?: string;
-  consultationType?: "initial" | "followup" | "nutritional_plan" | "medical_checkup" | "emergency";
-  status?: "scheduled" | "confirmed" | "in_progress" | "completed" | "cancelled" | "no_show";
+  consultationType?:
+    | "initial"
+    | "followup"
+    | "nutritional_plan"
+    | "medical_checkup"
+    | "emergency";
+  status?:
+    | "scheduled"
+    | "confirmed"
+    | "in_progress"
+    | "completed"
+    | "cancelled"
+    | "no_show";
   notes?: string;
   durationMinutes?: number;
   patientId?: string;
@@ -82,34 +128,53 @@ export interface UpdateAppointmentData {
 
 export const appointmentService = {
   // Get paginated appointments list
-  getAppointments: async (params: AppointmentsQueryParams = {}): Promise<PaginatedAppointmentsResponse> => {
+  getAppointments: async (
+    params: AppointmentsQueryParams = {}
+  ): Promise<PaginatedAppointmentsResponse> => {
     const searchParams = new URLSearchParams();
-    
-    if (params.page) searchParams.append('page', params.page.toString());
-    if (params.limit) searchParams.append('limit', params.limit.toString());
-    if (params.search) searchParams.append('search', params.search);
-    if (params.status) searchParams.append('status', params.status);
-    if (params.date) searchParams.append('date', params.date);
 
-    const response = await apiClient.get(`/appointments?${searchParams.toString()}`);
+    if (params.page) searchParams.append("page", params.page.toString());
+    if (params.limit) searchParams.append("limit", params.limit.toString());
+    if (params.search) searchParams.append("search", params.search);
+    if (params.appointmentDate)
+      searchParams.append("appointmentDate", params.appointmentDate);
+    if (params.startDate) searchParams.append("startDate", params.startDate);
+    if (params.endDate) searchParams.append("endDate", params.endDate);
+    if (params.consultationType)
+      searchParams.append("consultationType", params.consultationType);
+    if (params.status) searchParams.append("status", params.status);
+
+    const response = await apiClient.get(
+      `/appointments?${searchParams.toString()}`
+    );
     return response.data;
   },
 
   // Get appointment details by ID
-  getAppointmentById: async (id: string): Promise<AppointmentDetailResponse> => {
+  getAppointmentById: async (
+    id: string
+  ): Promise<AppointmentDetailResponse> => {
     const response = await apiClient.get(`/appointments/${id}`);
     return response.data;
   },
 
   // Create new appointment
-  createAppointment: async (appointmentData: CreateAppointmentData): Promise<ApiResponse<Appointment>> => {
-    const response = await apiClient.post('/appointments', appointmentData);
+  createAppointment: async (
+    appointmentData: CreateAppointmentData
+  ): Promise<ApiResponse<Appointment>> => {
+    const response = await apiClient.post("/appointments", appointmentData);
     return response.data;
   },
 
   // Update appointment by ID
-  updateAppointment: async (id: string, appointmentData: UpdateAppointmentData): Promise<ApiResponse<Appointment>> => {
-    const response = await apiClient.patch(`/appointments/${id}`, appointmentData);
+  updateAppointment: async (
+    id: string,
+    appointmentData: UpdateAppointmentData
+  ): Promise<ApiResponse<Appointment>> => {
+    const response = await apiClient.patch(
+      `/appointments/${id}`,
+      appointmentData
+    );
     return response.data;
   },
 
@@ -117,5 +182,5 @@ export const appointmentService = {
   deleteAppointment: async (id: string): Promise<ApiResponse<void>> => {
     const response = await apiClient.delete(`/appointments/${id}`);
     return response.data;
-  }
+  },
 };
