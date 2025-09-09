@@ -3,11 +3,20 @@
 import { useState } from "react";
 import { Calendar, Plus, Table, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAppointments, useAppointmentCalendar } from "@/hooks/useAppointments";
+import {
+  useAppointments,
+  useAppointmentCalendar,
+} from "@/hooks/useAppointments";
 import { ScheduleAppointmentDialog } from "@/components/appointments/schedule-appointment-dialog";
 import { AppointmentsTable } from "@/components/appointments/appointments-table";
 import { AppointmentsCalendar } from "@/components/appointments/appointments-calendar";
-import { format, startOfMonth, endOfMonth } from "date-fns";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+} from "date-fns";
 
 export default function AppointmentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,13 +30,12 @@ export default function AppointmentsPage() {
   const [limit] = useState(10);
   const [view, setView] = useState<"table" | "calendar">("table");
 
-  // Calendar date range - expanded to show more events
+  // Calendar date range - current week from Monday to Sunday
   const today = new Date();
-  const rangeStart = new Date(today.getFullYear() - 1, 0, 1); // Start of last year
-  const rangeEnd = new Date(today.getFullYear() + 1, 11, 31); // End of next year
+  const rangeStart = startOfWeek(today, { weekStartsOn: 1 }); // Start of this week (Monday)
+  const rangeEnd = endOfWeek(today, { weekStartsOn: 1 }); // End of this week (Sunday)
   const calendarStart = format(rangeStart, "yyyy-MM-dd");
   const calendarEnd = format(rangeEnd, "yyyy-MM-dd");
-
 
   const {
     data: appointmentsData,
