@@ -40,6 +40,10 @@ export default function PatientsPage() {
     setCurrentPage(page);
   };
 
+  const handlePatientDeleted = () => {
+    setSelectedPatientId(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -80,6 +84,7 @@ export default function PatientsPage() {
             patient={selectedPatient}
             isLoading={isLoadingPatient}
             selectedPatientId={selectedPatientId}
+            onPatientUpdated={handlePatientDeleted}
           />
         </div>
       </div>

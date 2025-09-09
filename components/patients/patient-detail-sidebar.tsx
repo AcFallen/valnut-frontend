@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import {
   User,
   Mail,
@@ -18,23 +20,36 @@ import {
   UserRound,
   Users,
   MessageCircle,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { EditPatientDialog } from "./edit-patient-dialog";
+import { DeletePatientAlert } from "./delete-patient-alert";
 import type { PatientDetail } from "@/services/patient.service";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PatientDetailSidebarProps {
   patient: PatientDetail | undefined;
   isLoading: boolean;
   selectedPatientId: string | null;
+  onPatientUpdated?: () => void;
 }
 
 export function PatientDetailSidebar({
   patient,
   isLoading,
   selectedPatientId,
+  onPatientUpdated,
 }: PatientDetailSidebarProps) {
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   if (!selectedPatientId) {
     return (
       <Card className="h-fit">
@@ -100,9 +115,46 @@ export function PatientDetailSidebar({
   return (
     <Card className="h-fit">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <User className="h-5 w-5" />
-          Detalles del Paciente
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Detalles del Paciente
+          </div>
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditDialogOpen(true)}
+                  title="Editar paciente"
+                  className="h-8 w-8 p-0 hover:bg-teal-50 dark:hover:bg-teal-950/30"
+                >
+                  <Edit className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent color="info">
+                <p>Editar paciente</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDeleteAlertOpen(true)}
+                  title="Eliminar paciente"
+                  className="h-8 w-8 p-0 hover:bg-red-50 dark:hover:bg-red-950/30"
+                >
+                  <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent color="danger">
+                <p>Eliminar paciente</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -175,10 +227,12 @@ export function PatientDetailSidebar({
                 <span>{patient.phone}</span>
                 <button
                   onClick={() => {
-                    const phoneNumber = patient.phone.replace(/[^\d+]/g, ''); // Remove all non-digit characters except +
+                    const phoneNumber = patient.phone.replace(/[^\d+]/g, ""); // Remove all non-digit characters except +
                     const message = `Hola ${patient.firstName}, soy del ${patient.tenant.name}. ¿Cómo te encuentras?`;
-                    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-                    window.open(whatsappUrl, '_blank');
+                    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+                      message
+                    )}`;
+                    window.open(whatsappUrl, "_blank");
                   }}
                   className="p-1 rounded-full bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-800/40 transition-colors"
                   title="Enviar mensaje por WhatsApp"
@@ -332,6 +386,19 @@ export function PatientDetailSidebar({
           </div>
         </div>
       </CardContent>
+
+      <EditPatientDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        patient={patient}
+      />
+
+      <DeletePatientAlert
+        open={deleteAlertOpen}
+        onOpenChange={setDeleteAlertOpen}
+        patient={patient}
+        onDeleted={onPatientUpdated}
+      />
     </Card>
   );
 }

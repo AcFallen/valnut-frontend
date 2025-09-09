@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { patientService, PatientsQueryParams, CreatePatientData } from "@/services/patient.service";
+import { patientService, PatientsQueryParams, CreatePatientData, UpdatePatientData } from "@/services/patient.service";
 import { toast } from "react-hot-toast";
 
 // Query keys for patients
@@ -50,6 +50,62 @@ export function useCreatePatient() {
         error?.response?.data?.details?.message ||
         error?.message ||
         "Error al crear el paciente";
+      
+      toast.error(errorMessage);
+    },
+  });
+}
+
+// Update patient mutation
+export function useUpdatePatient() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, patientData }: { id: string; patientData: UpdatePatientData }) => 
+      patientService.updatePatient(id, patientData),
+    onSuccess: (data, variables) => {
+      // Invalidate all patient queries to refresh the list and details
+      queryClient.invalidateQueries({ queryKey: patientQueryKeys.all });
+      queryClient.invalidateQueries({ queryKey: patientQueryKeys.detail(variables.id) });
+      toast.success("Paciente actualizado exitosamente");
+    },
+    onError: (error: any) => {
+      console.error("Error updating patient:", error);
+      
+      // Extract error message from server response
+      const errorMessage = 
+        error?.response?.data?.error || 
+        error?.response?.data?.message || 
+        error?.response?.data?.details?.message ||
+        error?.message ||
+        "Error al actualizar el paciente";
+      
+      toast.error(errorMessage);
+    },
+  });
+}
+
+// Delete patient mutation
+export function useDeletePatient() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => patientService.deletePatient(id),
+    onSuccess: () => {
+      // Invalidate all patient queries to refresh the list
+      queryClient.invalidateQueries({ queryKey: patientQueryKeys.all });
+      toast.success("Paciente eliminado exitosamente");
+    },
+    onError: (error: any) => {
+      console.error("Error deleting patient:", error);
+      
+      // Extract error message from server response
+      const errorMessage = 
+        error?.response?.data?.error || 
+        error?.response?.data?.message || 
+        error?.response?.data?.details?.message ||
+        error?.message ||
+        "Error al eliminar el paciente";
       
       toast.error(errorMessage);
     },

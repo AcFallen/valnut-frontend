@@ -87,6 +87,19 @@ export interface CreatePatientData {
   notes?: string;
 }
 
+export interface UpdatePatientData {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  gender?: "male" | "female" | "other";
+  address?: string;
+  medicalHistory?: string;
+  allergies?: string;
+  notes?: string;
+}
+
 export const patientService = {
   // Get paginated patients list
   getPatients: async (params: PatientsQueryParams = {}): Promise<PaginatedPatientsResponse> => {
@@ -109,6 +122,18 @@ export const patientService = {
   // Create new patient
   createPatient: async (patientData: CreatePatientData): Promise<ApiResponse<PatientDetail>> => {
     const response = await apiClient.post('/patients', patientData);
+    return response.data;
+  },
+
+  // Update patient by ID
+  updatePatient: async (id: string, patientData: UpdatePatientData): Promise<ApiResponse<PatientDetail>> => {
+    const response = await apiClient.patch(`/patients/${id}`, patientData);
+    return response.data;
+  },
+
+  // Delete patient by ID
+  deletePatient: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await apiClient.delete(`/patients/${id}`);
     return response.data;
   }
 };

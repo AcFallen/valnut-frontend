@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -32,10 +33,10 @@ import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { useCreatePatient } from "@/hooks/usePatients";
-import type { CreatePatientData } from "@/services/patient.service";
+import { useUpdatePatient } from "@/hooks/usePatients";
+import type { UpdatePatientData, PatientDetail } from "@/services/patient.service";
 
-const createPatientSchema = z.object({
+const updatePatientSchema = z.object({
   firstName: z
     .string()
     .min(1, "El nombre es requerido")
@@ -61,18 +62,20 @@ const createPatientSchema = z.object({
   notes: z.string().optional().or(z.literal("")),
 });
 
-type CreatePatientFormData = z.infer<typeof createPatientSchema>;
+type UpdatePatientFormData = z.infer<typeof updatePatientSchema>;
 
-interface CreatePatientDialogProps {
+interface EditPatientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  patient: PatientDetail | null;
 }
 
-export function CreatePatientDialog({
+export function EditPatientDialog({
   open,
   onOpenChange,
-}: CreatePatientDialogProps) {
-  const createPatientMutation = useCreatePatient();
+  patient,
+}: EditPatientDialogProps) {
+  const updatePatientMutation = useUpdatePatient();
 
   const {
     register,
@@ -80,8 +83,8 @@ export function CreatePatientDialog({
     control,
     reset,
     formState: { errors },
-  } = useForm<CreatePatientFormData>({
-    resolver: zodResolver(createPatientSchema),
+  } = useForm<UpdatePatientFormData>({
+    resolver: zodResolver(updatePatientSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -94,9 +97,29 @@ export function CreatePatientDialog({
     },
   });
 
-  const onSubmit = async (data: CreatePatientFormData) => {
+  // Load patient data into form when patient changes
+  useEffect(() => {
+    if (patient && open) {
+      reset({
+        firstName: patient.firstName,
+        lastName: patient.lastName,
+        email: patient.email,
+        phone: patient.phone || "",
+        dateOfBirth: patient.dateOfBirth ? new Date(patient.dateOfBirth) : undefined,
+        gender: patient.gender as "male" | "female" | "other" | undefined,
+        address: patient.address || "",
+        medicalHistory: patient.medicalHistory || "",
+        allergies: patient.allergies || "",
+        notes: patient.notes || "",
+      });
+    }
+  }, [patient, open, reset]);
+
+  const onSubmit = async (data: UpdatePatientFormData) => {
+    if (!patient) return;
+
     try {
-      const submitData: CreatePatientData = {
+      const submitData: UpdatePatientData = {
         ...data,
         dateOfBirth: data.dateOfBirth
           ? format(data.dateOfBirth, "yyyy-MM-dd")
@@ -109,12 +132,14 @@ export function CreatePatientDialog({
         notes: data.notes || undefined,
       };
 
-      await createPatientMutation.mutateAsync(submitData);
-      reset();
+      await updatePatientMutation.mutateAsync({
+        id: patient.id,
+        patientData: submitData,
+      });
       onOpenChange(false);
     } catch (error) {
       // Error handling is done in the mutation
-      console.error("Error creating patient:", error);
+      console.error("Error updating patient:", error);
     }
   };
 
@@ -129,9 +154,9 @@ export function CreatePatientDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Crear Nuevo Paciente</DialogTitle>
+          <DialogTitle>Editar Paciente</DialogTitle>
           <DialogDescription>
-            Completa la información del paciente. Los campos marcados con * son
+            Modifica la información del paciente. Los campos marcados con * son
             obligatorios.
           </DialogDescription>
         </DialogHeader>
@@ -139,8 +164,7 @@ export function CreatePatientDialog({
         <ScrollArea className="max-h-[70vh] pr-2">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6 p-1
-          "
+            className="space-y-6 p-1"
           >
             {/* Basic Information */}
             <div className="space-y-4">
@@ -336,18 +360,18 @@ export function CreatePatientDialog({
             type="button"
             variant="outline"
             onClick={() => handleOpenChange(false)}
-            disabled={createPatientMutation.isPending}
+            disabled={updatePatientMutation.isPending}
           >
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
-            disabled={createPatientMutation.isPending}
+            disabled={updatePatientMutation.isPending}
           >
-            {createPatientMutation.isPending && (
+            {updatePatientMutation.isPending && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Crear Paciente
+            Actualizar Paciente
           </Button>
         </div>
       </DialogContent>
