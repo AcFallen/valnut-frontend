@@ -118,6 +118,7 @@ export function EditAppointmentDialog({
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors },
   } = useForm<EditAppointmentFormData>({
     resolver: zodResolver(editAppointmentSchema),
@@ -428,6 +429,8 @@ export function EditAppointmentDialog({
 
               {/* Consultation Details */}
 
+              {/* <pre>{JSON.stringify(watch(), null, 2)}</pre> */}
+
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <UserCheck className="h-5 w-5" />
@@ -444,7 +447,7 @@ export function EditAppointmentDialog({
                       render={({ field }) => (
                         <ShadcnSelect
                           value={
-                            field.value || appointmentData?.consultationType
+                            appointmentData?.consultationType || field.value
                           }
                           onValueChange={field.onChange}
                         >
@@ -487,7 +490,7 @@ export function EditAppointmentDialog({
                       control={control}
                       render={({ field }) => (
                         <ShadcnSelect
-                          value={field.value || appointmentData?.status}
+                          value={appointmentData?.status || field.value}
                           onValueChange={field.onChange}
                         >
                           <SelectTrigger className="w-full">
