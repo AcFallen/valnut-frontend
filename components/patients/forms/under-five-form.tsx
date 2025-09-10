@@ -34,8 +34,8 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
           {/* Datos Antropométricos */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Weight className="h-5 w-5 text-purple-600" />
-              <h3 className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+              <Weight className="h-5 w-5 text-violet-600" />
+              <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300">
                 Datos Antropométricos
               </h3>
             </div>
@@ -121,8 +121,8 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
           {/* Diagnóstico Nutricional según Indicadores */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-5 w-5 text-emerald-600" />
-              <h3 className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+              <TrendingUp className="h-5 w-5 text-violet-600" />
+              <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300">
                 Diagnóstico Nutricional según Indicadores
               </h3>
             </div>
@@ -189,8 +189,8 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
         <div className="space-y-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Calculator className="h-5 w-5 text-blue-600" />
-              <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+              <Calculator className="h-5 w-5 text-violet-600" />
+              <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300">
                 Cálculo del Gasto Energético Total
               </h3>
             </div>
@@ -237,7 +237,7 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-3">
-                <p className="text-sm text-blue-600 font-semibold">
+                <p className="text-sm text-violet-600 font-semibold">
                   TMB Según Harris y Benedict
                 </p>
 
@@ -311,7 +311,7 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
                       placeholder="1186.00"
                       className="rounded-r-none font-semibold"
                     />
-                    <div className="px-3 py-1 bg-blue-100 dark:bg-blue-800 border border-l-0 rounded-r-md text-sm font-semibold flex items-center">
+                    <div className="px-3 py-1 bg-violet-100 dark:bg-violet-800 border border-l-0 rounded-r-md text-sm font-semibold flex items-center">
                       <span>kcal/día</span>
                     </div>
                   </div>
@@ -319,7 +319,7 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-3">
-                <p className="text-sm text-green-600 font-semibold">
+                <p className="text-sm text-violet-600 font-semibold">
                   TMB Según (Schofield)
                 </p>
 
@@ -355,7 +355,7 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
                       placeholder="1343.197875"
                       className="rounded-r-none font-semibold"
                     />
-                    <div className="px-3 py-1 bg-green-100 dark:bg-green-800 border border-l-0 rounded-r-md text-sm font-semibold flex items-center">
+                    <div className="px-3 py-1 bg-violet-100 dark:bg-violet-800 border border-l-0 rounded-r-md text-sm font-semibold flex items-center">
                       <span>kcal/día</span>
                     </div>
                   </div>
@@ -370,8 +370,8 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
           {/* Exámenes Auxiliares */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Stethoscope className="h-5 w-5 text-indigo-600" />
-              <h3 className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
+              <Stethoscope className="h-5 w-5 text-violet-600" />
+              <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300">
                 Exámenes Auxiliares
               </h3>
             </div>
@@ -511,8 +511,8 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
           {/* Indicaciones */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <FileText className="h-5 w-5 text-rose-600" />
-              <h3 className="text-sm font-semibold text-rose-700 dark:text-rose-300">
+              <FileText className="h-5 w-5 text-violet-600" />
+              <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300">
                 Indicaciones
               </h3>
             </div>
