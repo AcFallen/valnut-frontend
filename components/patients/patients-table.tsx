@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { FaFolder } from "react-icons/fa6";
 import {
   Table,
   TableBody,
@@ -26,18 +27,27 @@ import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import Link from "next/link";
 import type { Patient } from "@/services/patient.service";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useRouter } from "next/navigation";
 
 interface PatientsTableProps {
-  data: {
-    data: Patient[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  } | undefined;
+  data:
+    | {
+        data: Patient[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+      }
+    | undefined;
   isLoading: boolean;
   error: any;
   selectedPatientId: string | null;
@@ -61,6 +71,8 @@ export function PatientsTable({
   onSearchChange,
   onCreatePatient,
 }: PatientsTableProps) {
+  const router = useRouter();
+
   if (error) {
     return (
       <Card>
@@ -119,9 +131,18 @@ export function PatientsTable({
         <Table>
           <TableHeader>
             <TableRow className="border-b">
-              <TableHead className="px-6 py-4 font-semibold">Paciente</TableHead>
-              <TableHead className="px-6 py-4 font-semibold">Contacto</TableHead>
-              <TableHead className="px-6 py-4 font-semibold">Fecha de Registro</TableHead>
+              <TableHead className="px-6 py-4 font-semibold">
+                Paciente
+              </TableHead>
+              <TableHead className="px-6 py-4 font-semibold">
+                Contacto
+              </TableHead>
+              <TableHead className="px-6 py-4 font-semibold">
+                Fecha de Registro
+              </TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-right">
+                Acciones
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -144,6 +165,9 @@ export function PatientsTable({
                   <TableCell className="px-6 py-4">
                     <Skeleton className="h-4 w-24" />
                   </TableCell>
+                  <TableCell className="px-6 py-4 text-right">
+                    <Skeleton className="h-8 w-20 ml-auto" />
+                  </TableCell>
                 </TableRow>
               ))
             ) : data && data.data.length > 0 ? (
@@ -153,7 +177,8 @@ export function PatientsTable({
                   key={patient.id}
                   className={cn(
                     "cursor-pointer transition-colors hover:bg-muted/50 border-b border-border/50",
-                    selectedPatientId === patient.id && "bg-muted/70 hover:bg-muted/70"
+                    selectedPatientId === patient.id &&
+                      "bg-muted/70 hover:bg-muted/70"
                   )}
                   onClick={() => onPatientSelect(patient.id)}
                 >
@@ -163,7 +188,7 @@ export function PatientsTable({
                         {patient.firstName} {patient.lastName}
                       </div>
                       <div className="text-xs text-muted-foreground font-mono">
-                        ID: {patient.id.split('-')[0]}...
+                        ID: {patient.id.split("-")[0]}...
                       </div>
                     </div>
                   </TableCell>
@@ -173,13 +198,17 @@ export function PatientsTable({
                         <div className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                           <Mail className="h-2.5 w-2.5 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <span className="truncate text-foreground">{patient.email}</span>
+                        <span className="truncate text-foreground">
+                          {patient.email}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <div className="w-4 h-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
                           <Phone className="h-2.5 w-2.5 text-green-600 dark:text-green-400" />
                         </div>
-                        <span className="text-muted-foreground">{patient.phone}</span>
+                        <span className="text-muted-foreground">
+                          {patient.phone}
+                        </span>
                       </div>
                     </div>
                   </TableCell>
@@ -190,12 +219,31 @@ export function PatientsTable({
                       })}
                     </div>
                   </TableCell>
+                  <TableCell className="px-6 py-4 text-right">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="sm"
+                          className="bg-yellow-500  text-white hover:bg-yellow-600 "
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/patients/${patient.id}`);
+                          }}
+                        >
+                          <FaFolder className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="text-sm bg-yellow-500 fill-yellow-500 text-white">
+                        <p>Historial Clinico</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               // No patients found
               <TableRow>
-                <TableCell colSpan={3} className="text-center py-12 px-6">
+                <TableCell colSpan={4} className="text-center py-12 px-6">
                   <div className="flex flex-col items-center gap-4">
                     <div className="w-20 h-20 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
                       <Users className="h-10 w-10 text-muted-foreground" />
@@ -205,7 +253,8 @@ export function PatientsTable({
                         No hay pacientes
                       </h3>
                       <p className="text-muted-foreground text-sm max-w-sm">
-                        No se encontraron pacientes que coincidan con tu búsqueda.
+                        No se encontraron pacientes que coincidan con tu
+                        búsqueda.
                       </p>
                     </div>
                   </div>
@@ -220,8 +269,15 @@ export function PatientsTable({
           <div className="flex items-center justify-between px-6 py-4 border-t bg-muted/20">
             <div className="flex items-center gap-2">
               <div className="text-sm text-muted-foreground">
-                Mostrando <span className="font-medium text-foreground">{data.data.length}</span> de{" "}
-                <span className="font-medium text-foreground">{data.total}</span> pacientes
+                Mostrando{" "}
+                <span className="font-medium text-foreground">
+                  {data.data.length}
+                </span>{" "}
+                de{" "}
+                <span className="font-medium text-foreground">
+                  {data.total}
+                </span>{" "}
+                pacientes
               </div>
               <Badge variant="outline" className="text-xs">
                 Página {data.page}/{data.totalPages}
