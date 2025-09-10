@@ -20,6 +20,7 @@ import {
   UserCheck,
   Stethoscope,
   Cake,
+  MessageCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -183,7 +184,6 @@ export default function PatientDetailPage() {
                             alt="Avatar del paciente"
                             width={120}
                             height={120}
-                          
                           />
                         </div>
                         <div className="text-center">
@@ -216,8 +216,8 @@ export default function PatientDetailPage() {
                         Email
                       </label>
                       <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        <p className="text-foreground">{patient?.email}</p>
+                        <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                        <p className="text-foreground truncate">{patient?.email}</p>
                       </div>
                     </div>
                     <div>
@@ -282,7 +282,7 @@ export default function PatientDetailPage() {
                         </p>
                       </div>
                     )}
-                    <div className="md:col-span-2">
+                    <div>
                       <label className="text-sm font-medium text-muted-foreground">
                         Direccion
                       </label>
