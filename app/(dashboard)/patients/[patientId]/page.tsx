@@ -299,14 +299,16 @@ export default function PatientDetailPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Heart className="h-5 w-5" />
+          <Card className="border-0 bg-gradient-to-br from-emerald-50/50 via-teal-50/30 to-cyan-50/50 dark:from-emerald-950/20 dark:via-teal-950/20 dark:to-cyan-950/20">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-emerald-700 dark:text-emerald-300">
+                <div className="p-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                  <Heart className="h-5 w-5" />
+                </div>
                 Informacion Medica
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               {isLoading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
@@ -317,34 +319,60 @@ export default function PatientDetailPage() {
                   ))}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      Historial Medico
-                    </label>
-                    <p className="text-foreground mt-1 p-3 bg-muted/30 rounded-md">
-                      {patient?.medicalHistory ||
-                        "Sin historial medico registrado"}
-                    </p>
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="relative">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="p-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex-shrink-0 mt-0.5">
+                        <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                          Historial Medico
+                        </label>
+                        <div className="mt-2 p-4 bg-white/60 dark:bg-gray-900/30 rounded-lg border border-blue-100 dark:border-blue-900/30 shadow-sm">
+                          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                            {patient?.medicalHistory ||
+                              "Sin historial medico registrado"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4" />
-                      Alergias
-                    </label>
-                    <p className="text-foreground mt-1 p-3 bg-muted/30 rounded-md">
-                      {patient?.allergies || "Sin alergias registradas"}
-                    </p>
+
+                  <div className="relative">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="p-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 flex-shrink-0 mt-0.5">
+                        <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-sm font-semibold text-amber-700 dark:text-amber-300">
+                          Alergias
+                        </label>
+                        <div className="mt-2 p-4 bg-white/60 dark:bg-gray-900/30 rounded-lg border border-amber-100 dark:border-amber-900/30 shadow-sm">
+                          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                            {patient?.allergies || "Sin alergias registradas"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      Notas Adicionales
-                    </label>
-                    <p className="text-foreground mt-1 p-3 bg-muted/30 rounded-md">
-                      {patient?.notes || "Sin notas adicionales"}
-                    </p>
+
+                  <div className="relative">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="p-1.5 rounded-full bg-purple-100 dark:bg-purple-900/30 flex-shrink-0 mt-0.5">
+                        <MessageCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                          Notas Adicionales
+                        </label>
+                        <div className="mt-2 p-4 bg-white/60 dark:bg-gray-900/30 rounded-lg border border-purple-100 dark:border-purple-900/30 shadow-sm">
+                          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                            {patient?.notes || "Sin notas adicionales"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
