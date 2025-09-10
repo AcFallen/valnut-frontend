@@ -78,32 +78,17 @@ export function NewConsultationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="6xl">
+      <DialogContent size="7xl" className="">
         <DialogHeader className="space-y-3">
           <DialogTitle className="flex items-center gap-3 text-xl">
             <Calendar className="h-6 w-6 text-blue-600" />
-            Nueva Consulta - {currentDate}
+            Nueva Consulta
           </DialogTitle>
-          
-          {/* Información del paciente y edad */}
-          <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border">
-            <User className="h-5 w-5 text-blue-600" />
-            <div>
-              <p className="font-semibold text-gray-800 dark:text-gray-200">
-                {patient.firstName} {patient.lastName}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Edad: {avatarInfo.ageText}
-              </p>
-            </div>
-          </div>
         </DialogHeader>
 
         {/* ScrollArea para el contenido del formulario */}
         <ScrollArea className="max-h-[75vh] w-full">
-          <div className="px-1">
-            {renderFormByAge()}
-          </div>
+          <div className="px-1">{renderFormByAge()}</div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
