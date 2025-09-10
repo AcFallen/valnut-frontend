@@ -19,10 +19,13 @@ import {
   Clock,
   UserCheck,
   Stethoscope,
+  Cake,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
+import { getPatientAvatarAndAge } from "@/lib/utils";
+import Image from "next/image";
 
 interface AttentionRecord {
   id: string;
@@ -76,6 +79,11 @@ export default function PatientDetailPage() {
   const patientId = params?.patientId as string;
 
   const { data: patient, isLoading, error } = usePatientDetail(patientId);
+
+  // Obtener información del avatar y edad
+  const avatarInfo = patient
+    ? getPatientAvatarAndAge(patient.dateOfBirth, patient.gender)
+    : null;
 
   if (error) {
     return (
@@ -164,95 +172,126 @@ export default function PatientDetailPage() {
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Nombre Completo
-                    </label>
-                    <p className="text-foreground">
-                      {patient?.firstName} {patient?.lastName}
-                    </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Columna del Avatar y Edad */}
+                  <div className="flex flex-col items-center space-y-4 p-4 bg-gradient-to-b from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border">
+                    {avatarInfo && (
+                      <>
+                        <div className="relative">
+                          <Image
+                            src={avatarInfo.imagePath}
+                            alt="Avatar del paciente"
+                            width={120}
+                            height={120}
+                          
+                          />
+                        </div>
+                        <div className="text-center">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <Cake className="h-4 w-4 text-blue-600" />
+                            <span className="text-blue-600 font-semibold">
+                              {avatarInfo.ageText}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Edad del paciente
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Email
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <p className="text-foreground">{patient?.email}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Telefono
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <p className="text-foreground">{patient?.phone}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Fecha de Nacimiento
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+
+                  {/* Columna de Información Personal */}
+                  <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Nombre Completo
+                      </label>
                       <p className="text-foreground">
-                        {patient?.dateOfBirth
-                          ? format(
-                              new Date(patient.dateOfBirth),
-                              "d MMMM yyyy",
-                              { locale: es }
-                            )
+                        {patient?.firstName} {patient?.lastName}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Email
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <p className="text-foreground">{patient?.email}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Telefono
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <p className="text-foreground">{patient?.phone}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Fecha de Nacimiento
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <p className="text-foreground">
+                          {patient?.dateOfBirth
+                            ? format(
+                                new Date(patient.dateOfBirth),
+                                "d MMMM yyyy",
+                                { locale: es }
+                              )
+                            : "No especificado"}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Genero
+                      </label>
+                      <p className="text-foreground">
+                        {patient?.gender === "male"
+                          ? "Masculino"
+                          : patient?.gender === "female"
+                          ? "Femenino"
+                          : patient?.gender === "other"
+                          ? "Otro"
                           : "No especificado"}
                       </p>
                     </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Genero
-                    </label>
-                    <p className="text-foreground">
-                      {patient?.gender === "male"
-                        ? "Masculino"
-                        : patient?.gender === "female"
-                        ? "Femenino"
-                        : patient?.gender === "other"
-                        ? "Otro"
-                        : "No especificado"}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Tipo de Documento
-                    </label>
-                    <p className="text-foreground">
-                      {patient?.documentType === "dni"
-                        ? "DNI"
-                        : patient?.documentType === "carnet_extranjeria"
-                        ? "Carnet de Extranjeria"
-                        : "No especificado"}
-                    </p>
-                  </div>
-                  {patient?.documentNumber && (
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
-                        Numero de Documento
+                        Tipo de Documento
                       </label>
                       <p className="text-foreground">
-                        {patient.documentNumber}
+                        {patient?.documentType === "dni"
+                          ? "DNI"
+                          : patient?.documentType === "carnet_extranjeria"
+                          ? "Carnet de Extranjeria"
+                          : "No especificado"}
                       </p>
                     </div>
-                  )}
-                  <div className="md:col-span-2">
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Direccion
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <p className="text-foreground">
-                        {patient?.address || "No especificado"}
-                      </p>
+                    {patient?.documentNumber && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Numero de Documento
+                        </label>
+                        <p className="text-foreground">
+                          {patient.documentNumber}
+                        </p>
+                      </div>
+                    )}
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Direccion
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <p className="text-foreground">
+                          {patient?.address || "No especificado"}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
