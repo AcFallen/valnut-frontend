@@ -22,6 +22,7 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 - **Lucide React**: Icon library
 - **next-themes**: Theme provider for dark/light/system mode support
 - **Framer Motion**: Animation library for page transitions and micro-interactions
+- **FullCalendar**: Calendar component library with dayGrid, timeGrid, and list views for appointment scheduling
 
 ### Authentication & Authorization
 - **NextAuth.js**: JWT-based authentication with credentials provider
@@ -50,12 +51,13 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 - **API client**: Centralized in `lib/api-client.ts` with auth interceptors
 - **Form handling**: React Hook Form with Zod validation
 - **Toast notifications**: react-hot-toast positioned at top-center
+- **Date handling**: date-fns for date manipulation and formatting
 
 ### Current Application Modules
 - **Dashboard**: Main navigation hub with animated route transitions
 - **Tenant Management**: Multi-tenant system with ownership and membership assignment
 - **Patient Management**: Patient records with CRUD operations and detailed sidebar
-- **Appointment Scheduling**: Appointment management with patient-nutritionist pairing
+- **Appointment Scheduling**: Full-featured calendar interface with FullCalendar integration, appointment management with patient-nutritionist pairing
 - **User Settings**: User management within tenant context
 - **Theme System**: System-aware theme switching with persistent preferences
 

@@ -22,10 +22,13 @@ import {
   MessageCircle,
   Edit,
   Trash2,
+  CreditCard,
+  IdCard,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { parseLocalDate } from "@/lib/utils";
 import { EditPatientDialog } from "./edit-patient-dialog";
 import { DeletePatientAlert } from "./delete-patient-alert";
 import type { PatientDetail } from "@/services/patient.service";
@@ -246,6 +249,41 @@ export function PatientDetailSidebar({
 
         <Separator className="my-3" />
 
+        {/* Document Information */}
+        {(patient.documentType || patient.documentNumber) && (
+          <>
+            <div className="space-y-2">
+              <h4 className="font-medium flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-100 to-teal-200 dark:from-teal-900/30 dark:to-teal-800/30 flex items-center justify-center">
+                  <IdCard className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                </div>
+                Documento de Identidad
+              </h4>
+              <div className="space-y-1.5 pl-10">
+                {patient.documentType && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-purple-50 dark:bg-purple-950/30 flex items-center justify-center flex-shrink-0">
+                      <CreditCard className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <span>
+                      {patient.documentType === "dni" ? "DNI" : "Carnet de Extranjería"}
+                    </span>
+                  </div>
+                )}
+                {patient.documentNumber && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center flex-shrink-0">
+                      <FileText className="h-3 w-3 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <span className="font-mono tracking-wide">{patient.documentNumber}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            <Separator className="my-3" />
+          </>
+        )}
+
         {/* Personal Information */}
         <div className="space-y-2">
           <h4 className="font-medium flex items-center gap-2">
@@ -260,13 +298,7 @@ export function PatientDetailSidebar({
                 <Calendar className="h-3 w-3 text-orange-600 dark:text-orange-400" />
               </div>
               <span>
-                {format(
-                  new Date(patient.dateOfBirth),
-                  "d 'de' MMMM 'de' yyyy",
-                  {
-                    locale: es,
-                  }
-                )}
+                {format(parseLocalDate(patient.dateOfBirth), "d 'de' MMMM 'de' yyyy", { locale: es })}
               </span>
             </div>
             <div className="flex items-start gap-2 text-sm">

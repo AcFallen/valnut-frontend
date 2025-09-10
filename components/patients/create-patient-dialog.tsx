@@ -33,7 +33,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCreatePatient } from "@/hooks/usePatients";
-import type { CreatePatientData } from "@/services/patient.service";
+import type { CreatePatientData, DocumentType } from "@/services/patient.service";
 
 const createPatientSchema = z.object({
   firstName: z
@@ -48,6 +48,15 @@ const createPatientSchema = z.object({
     .string()
     .min(1, "El email es requerido")
     .email("Ingresa un email válido"),
+  documentType: z
+    .enum(["dni", "carnet_extranjeria"])
+    .refine((val) => val !== undefined, {
+      message: "El tipo de documento es requerido",
+    }),
+  documentNumber: z
+    .string()
+    .min(1, "El número de documento es requerido")
+    .max(20, "El número de documento no puede exceder 20 caracteres"),
   phone: z
     .string()
     .max(20, "El teléfono no puede exceder 20 caracteres")
@@ -86,6 +95,8 @@ export function CreatePatientDialog({
       firstName: "",
       lastName: "",
       email: "",
+      documentType: undefined,
+      documentNumber: "",
       phone: "",
       address: "",
       medicalHistory: "",
@@ -107,6 +118,8 @@ export function CreatePatientDialog({
         medicalHistory: data.medicalHistory || undefined,
         allergies: data.allergies || undefined,
         notes: data.notes || undefined,
+        documentType: data.documentType as DocumentType,
+        documentNumber: data.documentNumber || undefined,
       };
 
       await createPatientMutation.mutateAsync(submitData);
@@ -209,6 +222,54 @@ export function CreatePatientDialog({
                   {errors.phone && (
                     <p className="text-sm text-red-500">
                       {errors.phone.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>
+                    Tipo de Documento <span className="text-red-500">*</span>
+                  </Label>
+                  <Controller
+                    name="documentType"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar tipo de documento" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="dni">DNI</SelectItem>
+                          <SelectItem value="carnet_extranjeria">Carnet de Extranjería</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.documentType && (
+                    <p className="text-sm text-red-500">
+                      {errors.documentType.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="documentNumber">
+                    Número de Documento <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="documentNumber"
+                    {...register("documentNumber")}
+                    placeholder="12345678"
+                    aria-invalid={!!errors.documentNumber}
+                  />
+                  {errors.documentNumber && (
+                    <p className="text-sm text-red-500">
+                      {errors.documentNumber.message}
                     </p>
                   )}
                 </div>

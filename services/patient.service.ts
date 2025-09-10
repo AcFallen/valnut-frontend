@@ -22,6 +22,8 @@ export interface PatientDetail {
   medicalHistory: string;
   allergies: string;
   notes: string;
+  documentType?: DocumentType;
+  documentNumber?: string;
   isActive: boolean;
   tenantId: string;
   createdAt: string;
@@ -74,6 +76,11 @@ export interface PatientsQueryParams {
   search?: string;
 }
 
+export enum DocumentType {
+  DNI = 'dni',
+  CARNET_EXTRANJERIA = 'carnet_extranjeria',
+}
+
 export interface CreatePatientData {
   firstName: string;
   lastName: string;
@@ -85,6 +92,8 @@ export interface CreatePatientData {
   medicalHistory?: string;
   allergies?: string;
   notes?: string;
+  documentType?: DocumentType;
+  documentNumber?: string;
 }
 
 export interface UpdatePatientData {
@@ -98,6 +107,8 @@ export interface UpdatePatientData {
   medicalHistory?: string;
   allergies?: string;
   notes?: string;
+  documentType?: DocumentType;
+  documentNumber?: string;
 }
 
 export interface PatientSelectOption {
