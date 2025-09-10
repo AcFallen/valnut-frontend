@@ -11,7 +11,8 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 - **Development server**: `npm run dev` (uses Turbopack for faster builds)
 - **Production build**: `npm run build` (also uses Turbopack)
 - **Production server**: `npm run start`
-- **Linting**: `npm run lint` (uses ESLint)
+- **Linting**: `npm run lint` (ESLint with Next.js core-web-vitals config)
+- **Type checking**: No separate typecheck command - Next.js handles TypeScript compilation
 
 ## Architecture & Key Technologies
 
@@ -77,3 +78,25 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 - Form validation uses Zod schemas with React Hook Form
 - Table components include pagination, filtering, and search functionality
 - Uses react-hot-toast for consistent notification styling
+
+## Important Implementation Patterns
+
+### Route Protection Implementation
+- Middleware (`middleware.ts`) handles role-based access control:
+  - `system_admin`: `/tenants` access only
+  - `tenant_owner`: `/settings` access + patient/appointment management
+  - `tenant_user`: Patient and appointment management only
+  - All authenticated users: `/dashboard` access
+- NextAuth JWT tokens carry `userType` for authorization decisions
+
+### API Integration Architecture
+- Centralized API client in `lib/api-client.ts` with automatic JWT token injection
+- Service classes in `services/` directory for each domain (tenants, patients, appointments, users)
+- Custom React Query hooks in `hooks/` for data fetching with built-in error handling
+- 401 responses trigger automatic redirect to login page
+
+### Component Organization Standards
+- Feature-specific components organized by module: `components/{module}/`
+- Shared UI components in `components/ui/` (Shadcn/ui base components)
+- Dialog-based modals for all CRUD operations following consistent patterns
+- Form components use React Hook Form + Zod validation throughout
