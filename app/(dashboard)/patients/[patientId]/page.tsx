@@ -21,12 +21,15 @@ import {
   Stethoscope,
   Cake,
   MessageCircle,
+  Plus,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
 import { getPatientAvatarAndAge } from "@/lib/utils";
 import Image from "next/image";
+import { NewConsultationDialog } from "@/components/patients/new-consultation-dialog";
+import { useState } from "react";
 
 interface AttentionRecord {
   id: string;
@@ -78,6 +81,7 @@ export default function PatientDetailPage() {
   const params = useParams();
   const router = useRouter();
   const patientId = params?.patientId as string;
+  const [isConsultationDialogOpen, setIsConsultationDialogOpen] = useState(false);
 
   const { data: patient, isLoading, error } = usePatientDetail(patientId);
 
@@ -383,9 +387,19 @@ export default function PatientDetailPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Stethoscope className="h-5 w-5" />
-                Historial de Atenciones
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Stethoscope className="h-5 w-5" />
+                  Historial de Atenciones
+                </div>
+                <Button 
+                  onClick={() => setIsConsultationDialogOpen(true)}
+                  className="gap-2"
+                  size="sm"
+                >
+                  <Plus className="h-4 w-4" />
+                  Nueva Consulta
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
@@ -477,6 +491,14 @@ export default function PatientDetailPage() {
           </Card>
         </div>
       </div>
+
+      {/* Dialog para nueva consulta */}
+      <NewConsultationDialog
+        open={isConsultationDialogOpen}
+        onOpenChange={setIsConsultationDialogOpen}
+        patient={patient || null}
+        avatarInfo={avatarInfo}
+      />
     </div>
   );
 }
