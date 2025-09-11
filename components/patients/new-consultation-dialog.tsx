@@ -12,6 +12,7 @@ import { es } from "date-fns/locale";
 import { PatientDetail } from "@/services/patient.service";
 import { AvatarInfo } from "@/lib/utils";
 import { UnderFiveForm } from "./forms/under-five-form";
+import { FiveToNineteenForm } from "./forms/five-to-nineteen-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Calendar, User } from "lucide-react";
 
@@ -57,6 +58,15 @@ export function NewConsultationDialog({
     if (avatarInfo.ageInYears < 5) {
       return (
         <UnderFiveForm
+          patientId={patient.id}
+          dateOfBirth={patient.dateOfBirth}
+        />
+      );
+    }
+
+    if (avatarInfo.ageInYears >= 5 && avatarInfo.ageInYears <= 19) {
+      return (
+        <FiveToNineteenForm
           patientId={patient.id}
           dateOfBirth={patient.dateOfBirth}
         />

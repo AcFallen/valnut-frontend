@@ -11,7 +11,7 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 - **Development server**: `npm run dev` (uses Turbopack for faster builds)
 - **Production build**: `npm run build` (also uses Turbopack)
 - **Production server**: `npm run start`
-- **Linting**: `npm run lint` (ESLint with Next.js core-web-vitals config)
+- **Linting**: `npm run lint` (ESLint configured with Next.js core-web-vitals, but currently disabled with `ignores: ["**/*"]`)
 - **Type checking**: No separate typecheck command - Next.js handles TypeScript compilation
 
 ## Architecture & Key Technologies
@@ -73,6 +73,7 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 ## Development Notes
 
 - API base URL configurable via `NEXT_PUBLIC_API_BASE_URL` environment variable
+- NextAuth secret required via `NEXTAUTH_SECRET` environment variable
 - TypeScript strict mode enabled with comprehensive type coverage
 - Shadcn/ui components follow consistent patterns for customization
 - Form validation uses Zod schemas with React Hook Form
@@ -100,3 +101,4 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 - Shared UI components in `components/ui/` (Shadcn/ui base components)
 - Dialog-based modals for all CRUD operations following consistent patterns
 - Form components use React Hook Form + Zod validation throughout
+- Domain-specific utilities in `lib/utils.ts` include patient age categorization and avatar selection logic
