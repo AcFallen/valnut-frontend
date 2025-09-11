@@ -1,10 +1,9 @@
-"use client";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { differenceInMonths } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -22,9 +21,21 @@ import {
 } from "lucide-react";
 interface UnderFiveFormProps {
   patientId: string;
+  dateOfBirth: string | null;
 }
 
-export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
+export function UnderFiveForm({ patientId, dateOfBirth }: UnderFiveFormProps) {
+  // Función para calcular la edad en meses
+  const calculateAgeInMonths = () => {
+    if (!dateOfBirth) return 0;
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    return differenceInMonths(today, birthDate);
+  };
+
+  const ageInMonths = calculateAgeInMonths();
+  const shouldShowBMIField = ageInMonths > 24; // Mayor de 24 meses (2 años)
+
   return (
     <div className="space-y-6 pr-2">
       {/* Grid principal - 3 columnas en md */}
@@ -166,6 +177,18 @@ export function UnderFiveForm({ patientId }: UnderFiveFormProps) {
                   className="flex-1"
                 />
               </div>
+
+              {shouldShowBMIField && (
+                <div className="flex items-center gap-4">
+                  <Label
+                    htmlFor="imcEdad"
+                    className="w-32 text-left font-medium text-sm"
+                  >
+                    IMC/Edad:
+                  </Label>
+                  <Input id="imcEdad" placeholder="NORMAL" className="flex-1" />
+                </div>
+              )}
 
               <div className="space-y-2 pt-4">
                 <Label

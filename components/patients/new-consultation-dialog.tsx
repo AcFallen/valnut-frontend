@@ -55,7 +55,12 @@ export function NewConsultationDialog({
 
   const renderFormByAge = () => {
     if (avatarInfo.ageInYears < 5) {
-      return <UnderFiveForm patientId={patient.id} />;
+      return (
+        <UnderFiveForm
+          patientId={patient.id}
+          dateOfBirth={patient.dateOfBirth}
+        />
+      );
     }
 
     return (
