@@ -1,0 +1,184 @@
+{
+  "hero": {
+    "title": "Valnut - Sistema Profesional para Nutricionistas",
+    "subtitle": "La plataforma completa que revoluciona la gestión de tu práctica nutricional",
+    "description": "Gestiona pacientes, citas, historiales clínicos y seguimiento nutricional en una sola plataforma diseñada especialmente para profesionales de la nutrición.",
+    "ctaButtons": [
+      {
+        "text": "Comenzar Prueba Gratuita",
+        "href": "/login",
+        "variant": "primary"
+      },
+      {
+        "text": "Ver Demo",
+        "href": "/login",
+        "variant": "secondary"
+      }
+    ],
+    "stats": [
+      {
+        "value": "500+",
+        "label": "Nutricionistas Activos"
+      },
+      {
+        "value": "10,000+",
+        "label": "Pacientes Gestionados"
+      },
+      {
+        "value": "99.9%",
+        "label": "Uptime Garantizado"
+      }
+    ]
+  },
+  "features": {
+    "title": "Funcionalidades que Impulsan tu Práctica",
+    "subtitle": "Todo lo que necesitas para gestionar tu consulta nutricional de manera profesional",
+    "items": [
+      {
+        "icon": "Users",
+        "title": "Gestión de Pacientes",
+        "description": "Registro completo de pacientes con datos antropométricos, historial clínico y seguimiento personalizado."
+      },
+      {
+        "icon": "Calendar",
+        "title": "Sistema de Citas",
+        "description": "Agenda inteligente con recordatorios automáticos, reprogramación fácil y sincronización de calendarios."
+      },
+      {
+        "icon": "FileText",
+        "title": "Formularios Dinámicos",
+        "description": "Formularios que se adaptan automáticamente según la edad del paciente y protocolos específicos."
+      },
+      {
+        "icon": "BarChart3",
+        "title": "Tablas OMS Integradas",
+        "description": "Cálculo automático de percentiles, IMC y análisis antropométrico basado en estándares de la OMS."
+      },
+      {
+        "icon": "Shield",
+        "title": "Control de Roles",
+        "description": "Sistema de permisos avanzado para equipos de trabajo con diferentes niveles de acceso."
+      },
+      {
+        "icon": "Database",
+        "title": "Historial Clínico Digital",
+        "description": "Expedientes electrónicos seguros con búsqueda avanzada y respaldo automático en la nube."
+      },
+      {
+        "icon": "Mail",
+        "title": "Envío de Resultados",
+        "description": "Comunicación directa con pacientes mediante reportes automáticos y seguimiento personalizado."
+      },
+      {
+        "icon": "Building2",
+        "title": "Gestión Multi-tenant",
+        "description": "Ideal para clínicas con múltiples nutricionistas, cada uno con su espacio independiente."
+      },
+      {
+        "icon": "Activity",
+        "title": "Análisis Nutricional",
+        "description": "Evaluación completa del estado nutricional con recomendaciones basadas en evidencia científica."
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Planes Diseñados para tu Práctica",
+    "subtitle": "Elige la membresía que mejor se adapte a tu consulta nutricional",
+    "plans": [
+      {
+        "name": "Básico",
+        "price": "29",
+        "currency": "USD",
+        "period": "mes",
+        "description": "Perfect para nutricionistas independientes",
+        "features": [
+          "Hasta 50 pacientes",
+          "Agenda básica de citas",
+          "Formularios estándar",
+          "Soporte por email",
+          "Respaldo en la nube"
+        ],
+        "cta": "Comenzar Prueba",
+        "popular": false
+      },
+      {
+        "name": "Profesional",
+        "price": "59",
+        "currency": "USD",
+        "period": "mes",
+        "description": "Ideal para consultas en crecimiento",
+        "features": [
+          "Pacientes ilimitados",
+          "Agenda avanzada con recordatorios",
+          "Formularios dinámicos por edad",
+          "Tablas OMS integradas",
+          "Análisis antropométrico",
+          "Reportes automáticos",
+          "Soporte prioritario"
+        ],
+        "cta": "Más Popular",
+        "popular": true
+      },
+      {
+        "name": "Clínica",
+        "price": "99",
+        "currency": "USD",
+        "period": "mes",
+        "description": "Para clínicas y equipos multidisciplinarios",
+        "features": [
+          "Todo del plan Profesional",
+          "Múltiples nutricionistas",
+          "Control de roles avanzado",
+          "Dashboard administrativo",
+          "API personalizada",
+          "Integración con sistemas externos",
+          "Soporte telefónico 24/7"
+        ],
+        "cta": "Contactar Ventas",
+        "popular": false
+      }
+    ]
+  },
+  "testimonials": {
+    "title": "Lo que Dicen Nuestros Profesionales",
+    "subtitle": "Miles de nutricionistas confían en Valnut para gestionar sus consultas",
+    "items": [
+      {
+        "name": "Dra. María González",
+        "role": "Nutricionista Clínica",
+        "location": "México, DF",
+        "content": "Valnut transformó completamente mi práctica. La automatización de formularios según la edad del paciente me ahorra horas cada semana.",
+        "rating": 5
+      },
+      {
+        "name": "Lic. Carlos Mendoza",
+        "role": "Director de Clínica Nutricional",
+        "location": "Buenos Aires, Argentina",
+        "content": "El control de roles es excepcional. Puedo gestionar un equipo de 8 nutricionistas con total transparencia y seguridad.",
+        "rating": 5
+      },
+      {
+        "name": "Dra. Ana Rodríguez",
+        "role": "Nutricionista Deportiva",
+        "location": "Barcelona, España",
+        "content": "Las tablas de la OMS integradas y el análisis antropométrico automático hacen que mis consultas sean mucho más precisas y profesionales.",
+        "rating": 5
+      }
+    ]
+  },
+  "cta": {
+    "title": "¿Listo para Revolucionar tu Práctica Nutricional?",
+    "subtitle": "Únete a cientos de nutricionistas que ya han digitalizado su consulta con Valnut",
+    "description": "Comienza tu prueba gratuita de 14 días sin compromiso. No necesitas tarjeta de crédito.",
+    "button": {
+      "text": "Comenzar Prueba Gratuita",
+      "href": "/login"
+    },
+    "features": [
+      "✓ Sin tarjeta de crédito",
+      "✓ Configuración en 5 minutos",
+      "✓ Soporte personalizado",
+      "✓ Migración de datos gratuita"
+    ]
+  }
+}
