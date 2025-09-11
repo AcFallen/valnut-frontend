@@ -408,11 +408,15 @@ export function UnderFiveForm({ patientId, dateOfBirth }: UnderFiveFormProps) {
                 >
                   Parasitológico:
                 </Label>
-                <Input
-                  id="parasitologico"
-                  placeholder="Ingrese resultado"
-                  className="flex-1"
-                />
+                <Select>
+                  <SelectTrigger className="flex-1" id="parasitologico">
+                    <SelectValue placeholder="Seleccione resultado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="negativo">Negativo</SelectItem>
+                    <SelectItem value="positivo">Positivo</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-center gap-4">
