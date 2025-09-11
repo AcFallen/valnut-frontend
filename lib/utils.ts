@@ -11,6 +11,7 @@ export interface AvatarInfo {
   ageText: string;
   ageInYears: number;
   ageInMonths: number;
+  description: string;
 }
 
 export function getPatientAvatarAndAge(
@@ -30,17 +31,25 @@ export function getPatientAvatarAndAge(
       ageText: "Edad no especificada",
       ageInYears: 0,
       ageInMonths: 0,
+      description: "Sin categoría",
     };
   }
 
   const birthDate = new Date(dateOfBirth);
   const ageInYears = differenceInYears(today, birthDate);
   const ageInMonths = differenceInMonths(today, birthDate);
+  const ageInDays = Math.floor(
+    (today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
 
   // Formatear texto de edad
   let ageText = "";
   if (ageInYears === 0) {
-    ageText = `${ageInMonths} ${ageInMonths === 1 ? "mes" : "meses"}`;
+    if (ageInDays <= 28) {
+      ageText = `${ageInDays} ${ageInDays === 1 ? "día" : "días"}`;
+    } else {
+      ageText = `${ageInMonths} ${ageInMonths === 1 ? "mes" : "meses"}`;
+    }
   } else if (ageInYears === 1) {
     const remainingMonths = ageInMonths - 12;
     if (remainingMonths === 0) {
@@ -61,20 +70,58 @@ export function getPatientAvatarAndAge(
     }
   }
 
-  // Determinar avatar basado en edad y género
+  // Determinar categoría, descripción y avatar basado en edad y género
   let imagePath = "/assets/images/avatar/";
+  let description = "";
 
-  if (ageInYears < 2) {
-    // Bebé (0-1 años)
+  // Categorías por edad
+  if (ageInDays <= 28) {
+    // Recién nacido: 0 – 28 días
+    description = "Recién nacido";
     imagePath += gender === "female" ? "bebe_f.png" : "bebe_m.png";
-  } else if (ageInYears < 12) {
-    // Niño/a (2-11 años)
+  } else if (ageInDays <= 180) {
+    // Lactante menor: 29 días – 5 meses 29 días (aproximadamente 180 días)
+    description = "Lactante menor";
+    imagePath += gender === "female" ? "bebe_f.png" : "bebe_m.png";
+  } else if (ageInMonths <= 11) {
+    // Lactante mayor: 6 – 11 meses 29 días
+    description = "Lactante mayor";
+    imagePath += gender === "female" ? "bebe_f.png" : "bebe_m.png";
+  } else if (ageInMonths <= 23) {
+    // Niño 1 – 2 años: 12 – 23 meses
+    description = "Niño 1 - 2 años";
     imagePath += gender === "female" ? "nina.png" : "nino.png";
+  } else if (ageInYears < 5) {
+    // Preescolar: 2 – 4 años 11 meses 29 días
+    description = "Preescolar";
+    imagePath += gender === "female" ? "nina.png" : "nino.png";
+  } else if (ageInYears < 10) {
+    // Escolar: 5 – 9 años 11 meses 29 días
+    description = "Escolar";
+    imagePath += gender === "female" ? "nina.png" : "nino.png";
+  } else if (ageInYears < 14) {
+    // Adolescente temprano: 10 – 13 años 11 meses 29 días
+    description = "Adolescente temprano";
+    imagePath += gender === "female" ? "nina.png" : "nino.png";
+  } else if (ageInYears < 17) {
+    // Adolescente intermedio: 14 – 16 años 11 meses 29 días
+    description = "Adolescente intermedio";
+    imagePath += gender === "female" ? "mujer.png" : "hombre.png";
+  } else if (ageInYears < 20) {
+    // Adolescente tardío: 17 – 19 años 11 meses 29 días
+    description = "Adolescente tardío";
+    imagePath += gender === "female" ? "mujer.png" : "hombre.png";
+  } else if (ageInYears < 30) {
+    // Joven: 20 – 29 años 11 meses 29 días
+    description = "Joven";
+    imagePath += gender === "female" ? "mujer.png" : "hombre.png";
   } else if (ageInYears < 60) {
-    // Adulto (12-59 años)
+    // Adulto: 30 – 59 años 11 meses 29 días
+    description = "Adulto";
     imagePath += gender === "female" ? "mujer.png" : "hombre.png";
   } else {
-    // Adulto mayor (60+ años)
+    // Anciano: >= 60
+    description = "Anciano";
     imagePath += gender === "female" ? "abuela.png" : "abuelo.png";
   }
 
@@ -83,6 +130,7 @@ export function getPatientAvatarAndAge(
     ageText,
     ageInYears,
     ageInMonths,
+    description,
   };
 }
 

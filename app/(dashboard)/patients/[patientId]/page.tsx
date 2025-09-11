@@ -81,7 +81,8 @@ export default function PatientDetailPage() {
   const params = useParams();
   const router = useRouter();
   const patientId = params?.patientId as string;
-  const [isConsultationDialogOpen, setIsConsultationDialogOpen] = useState(false);
+  const [isConsultationDialogOpen, setIsConsultationDialogOpen] =
+    useState(false);
 
   const { data: patient, isLoading, error } = usePatientDetail(patientId);
 
@@ -198,7 +199,7 @@ export default function PatientDetailPage() {
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Edad del paciente
+                            {avatarInfo.description}
                           </p>
                         </div>
                       </>
@@ -221,7 +222,9 @@ export default function PatientDetailPage() {
                       </label>
                       <div className="flex items-center gap-2">
                         <MessageCircle className="h-4 w-4 text-muted-foreground" />
-                        <p className="text-foreground truncate">{patient?.email}</p>
+                        <p className="text-foreground truncate">
+                          {patient?.email}
+                        </p>
                       </div>
                     </div>
                     <div>
@@ -392,7 +395,7 @@ export default function PatientDetailPage() {
                   <Stethoscope className="h-5 w-5" />
                   Historial de Atenciones
                 </div>
-                <Button 
+                <Button
                   onClick={() => setIsConsultationDialogOpen(true)}
                   className="gap-2"
                   size="sm"
