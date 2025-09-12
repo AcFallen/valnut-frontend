@@ -14,6 +14,7 @@ import { AvatarInfo } from "@/lib/utils";
 import { UnderFiveForm } from "./forms/under-five-form";
 import { FiveToNineteenForm } from "./forms/five-to-nineteen-form";
 import { TwentyToFiftyForm } from "./forms/twenty-to-fifty-form";
+import { SixtyPlusForm } from "./forms/sixty-plus-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Calendar, User } from "lucide-react";
 
@@ -71,9 +72,18 @@ export function NewConsultationDialog({
       );
     }
 
-    if (avatarInfo.ageInYears >= 20 && avatarInfo.ageInYears <= 50) {
+    if (avatarInfo.ageInYears >= 20 && avatarInfo.ageInYears <= 59) {
       return (
         <TwentyToFiftyForm
+          patientId={patient.id}
+          dateOfBirth={patient.dateOfBirth}
+        />
+      );
+    }
+
+    if (avatarInfo.ageInYears >= 60) {
+      return (
+        <SixtyPlusForm
           patientId={patient.id}
           dateOfBirth={patient.dateOfBirth}
         />
