@@ -13,6 +13,7 @@ import { PatientDetail } from "@/services/patient.service";
 import { AvatarInfo } from "@/lib/utils";
 import { UnderFiveForm } from "./forms/under-five-form";
 import { FiveToNineteenForm } from "./forms/five-to-nineteen-form";
+import { TwentyToFiftyForm } from "./forms/twenty-to-fifty-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Calendar, User } from "lucide-react";
 
@@ -29,9 +30,6 @@ export function NewConsultationDialog({
   patient,
   avatarInfo,
 }: NewConsultationDialogProps) {
-  const today = new Date();
-  const currentDate = format(today, "d 'de' MMMM 'de' yyyy", { locale: es });
-
   if (!patient || !avatarInfo) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -73,6 +71,15 @@ export function NewConsultationDialog({
       );
     }
 
+    if (avatarInfo.ageInYears >= 20 && avatarInfo.ageInYears <= 50) {
+      return (
+        <TwentyToFiftyForm
+          patientId={patient.id}
+          dateOfBirth={patient.dateOfBirth}
+        />
+      );
+    }
+
     return (
       <Card className="p-8">
         <CardContent className="text-center">
@@ -96,7 +103,7 @@ export function NewConsultationDialog({
       <DialogContent size="7xl" className="">
         <DialogHeader className="space-y-3">
           <DialogTitle className="flex items-center gap-3 text-xl">
-            <Calendar className="h-6 w-6 text-blue-600" />
+            <Calendar className="h-6 w-6 text-violet-600" />
             Nueva Consulta
           </DialogTitle>
         </DialogHeader>
