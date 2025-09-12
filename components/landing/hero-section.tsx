@@ -31,13 +31,13 @@ export function HeroSection({
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* SVG Wave at the top */}
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="absolute -top-70 left-0 w-full h-full">
+      {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="absolute -top-70 left-0 w-full h-full">
         <path
           fill="lab(56.101% 79.4328 31.4532)"
           fillOpacity="1"
           d="M0,96L15,90.7C30,85,60,75,90,69.3C120,64,150,64,180,58.7C210,53,240,43,270,69.3C300,96,330,160,360,154.7C390,149,420,75,450,48C480,21,510,43,540,69.3C570,96,600,128,630,128C660,128,690,96,720,85.3C750,75,780,85,810,90.7C840,96,870,96,900,90.7C930,85,960,75,990,80C1020,85,1050,107,1080,106.7C1110,107,1140,85,1170,80C1200,75,1230,85,1260,96C1290,107,1320,117,1350,133.3C1380,149,1410,171,1425,181.3L1440,192L1440,0L1425,0C1410,0,1380,0,1350,0C1320,0,1290,0,1260,0C1230,0,1200,0,1170,0C1140,0,1110,0,1080,0C1050,0,1020,0,990,0C960,0,930,0,900,0C870,0,840,0,810,0C780,0,750,0,720,0C690,0,660,0,630,0C600,0,570,0,540,0C510,0,480,0,450,0C420,0,390,0,360,0C330,0,300,0,270,0C240,0,210,0,180,0C150,0,120,0,90,0C60,0,30,0,15,0L0,0Z"
         ></path>
-      </svg>
+      </svg> */}
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center">
