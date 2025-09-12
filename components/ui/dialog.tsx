@@ -46,7 +46,7 @@ function DialogOverlay({
   )
 }
 
-type DialogSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl"
+type DialogSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl"
 
 const dialogSizeClasses: Record<DialogSize, string> = {
   sm: "sm:max-w-sm",
@@ -59,6 +59,7 @@ const dialogSizeClasses: Record<DialogSize, string> = {
   "5xl": "sm:max-w-5xl",
   "6xl": "sm:max-w-6xl",
   "7xl": "sm:max-w-7xl",
+  "8xl": "sm:max-w-8xl",
 }
 
 function DialogContent({

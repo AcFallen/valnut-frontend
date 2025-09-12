@@ -27,7 +27,9 @@ import {
   Activity,
   Heart,
   TestTube,
+  FileText,
 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface TwentyToFiftyFormProps {
   patientId: string;
@@ -41,9 +43,9 @@ export function TwentyToFiftyForm({
   return (
     <div className="space-y-6 pr-2">
       {/* Grid principal - 3 columnas en md */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
         {/* COLUMNA 1: Datos Antropométricos, Diagnóstico y Macronutrientes */}
-        <div className="space-y-6">
+        <div className="space-y-6 col-span-1 ">
           {/* Cálculo Antropométrico */}
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -194,7 +196,7 @@ export function TwentyToFiftyForm({
         </div>
 
         {/* COLUMNA 2: Requerimientos */}
-        <div className="space-y-6">
+        <div className="space-y-6 col-span-1 md:col-span-2">
           {/* Macronutrientes */}
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -387,7 +389,7 @@ export function TwentyToFiftyForm({
         </div>
 
         {/* COLUMNA 3: Tabs con Antropometría, Patología y Biometría */}
-        <div className="space-y-6">
+        <div className="space-y-6 col-span-1 md:col-span-3">
           <Tabs defaultValue="antropometria" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="antropometria" className="text-xs">
@@ -404,39 +406,357 @@ export function TwentyToFiftyForm({
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="antropometria" className="space-y-4">
-              <div className="border rounded-lg p-4 min-h-[400px]">
-                <h4 className="font-medium text-sm text-violet-700 dark:text-violet-300 mb-2">
-                  Datos Antropométricos
-                </h4>
-                <p className="text-sm text-gray-500">
-                  Contenido pendiente por implementar...
-                </p>
+            <TabsContent value="antropometria" className="space-y-3">
+              <div className="border rounded-lg p-3">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* Pliegues cutáneos */}
+                  <div>
+                    <h4 className="font-medium text-xs text-violet-700 dark:text-violet-300 mb-2">
+                      Pliegues cutáneos(cm)
+                    </h4>
+                    <div className="space-y-2">
+                      {[
+                        "Bicipital",
+                        "Tricipital",
+                        "Subescapular",
+                        "Suprailíaco",
+                        "Abdominal",
+                        "Pantorrilla",
+                        "Femoral",
+                        "Pectoral",
+                      ].map((field) => (
+                        <div key={field} className="flex items-center gap-2">
+                          <Label className="w-20 text-xs font-medium">
+                            {field}
+                          </Label>
+                          <Input className="h-7 text-xs" placeholder="0" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Circunferencias */}
+                  <div>
+                    <h4 className="font-medium text-xs text-violet-700 dark:text-violet-300 mb-2">
+                      Circunferencias (cm)
+                    </h4>
+                    <div className="space-y-2">
+                      {[
+                        "Braquial",
+                        "Pantorrilla",
+                        "Cintura",
+                        "Cadera",
+                        "Muñeca",
+                      ].map((field) => (
+                        <div key={field} className="flex items-center gap-2">
+                          <Label className="w-20 text-xs font-medium">
+                            {field}
+                          </Label>
+                          <Input
+                            className={`h-7 text-xs ${
+                              field === "Cadera" || field === "Muñeca"
+                                ? "bg-yellow-50 dark:bg-yellow-900/20"
+                                : ""
+                            }`}
+                            placeholder="0"
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    <h5 className="font-medium text-xs text-violet-700 dark:text-violet-300 mt-4 mb-2">
+                      Diámetros (cm)
+                    </h5>
+                    <div className="space-y-2">
+                      {["Muñeca", "Fémur"].map((field) => (
+                        <div key={field} className="flex items-center gap-2">
+                          <Label className="w-20 text-xs font-medium">
+                            {field}
+                          </Label>
+                          <Input className="h-7 text-xs" placeholder="0" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Resultados */}
+                  <div>
+                    <h4 className="font-medium text-xs text-violet-700 dark:text-violet-300 mb-2">
+                      Resultados
+                    </h4>
+                    <div className="space-y-2">
+                      {[
+                        {
+                          label: "Contextura",
+                          color: "bg-purple-100 dark:bg-purple-900/20",
+                        },
+                        {
+                          label: "Riesgo CV",
+                          color: "bg-purple-100 dark:bg-purple-900/20",
+                        },
+                        {
+                          label: "Reserva Proteica",
+                          color: "bg-purple-100 dark:bg-purple-900/20",
+                        },
+                        {
+                          label: "Reserva Calórica",
+                          color: "bg-purple-100 dark:bg-purple-900/20",
+                        },
+                        { label: "Porcentaje de Grasa", color: "" },
+                        { label: "Porcentaje Masa", color: "" },
+                        { label: "Peso Óseo", color: "" },
+                        {
+                          label: "Peso Residual",
+                          color: "bg-purple-100 dark:bg-purple-900/20",
+                          value: "18,08",
+                        },
+                        { label: "Masa Muscular", color: "" },
+                        {
+                          label: "Agua Corporal",
+                          color: "bg-purple-100 dark:bg-purple-900/20",
+                          value: "42,84",
+                        },
+                      ].map((field) => (
+                        <div
+                          key={field.label}
+                          className="flex items-center gap-2"
+                        >
+                          <Label className="w-24 text-xs font-medium">
+                            {field.label}
+                          </Label>
+                          <Input
+                            className={`h-7 text-xs ${field.color}`}
+                            placeholder={field.value || "0"}
+                            defaultValue={field.value || ""}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="patologia" className="space-y-4">
-              <div className="border rounded-lg p-4 min-h-[400px]">
-                <h4 className="font-medium text-sm text-violet-700 dark:text-violet-300 mb-2">
-                  Información Patológica
+            <TabsContent value="patologia" className="space-y-3">
+              <div className="border rounded-lg p-3">
+                <h4 className="font-medium text-sm text-violet-700 dark:text-violet-300 mb-3">
+                  Antecedentes
                 </h4>
-                <p className="text-sm text-gray-500">
-                  Contenido pendiente por implementar...
-                </p>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Antecedentes Familiares */}
+                  <div>
+                    <h5 className="font-medium text-xs text-gray-700 dark:text-gray-300 mb-3">
+                      Familiares
+                    </h5>
+                    <div className="space-y-2">
+                      {[
+                        "Diabetes Mellitus",
+                        "Obesidad",
+                        "Cardiopatías",
+                        "Hipertensión",
+                        "Arteroesclerosis",
+                        "Nefropatías",
+                        "Cáncer",
+                        "Osteoporosis",
+                        "Gota",
+                        "Hepatitis",
+                        "Hipertiroidismo",
+                        "Hipotiroidismo",
+                      ].map((condition) => (
+                        <div
+                          key={`fam-${condition}`}
+                          className="flex items-center space-x-2"
+                        >
+                          <input
+                            type="checkbox"
+                            id={`fam-${condition}`}
+                            className="w-3 h-3 text-violet-600 border-gray-300 rounded focus:ring-violet-500"
+                          />
+                          <Label
+                            htmlFor={`fam-${condition}`}
+                            className="text-xs"
+                          >
+                            {condition}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Antecedentes Personales */}
+                  <div>
+                    <h5 className="font-medium text-xs text-gray-700 dark:text-gray-300 mb-3">
+                      Personales
+                    </h5>
+                    <div className="space-y-2">
+                      {[
+                        "Diabetes Mellitus",
+                        "Obesidad",
+                        "Cardiopatías",
+                        "Hipertensión",
+                        "Arteroesclerosis",
+                        "Nefropatías",
+                        "Cáncer",
+                        "Osteoporosis",
+                        "Gota",
+                        "Hepatitis",
+                        "Hipertiroidismo",
+                        "Hipotiroidismo",
+                      ].map((condition) => (
+                        <div
+                          key={`per-${condition}`}
+                          className="flex items-center space-x-2"
+                        >
+                          <input
+                            type="checkbox"
+                            id={`per-${condition}`}
+                            className="w-3 h-3 text-violet-600 border-gray-300 rounded focus:ring-violet-500"
+                          />
+                          <Label
+                            htmlFor={`per-${condition}`}
+                            className="text-xs"
+                          >
+                            {condition}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Actuales */}
+                  <div>
+                    <h5 className="font-medium text-xs text-gray-700 dark:text-gray-300 mb-3">
+                      Actuales
+                    </h5>
+                    <div className="space-y-2">
+                      {[
+                        "Diarrea",
+                        "Estreñimiento",
+                        "Gastritis",
+                        "Úlcera",
+                        "Náuseas",
+                        "Pirosis",
+                        "Vómito",
+                        "Colitis",
+                        "Dentadura Parcial",
+                        "Toma:",
+                        "Laxantes",
+                        "Diuréticos",
+                        "Antiácidos",
+                        "Analgésicos",
+                      ].map((condition) => (
+                        <div
+                          key={`act-${condition}`}
+                          className="flex items-center space-x-2"
+                        >
+                          <input
+                            type="checkbox"
+                            id={`act-${condition}`}
+                            className="w-3 h-3 text-violet-600 border-gray-300 rounded focus:ring-violet-500"
+                          />
+                          <Label
+                            htmlFor={`act-${condition}`}
+                            className="text-xs"
+                          >
+                            {condition}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="biometria" className="space-y-4">
-              <div className="border rounded-lg p-4 min-h-[400px]">
-                <h4 className="font-medium text-sm text-violet-700 dark:text-violet-300 mb-2">
-                  Datos de Biometría
+            <TabsContent value="biometria" className="space-y-3">
+              <div className="border rounded-lg p-3">
+                <h4 className="font-medium text-sm text-violet-700 dark:text-violet-300 mb-3">
+                  Datos bioquímicos
                 </h4>
-                <p className="text-sm text-gray-500">
-                  Contenido pendiente por implementar...
-                </p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    {[
+                      { label: "Hemoglobina", unit: "g/dL" },
+                      { label: "Glucosa", unit: "mg/dL" },
+                      { label: "HbA1c", unit: "%" },
+                      { label: "Hematocrito", unit: "%" },
+                      { label: "Ferritina", unit: "" },
+                      { label: "Triglicéridos", unit: "mg/dL" },
+                      { label: "Colesterol", unit: "mg/dL" },
+                      { label: "Colesterol HDL", unit: "mg/dL" },
+                    ].map((field) => (
+                      <div
+                        key={field.label}
+                        className="flex items-center gap-3"
+                      >
+                        <Label className="w-24 text-xs font-medium">
+                          {field.label}
+                        </Label>
+                        <div className="flex flex-1">
+                          <Input
+                            className="h-7 text-xs rounded-r-none"
+                            placeholder=""
+                          />
+                          {field.unit && (
+                            <div className="px-2 py-1 bg-gray-100 dark:bg-gray-800 border border-l-0 rounded-r-md text-xs flex items-center min-w-[60px] justify-center">
+                              <span>{field.unit}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-3">
+                    {[
+                      { label: "Colesterol LDL", unit: "mg/dL" },
+                      { label: "Leucocitos", unit: "cel/mm3" },
+                      { label: "Ácido úrico", unit: "mg/dL" },
+                      { label: "Creatina", unit: "mg/dL" },
+                      { label: "Urea", unit: "mg/dL" },
+                    ].map((field) => (
+                      <div
+                        key={field.label}
+                        className="flex items-center gap-3"
+                      >
+                        <Label className="w-24 text-xs font-medium">
+                          {field.label}
+                        </Label>
+                        <div className="flex flex-1">
+                          <Input
+                            className="h-7 text-xs rounded-r-none"
+                            placeholder=""
+                          />
+                          {field.unit && (
+                            <div className="px-2 py-1 bg-gray-100 dark:bg-gray-800 border border-l-0 rounded-r-md text-xs flex items-center min-w-[60px] justify-center">
+                              <span>{field.unit}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </TabsContent>
           </Tabs>
+
+          {/* Indicaciones */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <FileText className="h-5 w-5 text-violet-600" />
+              <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300">
+                Indicaciones
+              </h3>
+            </div>
+            <Separator className="mb-2" />
+
+            <Textarea
+              placeholder="brindarlafatitvitasedfasdy"
+              rows={4}
+              className="w-full"
+            />
+          </div>
         </div>
       </div>
 

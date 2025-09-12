@@ -100,7 +100,7 @@ export function NewConsultationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="7xl" className="">
+      <DialogContent size="8xl" className="">
         <DialogHeader className="space-y-3">
           <DialogTitle className="flex items-center gap-3 text-xl">
             <Calendar className="h-6 w-6 text-violet-600" />
