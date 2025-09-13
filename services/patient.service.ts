@@ -8,6 +8,8 @@ export interface Patient {
   email: string;
   phone: string;
   createdAt: string;
+  dateOfBirth: string;
+  gender: string;
 }
 
 export interface PatientDetail {
@@ -77,8 +79,8 @@ export interface PatientsQueryParams {
 }
 
 export enum DocumentType {
-  DNI = 'dni',
-  CARNET_EXTRANJERIA = 'carnet_extranjeria',
+  DNI = "dni",
+  CARNET_EXTRANJERIA = "carnet_extranjeria",
 }
 
 export interface CreatePatientData {
@@ -125,14 +127,18 @@ export interface PatientSelectResponse {
 
 export const patientService = {
   // Get paginated patients list
-  getPatients: async (params: PatientsQueryParams = {}): Promise<PaginatedPatientsResponse> => {
+  getPatients: async (
+    params: PatientsQueryParams = {}
+  ): Promise<PaginatedPatientsResponse> => {
     const searchParams = new URLSearchParams();
-    
-    if (params.page) searchParams.append('page', params.page.toString());
-    if (params.limit) searchParams.append('limit', params.limit.toString());
-    if (params.search) searchParams.append('search', params.search);
 
-    const response = await apiClient.get(`/patients?${searchParams.toString()}`);
+    if (params.page) searchParams.append("page", params.page.toString());
+    if (params.limit) searchParams.append("limit", params.limit.toString());
+    if (params.search) searchParams.append("search", params.search);
+
+    const response = await apiClient.get(
+      `/patients?${searchParams.toString()}`
+    );
     return response.data;
   },
 
@@ -143,13 +149,18 @@ export const patientService = {
   },
 
   // Create new patient
-  createPatient: async (patientData: CreatePatientData): Promise<ApiResponse<PatientDetail>> => {
-    const response = await apiClient.post('/patients', patientData);
+  createPatient: async (
+    patientData: CreatePatientData
+  ): Promise<ApiResponse<PatientDetail>> => {
+    const response = await apiClient.post("/patients", patientData);
     return response.data;
   },
 
   // Update patient by ID
-  updatePatient: async (id: string, patientData: UpdatePatientData): Promise<ApiResponse<PatientDetail>> => {
+  updatePatient: async (
+    id: string,
+    patientData: UpdatePatientData
+  ): Promise<ApiResponse<PatientDetail>> => {
     const response = await apiClient.patch(`/patients/${id}`, patientData);
     return response.data;
   },
@@ -162,7 +173,7 @@ export const patientService = {
 
   // Get patients for select dropdown
   getPatientsSelect: async (): Promise<PatientSelectResponse> => {
-    const response = await apiClient.get('/patients/select');
+    const response = await apiClient.get("/patients/select");
     return response.data;
-  }
+  },
 };

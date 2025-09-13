@@ -35,6 +35,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useRouter } from "next/navigation";
+import { getPatientAvatarAndAge } from "@/lib/utils";
+import Image from "next/image";
 
 interface PatientsTableProps {
   data:
@@ -131,16 +133,18 @@ export function PatientsTable({
         <Table>
           <TableHeader>
             <TableRow className="border-b">
-              <TableHead className="px-6 py-4 font-semibold">
+              <TableHead className="px-4 py-2 font-semibold">Avatar</TableHead>
+              <TableHead className="px-4 py-2 font-semibold">
                 Paciente
               </TableHead>
-              <TableHead className="px-6 py-4 font-semibold">
+              <TableHead className="px-4 py-2 font-semibold">
                 Contacto
               </TableHead>
-              <TableHead className="px-6 py-4 font-semibold">
-                Fecha de Registro
+              <TableHead className="px-4 py-2 font-semibold text-nowrap">
+                Fecha de Nacimiento
               </TableHead>
-              <TableHead className="px-6 py-4 font-semibold text-right">
+
+              <TableHead className="px-4 py-2 font-semibold text-right">
                 Acciones
               </TableHead>
             </TableRow>
@@ -150,6 +154,9 @@ export function PatientsTable({
               // Loading skeletons
               Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
+                  <TableCell className="px-6 py-4">
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                  </TableCell>
                   <TableCell className="px-6 py-4">
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-32" />
@@ -165,6 +172,9 @@ export function PatientsTable({
                   <TableCell className="px-6 py-4">
                     <Skeleton className="h-4 w-24" />
                   </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
                   <TableCell className="px-6 py-4 text-right">
                     <Skeleton className="h-8 w-20 ml-auto" />
                   </TableCell>
@@ -172,78 +182,105 @@ export function PatientsTable({
               ))
             ) : data && data.data.length > 0 ? (
               // Patient rows
-              data.data.map((patient) => (
-                <TableRow
-                  key={patient.id}
-                  className={cn(
-                    "cursor-pointer transition-colors hover:bg-muted/50 border-b border-border/50",
-                    selectedPatientId === patient.id &&
-                      "bg-muted/70 hover:bg-muted/70"
-                  )}
-                  onClick={() => onPatientSelect(patient.id)}
-                >
-                  <TableCell className="px-6 py-4">
-                    <div className="space-y-1">
-                      <div className="font-semibold text-foreground">
-                        {patient.firstName} {patient.lastName}
-                      </div>
-                      <div className="text-xs text-muted-foreground font-mono">
-                        ID: {patient.id.split("-")[0]}...
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                          <Mail className="h-2.5 w-2.5 text-blue-600 dark:text-blue-400" />
+              data.data.map((patient) => {
+                const avatarInfo = getPatientAvatarAndAge(
+                  patient.dateOfBirth,
+                  patient.gender
+                );
+
+                return (
+                  <TableRow
+                    key={patient.id}
+                    className={cn(
+                      "cursor-pointer transition-colors hover:bg-muted/50 border-b border-border/50",
+                      selectedPatientId === patient.id &&
+                        "bg-muted/70 hover:bg-muted/70"
+                    )}
+                    onClick={() => onPatientSelect(patient.id)}
+                  >
+                    <TableCell className="px-6 py-4">
+                      {avatarInfo && (
+                        <div className="relative">
+                          <Image
+                            src={avatarInfo.imagePath}
+                            alt={`Avatar de ${patient.firstName}`}
+                            width={48}
+                            height={48}
+                            className="rounded-full"
+                          />
                         </div>
-                        <span className="truncate text-foreground">
-                          {patient.email}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="w-4 h-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-                          <Phone className="h-2.5 w-2.5 text-green-600 dark:text-green-400" />
+                      )}
+                    </TableCell>
+                    <TableCell className="px-6 py-4">
+                      <div className="space-y-1">
+                        <div className="font-semibold text-foreground">
+                          {patient.firstName} {patient.lastName}
                         </div>
-                        <span className="text-muted-foreground">
-                          {patient.phone}
-                        </span>
+                        <div className="text-xs text-muted-foreground">
+                          {avatarInfo?.ageText}
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    <div className="text-sm text-foreground font-medium">
-                      {format(new Date(patient.createdAt), "d MMM yyyy", {
-                        locale: es,
-                      })}
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-right">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          size="sm"
-                          className="bg-yellow-500  text-white hover:bg-yellow-600 "
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/patients/${patient.id}`);
-                          }}
-                        >
-                          <FaFolder className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="text-sm bg-yellow-500 fill-yellow-500 text-white">
-                        <p>Historial Clinico</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell className="px-6 py-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                            <Mail className="h-2.5 w-2.5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <span className="truncate text-foreground">
+                            {patient.email}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="w-4 h-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                            <Phone className="h-2.5 w-2.5 text-green-600 dark:text-green-400" />
+                          </div>
+                          <span className="text-muted-foreground">
+                            {patient.phone}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-4">
+                      <div className="text-sm text-foreground font-medium">
+                        {patient.dateOfBirth
+                          ? format(
+                              new Date(patient.dateOfBirth),
+                              "d MMM yyyy",
+                              {
+                                locale: es,
+                              }
+                            )
+                          : "No especificado"}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="px-6 py-4 text-right">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="sm"
+                            className="bg-yellow-500  text-white hover:bg-yellow-600 "
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/patients/${patient.id}`);
+                            }}
+                          >
+                            <FaFolder className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="text-sm bg-yellow-500 fill-yellow-500 text-white">
+                          <p>Historial Clinico</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               // No patients found
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-12 px-6">
+                <TableCell colSpan={6} className="text-center py-12 px-6">
                   <div className="flex flex-col items-center gap-4">
                     <div className="w-20 h-20 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
                       <Users className="h-10 w-10 text-muted-foreground" />
