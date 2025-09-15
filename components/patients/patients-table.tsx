@@ -202,7 +202,7 @@ export function PatientsTable({
                       selectedPatientId === patient.id &&
                         "bg-muted/70 hover:bg-muted/70"
                     )}
-                    onClick={() => onPatientSelect(patient.id)}
+                    // onClick={() => onPatientSelect(patient.id)}
                   >
                     <TableCell className="px-6 py-4">
                       {avatarInfo && (
@@ -273,7 +273,7 @@ export function PatientsTable({
                                 onEditPatient(patient);
                               }}
                             >
-                              <Edit className="h-4 w-4 " />
+                              <Edit />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent className="text-sm bg-teal-500 fill-teal-500 text-white">
@@ -291,7 +291,7 @@ export function PatientsTable({
                                 router.push(`/patients/${patient.id}`);
                               }}
                             >
-                              <FaFolder className="h-4 w-4" />
+                              <FaFolder />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent className="text-sm bg-yellow-500 fill-yellow-500 text-white">
@@ -309,7 +309,7 @@ export function PatientsTable({
                                 onDeletePatient(patient);
                               }}
                             >
-                              <Trash2 className="h-4 w-4 " />
+                              <Trash2 />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent className="text-sm bg-red-500 fill-red-500 text-white">
