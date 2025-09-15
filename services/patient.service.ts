@@ -33,6 +33,7 @@ export interface PatientDetail {
   deletedAt: string | null;
   createdBy: string | null;
   updatedBy: string | null;
+  isPregnant: boolean;
   tenant: {
     id: string;
     name: string;
@@ -96,6 +97,7 @@ export interface CreatePatientData {
   notes?: string;
   documentType?: DocumentType;
   documentNumber?: string;
+  isPregnant?: boolean;
 }
 
 export interface UpdatePatientData {
@@ -111,6 +113,7 @@ export interface UpdatePatientData {
   notes?: string;
   documentType?: DocumentType;
   documentNumber?: string;
+  isPregnant?: boolean;
 }
 
 export interface PatientSelectOption {

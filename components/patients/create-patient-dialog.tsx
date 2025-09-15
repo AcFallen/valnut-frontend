@@ -28,12 +28,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCreatePatient } from "@/hooks/usePatients";
-import type { CreatePatientData, DocumentType } from "@/services/patient.service";
+import type {
+  CreatePatientData,
+  DocumentType,
+} from "@/services/patient.service";
 
 const createPatientSchema = z.object({
   firstName: z
@@ -64,6 +68,7 @@ const createPatientSchema = z.object({
     .or(z.literal("")),
   dateOfBirth: z.date().optional(),
   gender: z.enum(["male", "female", "other"]).optional(),
+  isPregnant: z.boolean().optional(),
   address: z.string().optional().or(z.literal("")),
   medicalHistory: z.string().optional().or(z.literal("")),
   allergies: z.string().optional().or(z.literal("")),
@@ -99,6 +104,7 @@ export function CreatePatientDialog({
       documentNumber: "",
       phone: "",
       address: "",
+      isPregnant: false,
       medicalHistory: "",
       allergies: "",
       notes: "",
@@ -115,6 +121,7 @@ export function CreatePatientDialog({
         // Remove empty strings and convert to undefined
         phone: data.phone || undefined,
         address: data.address || undefined,
+        isPregnant: data.gender === "female" ? data.isPregnant : undefined,
         medicalHistory: data.medicalHistory || undefined,
         allergies: data.allergies || undefined,
         notes: data.notes || undefined,
@@ -245,7 +252,9 @@ export function CreatePatientDialog({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="dni">DNI</SelectItem>
-                          <SelectItem value="carnet_extranjeria">Carnet de Extranjería</SelectItem>
+                          <SelectItem value="carnet_extranjeria">
+                            Carnet de Extranjería
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     )}
@@ -335,13 +344,45 @@ export function CreatePatientDialog({
                         <SelectContent>
                           <SelectItem value="male">Masculino</SelectItem>
                           <SelectItem value="female">Femenino</SelectItem>
-                          <SelectItem value="other">Otro</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
                   />
                 </div>
               </div>
+
+              <Controller
+                name="gender"
+                control={control}
+                render={({ field: genderField }) => (
+                  <div className="space-y-4">
+                    {genderField.value === "female" && (
+                      <div className="space-y-2">
+                        <Label>¿Está embarazada?</Label>
+                        <Controller
+                          name="isPregnant"
+                          control={control}
+                          render={({ field: pregnantField }) => (
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id="isPregnant"
+                                checked={pregnantField.value || false}
+                                onCheckedChange={pregnantField.onChange}
+                              />
+                              <Label
+                                htmlFor="isPregnant"
+                                className="text-sm font-normal"
+                              >
+                                {pregnantField.value ? "Sí" : "No"}
+                              </Label>
+                            </div>
+                          )}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              />
 
               <div className="space-y-2">
                 <Label htmlFor="address">Dirección</Label>

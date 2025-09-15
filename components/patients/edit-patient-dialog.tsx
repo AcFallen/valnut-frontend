@@ -29,12 +29,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn, parseLocalDate } from "@/lib/utils";
 import { useUpdatePatient } from "@/hooks/usePatients";
-import type { UpdatePatientData, PatientDetail, DocumentType } from "@/services/patient.service";
+import type {
+  UpdatePatientData,
+  PatientDetail,
+  DocumentType,
+} from "@/services/patient.service";
 
 const updatePatientSchema = z.object({
   firstName: z
@@ -65,6 +70,7 @@ const updatePatientSchema = z.object({
     .or(z.literal("")),
   dateOfBirth: z.date().optional(),
   gender: z.enum(["male", "female", "other"]).optional(),
+  isPregnant: z.boolean().optional(),
   address: z.string().optional().or(z.literal("")),
   medicalHistory: z.string().optional().or(z.literal("")),
   allergies: z.string().optional().or(z.literal("")),
@@ -102,6 +108,7 @@ export function EditPatientDialog({
       documentNumber: "",
       phone: "",
       address: "",
+      isPregnant: false,
       medicalHistory: "",
       allergies: "",
       notes: "",
@@ -115,11 +122,17 @@ export function EditPatientDialog({
         firstName: patient.firstName,
         lastName: patient.lastName,
         email: patient.email,
-        documentType: patient.documentType as "dni" | "carnet_extranjeria" | undefined,
+        documentType: patient.documentType as
+          | "dni"
+          | "carnet_extranjeria"
+          | undefined,
         documentNumber: patient.documentNumber || "",
         phone: patient.phone || "",
-        dateOfBirth: patient.dateOfBirth ? parseLocalDate(patient.dateOfBirth) : undefined,
+        dateOfBirth: patient.dateOfBirth
+          ? parseLocalDate(patient.dateOfBirth)
+          : undefined,
         gender: patient.gender as "male" | "female" | "other" | undefined,
+        isPregnant: patient.isPregnant || false,
         address: patient.address || "",
         medicalHistory: patient.medicalHistory || "",
         allergies: patient.allergies || "",
@@ -140,6 +153,7 @@ export function EditPatientDialog({
         // Remove empty strings and convert to undefined
         phone: data.phone || undefined,
         address: data.address || undefined,
+        isPregnant: data.gender === "female" ? data.isPregnant : undefined,
         medicalHistory: data.medicalHistory || undefined,
         allergies: data.allergies || undefined,
         notes: data.notes || undefined,
@@ -177,10 +191,7 @@ export function EditPatientDialog({
         </DialogHeader>
 
         <ScrollArea className="max-h-[70vh] pr-2">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6 p-1"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-1">
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Información Básica</h3>
@@ -271,7 +282,9 @@ export function EditPatientDialog({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="dni">DNI</SelectItem>
-                          <SelectItem value="carnet_extranjeria">Carnet de Extranjería</SelectItem>
+                          <SelectItem value="carnet_extranjeria">
+                            Carnet de Extranjería
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     )}
@@ -361,13 +374,45 @@ export function EditPatientDialog({
                         <SelectContent>
                           <SelectItem value="male">Masculino</SelectItem>
                           <SelectItem value="female">Femenino</SelectItem>
-                          <SelectItem value="other">Otro</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
                   />
                 </div>
               </div>
+
+              <Controller
+                name="gender"
+                control={control}
+                render={({ field: genderField }) => (
+                  <div className="space-y-4">
+                    {genderField.value === "female" && (
+                      <div className="space-y-2">
+                        <Label>¿Está embarazada?</Label>
+                        <Controller
+                          name="isPregnant"
+                          control={control}
+                          render={({ field: pregnantField }) => (
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id="isPregnant"
+                                checked={pregnantField.value || false}
+                                onCheckedChange={pregnantField.onChange}
+                              />
+                              <Label
+                                htmlFor="isPregnant"
+                                className="text-sm font-normal"
+                              >
+                                {pregnantField.value ? "Sí" : "No"}
+                              </Label>
+                            </div>
+                          )}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              />
 
               <div className="space-y-2">
                 <Label htmlFor="address">Dirección</Label>
