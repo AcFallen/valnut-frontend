@@ -29,31 +29,9 @@ export function CTASection({
 }: CTASectionProps) {
   const router = useRouter();
   return (
-    <section className="py-20 bg-gradient-to-br from-primary to-secondary relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0">
-        {Array.from({ length: 6 }, (_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-32 h-32 bg-white/10 rounded-full blur-xl"
-            style={{
-              left: `${20 + i * 15}%`,
-              top: `${10 + (i % 3) * 30}%`,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              x: [0, 10, 0],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 4 + i * 0.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
-
+    <section className="py-20 bg-gradient-to-br from-primary to-primary/90 relative overflow-hidden">
+      {/* Dark overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/30 z-0"></div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
@@ -63,7 +41,7 @@ export function CTASection({
             viewport={{ once: true }}
             className="mb-12"
           >
-            <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold text-white mb-6 drop-shadow-lg">
               {title.split(" ").map((word, index) => (
                 <motion.span
                   key={index}
@@ -83,7 +61,7 @@ export function CTASection({
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
-              className="text-xl md:text-2xl text-white/90 mb-4"
+              className="text-xl md:text-2xl text-white mb-4 drop-shadow-md"
             >
               {subtitle}
             </motion.p>
@@ -93,7 +71,7 @@ export function CTASection({
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
               viewport={{ once: true }}
-              className="text-lg text-white/80 max-w-2xl mx-auto mb-12"
+              className="text-lg text-white/90 max-w-2xl mx-auto mb-12 drop-shadow-md"
             >
               {description}
             </motion.p>
@@ -114,7 +92,7 @@ export function CTASection({
               <Button
                 size="lg"
                 variant="secondary"
-                className="px-12 py-6 text-lg font-bold bg-white text-primary hover:bg-white/90 shadow-2xl"
+                className="px-12 py-6 text-lg font-bold bg-white text-primary hover:bg-gray-100 shadow-2xl border border-white/20"
                 onClick={() => router.push(button.href)}
               >
                 {button.text}
@@ -137,7 +115,7 @@ export function CTASection({
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 * index }}
                 viewport={{ once: true }}
-                className="flex items-center justify-center md:justify-start text-white/90"
+                className="flex items-center justify-center md:justify-start text-white"
               >
                 <CheckCircle className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span className="text-sm font-medium">
@@ -155,7 +133,7 @@ export function CTASection({
             viewport={{ once: true }}
             className="mt-16 pt-12 border-t border-white/20"
           >
-            <p className="text-white/70 text-sm mb-8">
+            <p className="text-white/80 text-sm mb-8 drop-shadow-md">
               Profesionales de la nutrición de todo el mundo confían en Valnut
             </p>
 
@@ -174,7 +152,7 @@ export function CTASection({
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="text-white/60 text-sm font-medium px-4 py-2 bg-white/10 rounded-full"
+                  className="text-white/80 text-sm font-medium px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm"
                 >
                   {country}
                 </motion.div>
