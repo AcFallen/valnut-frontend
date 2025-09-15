@@ -5,14 +5,19 @@ import { Users } from "lucide-react";
 import { usePatients, usePatientDetail } from "@/hooks/usePatients";
 import { useDebounce } from "@/hooks/useDebounce";
 import { PatientsTable } from "@/components/patients/patients-table";
-import { PatientDetailSidebar } from "@/components/patients/patient-detail-sidebar";
 import { CreatePatientDialog } from "@/components/patients/create-patient-dialog";
+import { EditPatientDialog } from "@/components/patients/edit-patient-dialog";
+import { DeletePatientAlert } from "@/components/patients/delete-patient-alert";
+import type { Patient, PatientDetail } from "@/services/patient.service";
 
 export default function PatientsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState<PatientDetail | null>(null);
   const [limit] = useState(10);
 
   const debouncedSearch = useDebounce(search, 500);
@@ -29,7 +34,6 @@ export default function PatientsPage() {
 
   const {
     data: selectedPatient,
-    isLoading: isLoadingPatient,
   } = usePatientDetail(selectedPatientId);
 
   const handlePatientSelect = (patientId: string) => {
@@ -42,6 +46,23 @@ export default function PatientsPage() {
 
   const handlePatientDeleted = () => {
     setSelectedPatientId(null);
+  };
+
+  const handleEditPatient = (patient: Patient) => {
+    // Set the selected patient ID to trigger usePatientDetail hook
+    setSelectedPatientId(patient.id);
+    // Wait for the patient detail data to load, then open dialog
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeletePatient = (patient: Patient) => {
+    // Convert Patient to PatientDetail for the dialog
+    setPatientToDelete(patient as PatientDetail);
+    setIsDeleteAlertOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setPatientToDelete(null);
   };
 
   return (
@@ -62,7 +83,7 @@ export default function PatientsPage() {
       {/* Main Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Table */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           {/* Patients Table */}
           <PatientsTable
             data={patientsData}
@@ -75,24 +96,44 @@ export default function PatientsPage() {
             search={search}
             onSearchChange={setSearch}
             onCreatePatient={() => setIsCreateDialogOpen(true)}
+            onEditPatient={handleEditPatient}
+            onDeletePatient={handleDeletePatient}
           />
         </div>
 
         {/* Right Column - Patient Detail */}
-        <div className="lg:col-span-1">
+        {/* <div className="lg:col-span-1">
           <PatientDetailSidebar
             patient={selectedPatient}
             isLoading={isLoadingPatient}
             selectedPatientId={selectedPatientId}
-            onPatientUpdated={handlePatientDeleted}
           />
-        </div>
+        </div> */}
       </div>
 
-      {/* Create Patient Dialog */}
+      {/* Dialogs */}
       <CreatePatientDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
+      />
+
+      <EditPatientDialog
+        open={isEditDialogOpen}
+        onOpenChange={(open) => {
+          setIsEditDialogOpen(open);
+          if (!open) handleDialogClose();
+        }}
+        patient={selectedPatient || null}
+      />
+
+      <DeletePatientAlert
+        open={isDeleteAlertOpen}
+        onOpenChange={(open) => {
+          setIsDeleteAlertOpen(open);
+          if (!open) handleDialogClose();
+        }}
+        patient={patientToDelete}
+        onDeleted={handlePatientDeleted}
       />
     </div>
   );

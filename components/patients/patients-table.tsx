@@ -21,6 +21,8 @@ import {
   Users,
   AlertCircle,
   Plus,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -59,6 +61,8 @@ interface PatientsTableProps {
   search: string;
   onSearchChange: (search: string) => void;
   onCreatePatient: () => void;
+  onEditPatient: (patient: Patient) => void;
+  onDeletePatient: (patient: Patient) => void;
 }
 
 export function PatientsTable({
@@ -72,6 +76,8 @@ export function PatientsTable({
   search,
   onSearchChange,
   onCreatePatient,
+  onEditPatient,
+  onDeletePatient,
 }: PatientsTableProps) {
   const router = useRouter();
 
@@ -256,23 +262,61 @@ export function PatientsTable({
                     </TableCell>
 
                     <TableCell className="px-6 py-4 text-right">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            size="sm"
-                            className="bg-yellow-500  text-white hover:bg-yellow-600 "
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(`/patients/${patient.id}`);
-                            }}
-                          >
-                            <FaFolder className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="text-sm bg-yellow-500 fill-yellow-500 text-white">
-                          <p>Historial Clinico</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <div className="flex items-center justify-end gap-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              className="bg-teal-500 text-white hover:bg-teal-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEditPatient(patient);
+                              }}
+                            >
+                              <Edit className="h-4 w-4 " />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-sm bg-teal-500 fill-teal-500 text-white">
+                            <p>Editar paciente</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              className="bg-yellow-500 text-white hover:bg-yellow-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/patients/${patient.id}`);
+                              }}
+                            >
+                              <FaFolder className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-sm bg-yellow-500 fill-yellow-500 text-white">
+                            <p>Historial Clinico</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              className="bg-red-500 text-white hover:bg-red-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeletePatient(patient);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 " />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-sm bg-red-500 fill-red-500 text-white">
+                            <p>Eliminar paciente</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
