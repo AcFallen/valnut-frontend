@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -18,13 +19,17 @@ import {
   TrendingUp,
   Stethoscope,
   Calculator,
+  ClipboardList,
 } from "lucide-react";
+import { FoodHabitsQuestionnaire } from "./food-habits-questionnaire";
 interface UnderFiveFormProps {
   patientId: string;
   dateOfBirth: string | null;
 }
 
 export function UnderFiveForm({ patientId, dateOfBirth }: UnderFiveFormProps) {
+  const [questionnaireOpen, setQuestionnaireOpen] = useState(false);
+
   // Función para calcular la edad en meses
   const calculateAgeInMonths = () => {
     if (!dateOfBirth) return 0;
@@ -555,13 +560,29 @@ export function UnderFiveForm({ patientId, dateOfBirth }: UnderFiveFormProps) {
       </div>
 
       {/* Botones de acción */}
-      <div className="flex justify-end gap-3 pt-6 border-t">
-        <Button variant="outline">Cancelar</Button>
-        <Button className="gap-2">
-          <Save className="h-4 w-4" />
-          Guardar Consulta
+      <div className="flex justify-between gap-3 pt-6 border-t">
+        <Button 
+          variant="secondary" 
+          className="gap-2 bg-cyan-600 hover:bg-cyan-700 text-white"
+          onClick={() => setQuestionnaireOpen(true)}
+        >
+          <ClipboardList className="h-4 w-4" />
+          Cuestionario de Hábitos Alimentarios
         </Button>
+        <div className="flex gap-3">
+          <Button variant="outline">Cancelar</Button>
+          <Button className="gap-2">
+            <Save className="h-4 w-4" />
+            Guardar Consulta
+          </Button>
+        </div>
       </div>
+
+      {/* Food Habits Questionnaire Dialog */}
+      <FoodHabitsQuestionnaire
+        open={questionnaireOpen}
+        onOpenChange={setQuestionnaireOpen}
+      />
     </div>
   );
 }
