@@ -15,6 +15,7 @@ import { UnderFiveForm } from "./forms/under-five-form";
 import { FiveToNineteenForm } from "./forms/five-to-nineteen-form";
 import { TwentyToFiftyForm } from "./forms/twenty-to-fifty-form";
 import { SixtyPlusForm } from "./forms/sixty-plus-form";
+import { PregnantForm } from "./forms/pregnant-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Calendar, User } from "lucide-react";
 
@@ -54,6 +55,16 @@ export function NewConsultationDialog({
   }
 
   const renderFormByAge = () => {
+    // Check if patient is pregnant first
+    if (patient.isPregnant) {
+      return (
+        <PregnantForm
+          patientId={patient.id}
+          dateOfBirth={patient.dateOfBirth}
+        />
+      );
+    }
+
     if (avatarInfo.ageInYears < 5) {
       return (
         <UnderFiveForm

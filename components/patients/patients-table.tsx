@@ -227,7 +227,7 @@ export function PatientsTable({
                           <div className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                             <Mail className="h-2.5 w-2.5 text-blue-600 dark:text-blue-400" />
                           </div>
-                          <span className="truncate text-foreground">
+                          <span className=" text-foreground text-nowrap">
                             {patient.email}
                           </span>
                         </div>
