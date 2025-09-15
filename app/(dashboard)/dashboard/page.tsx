@@ -1,11 +1,39 @@
-"use client"
+"use client";
 
-import { useSession } from "next-auth/react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Activity, Users, Calendar, TrendingUp } from "lucide-react"
+import { useSession } from "next-auth/react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Activity, Users, Calendar, TrendingUp } from "lucide-react";
+
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+const chartData = [
+  { month: "January", desktop: 186, mobile: 80 },
+  { month: "February", desktop: 305, mobile: 200 },
+  { month: "March", desktop: 237, mobile: 120 },
+  { month: "April", desktop: 73, mobile: 190 },
+  { month: "May", desktop: 209, mobile: 130 },
+  { month: "June", desktop: 214, mobile: 140 },
+];
+const chartConfig = {
+  desktop: {
+    label: "Desktop",
+    color: "#2563eb",
+  },
+  mobile: {
+    label: "Mobile",
+    color: "#60a5fa",
+  },
+} satisfies ChartConfig;
 
 export default function Dashboard() {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
 
   const stats = [
     {
@@ -13,30 +41,30 @@ export default function Dashboard() {
       value: "124",
       icon: Users,
       change: "+12%",
-      changeType: "positive" as const
+      changeType: "positive" as const,
     },
     {
       title: "Citas Hoy",
       value: "8",
       icon: Calendar,
       change: "+2",
-      changeType: "positive" as const
+      changeType: "positive" as const,
     },
     {
       title: "Actividad",
       value: "94%",
       icon: Activity,
       change: "+5%",
-      changeType: "positive" as const
+      changeType: "positive" as const,
     },
     {
       title: "Crecimiento",
       value: "+18%",
       icon: TrendingUp,
       change: "+3%",
-      changeType: "positive" as const
-    }
-  ]
+      changeType: "positive" as const,
+    },
+  ];
 
   return (
     <div className="space-y-8">
@@ -61,14 +89,16 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
               <p className="text-xs text-muted-foreground">
-                <span className={
-                  stat.changeType === 'positive' 
-                    ? 'text-green-600 dark:text-green-400' 
-                    : 'text-red-600 dark:text-red-400'
-                }>
+                <span
+                  className={
+                    stat.changeType === "positive"
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
+                  }
+                >
                   {stat.change}
-                </span>
-                {" "}desde el mes pasado
+                </span>{" "}
+                desde el mes pasado
               </p>
             </CardContent>
           </Card>
@@ -86,7 +116,8 @@ export default function Dashboard() {
               <div>
                 <p className="text-sm text-muted-foreground">Nombre</p>
                 <p className="font-medium">
-                  {session?.user?.profile?.firstName} {session?.user?.profile?.lastName}
+                  {session?.user?.profile?.firstName}{" "}
+                  {session?.user?.profile?.lastName}
                 </p>
               </div>
               <div>
@@ -121,14 +152,18 @@ export default function Dashboard() {
               <div className="flex items-center space-x-4">
                 <div className="w-2 h-2 bg-green-600 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Plan nutricional actualizado</p>
+                  <p className="text-sm font-medium">
+                    Plan nutricional actualizado
+                  </p>
                   <p className="text-xs text-muted-foreground">Hace 4 horas</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Nuevo paciente registrado</p>
+                  <p className="text-sm font-medium">
+                    Nuevo paciente registrado
+                  </p>
                   <p className="text-xs text-muted-foreground">Ayer</p>
                 </div>
               </div>
@@ -136,6 +171,25 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+          <BarChart accessibilityLayer data={chartData}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <ChartLegend content={<ChartLegendContent />} />
+            <Bar dataKey="desktop" fill="var(--color-chart-1)" radius={4} />
+            <Bar dataKey="mobile" fill="var(--color-chart-2)" radius={4} />
+          </BarChart>
+        </ChartContainer>
+      </div>
     </div>
-  )
+  );
 }
