@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +19,6 @@ import {
   UserRound,
   Users,
   MessageCircle,
-  Edit,
-  Trash2,
   CreditCard,
   IdCard,
 } from "lucide-react";
@@ -29,30 +26,19 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { parseLocalDate } from "@/lib/utils";
-import { EditPatientDialog } from "./edit-patient-dialog";
-import { DeletePatientAlert } from "./delete-patient-alert";
 import type { PatientDetail } from "@/services/patient.service";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface PatientDetailSidebarProps {
   patient: PatientDetail | undefined;
   isLoading: boolean;
   selectedPatientId: string | null;
-  onPatientUpdated?: () => void;
 }
 
 export function PatientDetailSidebar({
   patient,
   isLoading,
   selectedPatientId,
-  onPatientUpdated,
 }: PatientDetailSidebarProps) {
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   if (!selectedPatientId) {
     return (
       <Card className="h-fit">
@@ -118,46 +104,9 @@ export function PatientDetailSidebar({
   return (
     <Card className="h-fit">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Detalles del Paciente
-          </div>
-          <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setEditDialogOpen(true)}
-                  title="Editar paciente"
-                  className="h-8 w-8 p-0 hover:bg-teal-50 dark:hover:bg-teal-950/30"
-                >
-                  <Edit className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent color="info">
-                <p>Editar paciente</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDeleteAlertOpen(true)}
-                  title="Eliminar paciente"
-                  className="h-8 w-8 p-0 hover:bg-red-50 dark:hover:bg-red-950/30"
-                >
-                  <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent color="danger">
-                <p>Eliminar paciente</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
+        <CardTitle className="flex items-center gap-2">
+          <User className="h-5 w-5" />
+          Detalles del Paciente
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -418,19 +367,6 @@ export function PatientDetailSidebar({
           </div>
         </div>
       </CardContent>
-
-      <EditPatientDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        patient={patient}
-      />
-
-      <DeletePatientAlert
-        open={deleteAlertOpen}
-        onOpenChange={setDeleteAlertOpen}
-        patient={patient}
-        onDeleted={onPatientUpdated}
-      />
     </Card>
   );
 }
