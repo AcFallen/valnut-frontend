@@ -33,7 +33,7 @@ api.interceptors.response.use(
 
 // Server-side API instance without localStorage
 export const serverApi = axios.create({
-  baseURL: process.env.API_BASE_URL || 'http://localhost:5000',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
