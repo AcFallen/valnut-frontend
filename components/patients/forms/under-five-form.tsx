@@ -17,6 +17,10 @@ import {
   type HeightForAgeResult
 } from "@/constants/talla_edad";
 import {
+  calculateWeightForAge,
+  type WeightForAgeResult
+} from "@/constants/peso_edad";
+import {
   FileText,
   Save,
   Weight,
@@ -72,6 +76,10 @@ export function UnderFiveForm({
   // Estado para el diagnóstico de Talla/Edad
   const [heightForAgeResult, setHeightForAgeResult] =
     useState<HeightForAgeResult | null>(null);
+
+  // Estado para el diagnóstico de Peso/Edad
+  const [weightForAgeResult, setWeightForAgeResult] =
+    useState<WeightForAgeResult | null>(null);
 
   // Función para calcular la edad en meses
   const calculateAgeInMonths = () => {
@@ -181,6 +189,16 @@ export function UnderFiveForm({
       setHeightForAgeResult(null);
     }
   }, [height, ageInMonths, gender]);
+
+  // Efecto para calcular el diagnóstico de Peso/Edad
+  useEffect(() => {
+    if (ageInMonths > 0 && netWeight > 0) {
+      const result = calculateWeightForAge(netWeight, ageInMonths, gender);
+      setWeightForAgeResult(result);
+    } else {
+      setWeightForAgeResult(null);
+    }
+  }, [netWeight, ageInMonths, gender]);
 
   // Función para obtener la descripción de la fórmula seleccionada
   const getSelectedFormulaDescription = () => {
@@ -373,7 +391,30 @@ export function UnderFiveForm({
                 >
                   Peso/Edad:
                 </Label>
-                <Input id="pesoEdad" placeholder="NORMAL" className="flex-1" />
+                <div className="flex flex-1 gap-2">
+                  <Input
+                    id="pesoEdad"
+                    value={weightForAgeResult?.diagnosis || ""}
+                    placeholder="NORMAL"
+                    readOnly
+                    className={`flex-1 font-medium ${
+                      weightForAgeResult?.diagnosis === "DESNUTRIDO"
+                        ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300"
+                        : weightForAgeResult?.diagnosis === "NORMAL"
+                        ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-300"
+                        : weightForAgeResult?.diagnosis === "SOBREPESO"
+                        ? "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300"
+                        : "bg-gray-50 dark:bg-gray-800"
+                    }`}
+                  />
+                  {weightForAgeResult && (
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 rounded border">
+                      <span title={`Percentil: ${weightForAgeResult.percentile}, Z-Score: ${weightForAgeResult.zScore}`}>
+                        {weightForAgeResult.percentile}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-4">
@@ -402,32 +443,6 @@ export function UnderFiveForm({
                 </div>
               )}
 
-              {/* Información detallada del diagnóstico */}
-              {heightForAgeResult && (
-                <div className="bg-slate-50 dark:bg-slate-900/20 p-3 rounded-md border border-slate-200 dark:border-slate-800">
-                  <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">
-                    Detalle del Diagnóstico Talla/Edad:
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                    <div>
-                      <span className="text-slate-600 dark:text-slate-400 font-medium">Edad:</span>
-                      <span className="ml-1">{ageInMonths} meses</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-600 dark:text-slate-400 font-medium">Talla:</span>
-                      <span className="ml-1">{height} cm</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-600 dark:text-slate-400 font-medium">Género:</span>
-                      <span className="ml-1">{gender === "male" ? "Masculino" : "Femenino"}</span>
-                    </div>
-                  </div>
-                  <div className="mt-2 text-xs">
-                    <span className="text-slate-600 dark:text-slate-400 font-medium">Z-Score:</span>
-                    <span className="ml-1">{heightForAgeResult.zScore}</span>
-                  </div>
-                </div>
-              )}
 
               <div className="space-y-2 pt-4">
                 <Label

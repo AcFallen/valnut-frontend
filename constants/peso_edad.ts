@@ -855,3 +855,96 @@ export const WEIGHT_FOR_AGE_PERCENTILES = {
     240.5: [44.449, 50.187, 58.237, 70.57, 92.587],
   }
 };
+
+// Tipos de resultado para el diagnóstico de Peso/Edad
+export type WeightForAgeDiagnosis =
+  | "DESNUTRIDO"
+  | "NORMAL"
+  | "SOBREPESO";
+
+// Interfaz para el resultado del diagnóstico
+export interface WeightForAgeResult {
+  diagnosis: WeightForAgeDiagnosis;
+  percentile: string;
+  zScore: string;
+}
+
+/**
+ * Calcula el diagnóstico nutricional de Peso/Edad según los percentiles de la OMS
+ * @param weight - Peso en kilogramos
+ * @param ageInMonths - Edad en meses (0-240)
+ * @param gender - Género del paciente ("male" | "female")
+ * @returns Resultado del diagnóstico con clasificación, percentil y Z-score
+ */
+export function calculateWeightForAge(
+  weight: number,
+  ageInMonths: number,
+  gender: "male" | "female"
+): WeightForAgeResult {
+  // Validar parámetros de entrada
+  if (weight <= 0 || ageInMonths < 0 || ageInMonths > 240) {
+    return {
+      diagnosis: "NORMAL",
+      percentile: "No disponible",
+      zScore: "No disponible"
+    };
+  }
+
+  // Redondear la edad al mes más cercano
+  const roundedAge = Math.round(ageInMonths);
+
+  // Obtener los datos según el género
+  const genderData = gender === "male"
+    ? WEIGHT_FOR_AGE_PERCENTILES.boys
+    : WEIGHT_FOR_AGE_PERCENTILES.girls;
+
+  // Verificar si tenemos datos para esta edad
+  if (!genderData[roundedAge as keyof typeof genderData]) {
+    return {
+      diagnosis: "NORMAL",
+      percentile: "Edad fuera de rango",
+      zScore: "No disponible"
+    };
+  }
+
+  const percentiles = genderData[roundedAge as keyof typeof genderData];
+
+  // Los percentiles están en el orden: [-2SD, -1SD, Mediana, +1SD, +2SD]
+  const [p3, p15, p50, p85, p97] = percentiles;
+
+  // Clasificar según los rangos de la OMS para Peso/Edad
+  let diagnosis: WeightForAgeDiagnosis;
+  let percentile: string;
+  let zScore: string;
+
+  if (weight < p3) {
+    diagnosis = "DESNUTRIDO";
+    percentile = "< P3";
+    zScore = "< -2 DE";
+  } else if (weight <= p97) {
+    diagnosis = "NORMAL";
+    if (weight < p15) {
+      percentile = "P3 - P15";
+      zScore = "-2 DE a -1 DE";
+    } else if (weight <= p50) {
+      percentile = "P15 - P50";
+      zScore = "-1 DE a 0 DE";
+    } else if (weight <= p85) {
+      percentile = "P50 - P85";
+      zScore = "0 DE a +1 DE";
+    } else {
+      percentile = "P85 - P97";
+      zScore = "+1 DE a +2 DE";
+    }
+  } else {
+    diagnosis = "SOBREPESO";
+    percentile = "> P97";
+    zScore = "> +2 DE";
+  }
+
+  return {
+    diagnosis,
+    percentile,
+    zScore
+  };
+}
