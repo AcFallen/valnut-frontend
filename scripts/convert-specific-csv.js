@@ -3,23 +3,26 @@ const path = require("path");
 
 // Configuración de archivos a procesar
 const FILES_CONFIG = {
-  "tabla2.csv": {
+  "peso_talla.csv": {
     name: "WEIGHT_FOR_HEIGHT_PERCENTILES",
     description: "Peso/Longitud-Talla",
     unit: "kg",
     ageUnit: "cm",
+    structure: "7col", // 7 columnas por género
   },
-  "tabla3.csv": {
-    name: "BMI_FOR_AGE_PERCENTILES",
-    description: "IMC/Edad",
-    unit: "kg/m²",
+  "talla_edad.csv": {
+    name: "HEIGHT_FOR_AGE_PERCENTILES",
+    description: "Talla/Edad",
+    unit: "cm",
     ageUnit: "meses",
+    structure: "7col", // 7 columnas por género, datos vacíos después del mes 59
   },
 };
 
 function parseNumber(str) {
   if (!str || str.trim() === "") return null;
-  return parseFloat(str.replace(",", "."));
+  const num = parseFloat(str.replace(",", "."));
+  return isNaN(num) ? null : Math.round(num * 1000) / 1000; // Limitar a 3 decimales
 }
 
 function processCSV(fileName, config) {
@@ -43,43 +46,48 @@ function processCSV(fileName, config) {
     }
   }
 
+  const boys = {};
+  const girls = {};
+
+  // Estructura para peso_talla.csv y talla_edad.csv
   // Saltar las primeras 2 líneas (títulos)
   const dataLines = lines.slice(2);
   console.log(`\n📊 Líneas de datos: ${dataLines.length}`);
 
-  const boys = {};
-  const girls = {};
-
-  dataLines.forEach((line, index) => {
+  dataLines.forEach((line) => {
     if (!line.trim()) return;
 
     const columns = line.split(";");
 
-    // Datos de niños: columna 0 (edad) + columnas 1-6 (todos los percentiles)
-    const boyAge = parseNumber(columns[0]);
-    if (boyAge !== null && columns.length > 6) {
-      const boyValues = [];
-      // Tomar columnas 1,2,3,4,5,6 que corresponden a -3SD, -2SD, -1SD, Median, 1SD, 2SD
-      for (let i = 1; i <= 6; i++) {
-        const value = parseNumber(columns[i]);
-        if (value !== null) boyValues.push(value);
-      }
-      if (boyValues.length === 6) {
-        boys[boyAge] = boyValues;
-      }
-    }
+    // Para peso_talla.csv: columna 0 es cm, para talla_edad.csv: columna 0 es meses
+    const ageValue = parseNumber(columns[0]);
 
-    // Datos de niñas: columna 8 (edad) + columnas 9-14 (todos los percentiles)
-    const girlAge = parseNumber(columns[8]);
-    if (girlAge !== null && columns.length > 14) {
-      const girlValues = [];
-      // Tomar columnas 9,10,11,12,13,14 que corresponden a -3SD, -2SD, -1SD, Median, 1SD, 2SD
-      for (let i = 9; i <= 14; i++) {
-        const value = parseNumber(columns[i]);
-        if (value !== null) girlValues.push(value);
+    if (ageValue !== null) {
+      // Datos de niños: columnas 1-6 (6 percentiles: -3SD, -2SD, -1SD, Median, +1SD, +2SD)
+      if (columns.length > 6) {
+        const boyValues = [];
+        for (let i = 1; i <= 6; i++) {
+          const value = parseNumber(columns[i]);
+          if (value !== null) boyValues.push(value);
+        }
+        if (boyValues.length === 6) {
+          boys[ageValue] = boyValues;
+        }
       }
-      if (girlValues.length === 6) {
-        girls[girlAge] = girlValues;
+
+      // Datos de niñas: verificar si hay datos en las columnas de niñas
+      if (columns.length > 14) {
+        const girlAgeValue = parseNumber(columns[8]); // Columna 8 para edad de niñas
+        if (girlAgeValue !== null) {
+          const girlValues = [];
+          for (let i = 9; i <= 14; i++) {
+            const value = parseNumber(columns[i]);
+            if (value !== null) girlValues.push(value);
+          }
+          if (girlValues.length === 6) {
+            girls[girlAgeValue] = girlValues;
+          }
+        }
       }
     }
   });
@@ -124,18 +132,14 @@ function generateTypeScriptFile(data, fileName) {
 
 export const ${config.name} = {
   boys: {
-    // ${
-      config.ageUnit
-    }: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
+    // ${config.ageUnit}: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
 ${Object.entries(boys)
   .sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
   .map(([age, values]) => `    ${age}: [${values.join(", ")}],`)
   .join("\n")}
   },
   girls: {
-    // ${
-      config.ageUnit
-    }: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
+    // ${config.ageUnit}: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
 ${Object.entries(girls)
   .sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
   .map(([age, values]) => `    ${age}: [${values.join(", ")}],`)
@@ -144,7 +148,7 @@ ${Object.entries(girls)
 };
 `;
 
-  const outputFileName = fileName.replace(".csv", "-percentiles.ts");
+  const outputFileName = fileName.replace(".csv", ".ts");
   const outputPath = path.join(__dirname, "..", "constants", outputFileName);
 
   fs.writeFileSync(outputPath, content, "utf8");
