@@ -3,6 +3,21 @@
 // Edad en: cm
 // Fuente: Organización Mundial de la Salud
 
+// Tipos de resultado para el diagnóstico de Peso/Talla
+export type WeightForHeightDiagnosis =
+  | "DESNUTRIDO SEVERO"
+  | "DESNUTRIDO"
+  | "NORMAL"
+  | "SOBREPESO"
+  | "OBESIDAD";
+
+// Interfaz para el resultado del diagnóstico
+export interface WeightForHeightResult {
+  diagnosis: WeightForHeightDiagnosis;
+  percentile: string;
+  zScore: string;
+}
+
 export const WEIGHT_FOR_HEIGHT_PERCENTILES = {
   boys: {
     // cm: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD), P99.9(+3SD)]
@@ -313,3 +328,87 @@ export const WEIGHT_FOR_HEIGHT_PERCENTILES = {
     120: [17.3, 18.9, 20.7, 22.8, 25.2, 28, 31.2],
   }
 };
+
+/**
+ * Calcula el diagnóstico nutricional de Peso/Talla según los percentiles de la OMS
+ * @param weight - Peso en kilogramos
+ * @param height - Talla en centímetros (45-120 cm)
+ * @param gender - Género del paciente ("male" | "female")
+ * @returns Resultado del diagnóstico con clasificación, percentil y Z-score
+ */
+export function calculateWeightForHeight(
+  weight: number,
+  height: number,
+  gender: "male" | "female"
+): WeightForHeightResult {
+  // Validar parámetros de entrada
+  if (weight <= 0 || height < 45 || height > 120) {
+    return {
+      diagnosis: "NORMAL",
+      percentile: "Fuera de rango",
+      zScore: "No disponible"
+    };
+  }
+
+  // Redondear la altura al centímetro más cercano con incrementos de 0.5
+  const roundedHeight = Math.round(height * 2) / 2;
+
+  // Obtener los datos según el género
+  const genderData = gender === "male"
+    ? WEIGHT_FOR_HEIGHT_PERCENTILES.boys
+    : WEIGHT_FOR_HEIGHT_PERCENTILES.girls;
+
+  // Verificar si tenemos datos para esta altura
+  if (!genderData[roundedHeight as keyof typeof genderData]) {
+    return {
+      diagnosis: "NORMAL",
+      percentile: "Altura fuera de rango",
+      zScore: "No disponible"
+    };
+  }
+
+  const percentiles = genderData[roundedHeight as keyof typeof genderData];
+
+  // Los percentiles están en el orden: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD), P99.9(+3SD)]
+  const [p01, p3, p15, , p85, p97, p999] = percentiles;
+
+  let diagnosis: WeightForHeightDiagnosis;
+  let percentile: string;
+  let zScore: string;
+
+  if (weight < p01) {
+    diagnosis = "DESNUTRIDO SEVERO";
+    percentile = "< P0.1";
+    zScore = "< -3 DE";
+  } else if (weight < p3) {
+    diagnosis = "DESNUTRIDO SEVERO";
+    percentile = "P0.1 - P3";
+    zScore = "-3 DE a -2 DE";
+  } else if (weight < p15) {
+    diagnosis = "DESNUTRIDO";
+    percentile = "P3 - P15";
+    zScore = "-2 DE a -1 DE";
+  } else if (weight <= p85) {
+    diagnosis = "NORMAL";
+    percentile = "P15 - P85";
+    zScore = "-1 DE a +1 DE";
+  } else if (weight <= p97) {
+    diagnosis = "SOBREPESO";
+    percentile = "P85 - P97";
+    zScore = "+1 DE a +2 DE";
+  } else if (weight <= p999) {
+    diagnosis = "OBESIDAD";
+    percentile = "P97 - P99.9";
+    zScore = "+2 DE a +3 DE";
+  } else {
+    diagnosis = "OBESIDAD";
+    percentile = "> P99.9";
+    zScore = "> +3 DE";
+  }
+
+  return {
+    diagnosis,
+    percentile,
+    zScore
+  };
+}

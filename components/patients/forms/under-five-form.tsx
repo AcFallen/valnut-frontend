@@ -21,6 +21,10 @@ import {
   type WeightForAgeResult
 } from "@/constants/peso_edad";
 import {
+  calculateWeightForHeight,
+  type WeightForHeightResult
+} from "@/constants/peso_talla";
+import {
   FileText,
   Save,
   Weight,
@@ -80,6 +84,10 @@ export function UnderFiveForm({
   // Estado para el diagnóstico de Peso/Edad
   const [weightForAgeResult, setWeightForAgeResult] =
     useState<WeightForAgeResult | null>(null);
+
+  // Estado para el diagnóstico de Peso/Talla
+  const [weightForHeightResult, setWeightForHeightResult] =
+    useState<WeightForHeightResult | null>(null);
 
   // Función para calcular la edad en meses
   const calculateAgeInMonths = () => {
@@ -199,6 +207,21 @@ export function UnderFiveForm({
       setWeightForAgeResult(null);
     }
   }, [netWeight, ageInMonths, gender]);
+
+  // Efecto para calcular el diagnóstico de Peso/Talla
+  useEffect(() => {
+    if (height && netWeight > 0) {
+      const heightNum = parseFloat(height);
+      if (!isNaN(heightNum) && heightNum > 0) {
+        const result = calculateWeightForHeight(netWeight, heightNum, gender);
+        setWeightForHeightResult(result);
+      } else {
+        setWeightForHeightResult(null);
+      }
+    } else {
+      setWeightForHeightResult(null);
+    }
+  }, [height, netWeight, gender]);
 
   // Función para obtener la descripción de la fórmula seleccionada
   const getSelectedFormulaDescription = () => {
@@ -424,11 +447,34 @@ export function UnderFiveForm({
                 >
                   Peso/Longitud-talla:
                 </Label>
-                <Input
-                  id="pesoLongitudTalla"
-                  placeholder="SOBREPESO"
-                  className="flex-1"
-                />
+                <div className="flex flex-1 gap-2">
+                  <Input
+                    id="pesoLongitudTalla"
+                    value={weightForHeightResult?.diagnosis || ""}
+                    placeholder="NORMAL"
+                    readOnly
+                    className={`flex-1 font-medium ${
+                      weightForHeightResult?.diagnosis === "DESNUTRIDO SEVERO"
+                        ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300"
+                        : weightForHeightResult?.diagnosis === "DESNUTRIDO"
+                        ? "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300"
+                        : weightForHeightResult?.diagnosis === "NORMAL"
+                        ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-300"
+                        : weightForHeightResult?.diagnosis === "SOBREPESO"
+                        ? "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-300"
+                        : weightForHeightResult?.diagnosis === "OBESIDAD"
+                        ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300"
+                        : "bg-gray-50 dark:bg-gray-800"
+                    }`}
+                  />
+                  {weightForHeightResult && (
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 rounded border">
+                      <span title={`Percentil: ${weightForHeightResult.percentile}, Z-Score: ${weightForHeightResult.zScore}`}>
+                        {weightForHeightResult.percentile}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {shouldShowBMIField && (
