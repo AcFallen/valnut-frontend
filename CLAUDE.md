@@ -13,6 +13,14 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 - **Production server**: `npm run start`
 - **Linting**: `npm run lint` (ESLint configured with Next.js core-web-vitals, but currently disabled with `ignores: ["**/*"]`)
 - **Type checking**: No separate typecheck command - Next.js handles TypeScript compilation
+- **Docker development**: `docker-compose up` (uses production build with configurable PORT and environment variables)
+
+## Environment Variables
+
+- `NEXT_PUBLIC_API_BASE_URL`: API base URL for client-side requests
+- `NEXTAUTH_SECRET`: Required for NextAuth.js JWT signing
+- `NEXTAUTH_URL`: Required for NextAuth.js callbacks (production only)
+- `PORT`: Server port (defaults to 5000 in Docker, 3000 in development)
 
 ## Architecture & Key Technologies
 
@@ -72,13 +80,14 @@ This is "Valnut", a Next.js application for nutrition professionals ("Sistema pa
 
 ## Development Notes
 
-- API base URL configurable via `NEXT_PUBLIC_API_BASE_URL` environment variable
-- NextAuth secret required via `NEXTAUTH_SECRET` environment variable
 - TypeScript strict mode enabled with comprehensive type coverage
 - Shadcn/ui components follow consistent patterns for customization
 - Form validation uses Zod schemas with React Hook Form
 - Table components include pagination, filtering, and search functionality
 - Uses react-hot-toast for consistent notification styling
+- Next.js configured with `output: 'standalone'` for Docker compatibility
+- Docker setup includes health checks and automatic restart policies
+- Development uses Turbopack for faster builds and hot reloading
 
 ## Important Implementation Patterns
 
