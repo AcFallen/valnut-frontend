@@ -294,7 +294,150 @@ export function UnderFiveForm({ patientId, dateOfBirth }: UnderFiveFormProps) {
 
         {/* COLUMNA 3: Exámenes Auxiliares e Indicaciones */}
         <div className="space-y-6">
- 
+          {/* Exámenes Auxiliares */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Stethoscope className="h-5 w-5 text-violet-600" />
+              <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300">
+                Exámenes Auxiliares
+              </h3>
+            </div>
+            <Separator className="mb-2" />
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Label
+                  htmlFor="parasitologico"
+                  className="w-28 text-left font-medium text-sm"
+                >
+                  Parasitológico:
+                </Label>
+                <Select>
+                  <SelectTrigger className="flex-1" id="parasitologico">
+                    <SelectValue placeholder="Seleccione resultado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="negativo">Negativo</SelectItem>
+                    <SelectItem value="positivo">Positivo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label
+                  htmlFor="hemoglobina"
+                  className="w-28 text-left font-medium text-sm"
+                >
+                  Hemoglobina:
+                </Label>
+                <div className="flex flex-1">
+                  <Input
+                    id="hemoglobina"
+                    placeholder="13.5"
+                    className="rounded-r-none"
+                  />
+                  <div className="px-3 py-1 bg-gray-100 dark:bg-gray-800 border border-l-0 rounded-r-md text-sm flex items-center">
+                    <span>mg/dl</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label
+                  htmlFor="altura"
+                  className="w-28 text-left font-medium text-sm"
+                >
+                  Altura:
+                </Label>
+                <div className="flex flex-1">
+                  <Input
+                    id="altura"
+                    placeholder="4000"
+                    className="rounded-r-none"
+                  />
+                  <div className="px-3 py-1 bg-gray-100 dark:bg-gray-800 border border-l-0 rounded-r-md text-sm flex items-center">
+                    <span>m.s.n.m</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label
+                  htmlFor="ajustePorAltura"
+                  className="w-28 text-left font-medium text-sm"
+                >
+                  Ajuste por Altura:
+                </Label>
+                <Input
+                  id="ajustePorAltura"
+                  placeholder="3.00"
+                  className="flex-1"
+                />
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label
+                  htmlFor="hemoglobinaCorregida"
+                  className="w-28 text-left font-medium text-sm"
+                >
+                  Hb Corregida:
+                </Label>
+                <div className="flex flex-1">
+                  <Input
+                    id="hemoglobinaCorregida"
+                    placeholder="10.00"
+                    className="rounded-r-none"
+                  />
+                  <div className="px-3 py-1 bg-gray-100 dark:bg-gray-800 border border-l-0 rounded-r-md text-sm flex items-center">
+                    <span>mg/dl</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label
+                  htmlFor="conclusion"
+                  className="w-28 text-left font-medium text-sm"
+                >
+                  Conclusión:
+                </Label>
+                <Input
+                  id="conclusion"
+                  placeholder="ANEMIA LEVE"
+                  className="flex-1"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="sugerenciaTratamiento"
+                  className="text-sm font-medium"
+                >
+                  Sugerencia de Tratamiento
+                </Label>
+                <Textarea
+                  id="sugerenciaTratamiento"
+                  placeholder="3 mg/Kg/día, Máxima dosis 70mg/día de Sulfato Ferroso o Gotas de Complejo Polimaltosado Férrico Durante 6 meses Al mes, a los 3 meses y 6 meses de iniciado el tratamiento Interpretación del perímetro craneal"
+                  rows={3}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label
+                  htmlFor="rangoNormalidad"
+                  className="w-28 text-left font-medium text-sm"
+                >
+                  Rango de normalidad:
+                </Label>
+                <Input
+                  id="rangoNormalidad"
+                  placeholder="De 46,6 a 52,2 cm"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+          </div>
 
           <div className="flex items-center gap-4">
             <Label
