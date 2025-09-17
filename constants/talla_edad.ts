@@ -3,6 +3,20 @@
 // Edad en: meses
 // Fuente: Organización Mundial de la Salud
 
+// Tipos de resultado para el diagnóstico de Talla/Edad
+export type HeightForAgeDiagnosis =
+  | "TALLA BAJA SEVERA"
+  | "TALLA BAJA"
+  | "NORMAL"
+  | "ALTA";
+
+// Interfaz para el resultado del diagnóstico
+export interface HeightForAgeResult {
+  diagnosis: HeightForAgeDiagnosis;
+  percentile: string;
+  zScore: string;
+}
+
 export const HEIGHT_FOR_AGE_PERCENTILES = {
   boys: {
     // meses: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
@@ -469,3 +483,128 @@ export const HEIGHT_FOR_AGE_PERCENTILES = {
     228: [null, 150.073, 156.614, 163.155, 169.696, 176.237],
   }
 };
+
+/**
+ * Calcula el diagnóstico nutricional de Talla/Edad según los percentiles de la OMS
+ * @param height - Talla en centímetros
+ * @param ageInMonths - Edad en meses (0-228)
+ * @param gender - Género del paciente ("male" | "female")
+ * @returns Resultado del diagnóstico con clasificación, percentil y Z-score
+ */
+export function calculateHeightForAge(
+  height: number,
+  ageInMonths: number,
+  gender: "male" | "female"
+): HeightForAgeResult {
+  // Validar parámetros de entrada
+  if (height <= 0 || ageInMonths < 0 || ageInMonths > 228) {
+    return {
+      diagnosis: "NORMAL",
+      percentile: "No disponible",
+      zScore: "No disponible"
+    };
+  }
+
+  // Redondear la edad al mes más cercano
+  const roundedAge = Math.round(ageInMonths);
+
+  // Obtener los datos según el género
+  const genderData = gender === "male"
+    ? HEIGHT_FOR_AGE_PERCENTILES.boys
+    : HEIGHT_FOR_AGE_PERCENTILES.girls;
+
+  // Verificar si tenemos datos para esta edad
+  if (!genderData[roundedAge as keyof typeof genderData]) {
+    return {
+      diagnosis: "NORMAL",
+      percentile: "Edad fuera de rango",
+      zScore: "No disponible"
+    };
+  }
+
+  const percentiles = genderData[roundedAge as keyof typeof genderData];
+
+  // Los percentiles están en el orden: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
+  const [p01, p3, p15, , p85, p97] = percentiles;
+
+  // Manejar el caso donde P0.1(-3SD) es null (después del mes 59)
+  let diagnosis: HeightForAgeDiagnosis;
+  let percentile: string;
+  let zScore: string;
+
+  if (p01 === null) {
+    // Después del mes 59, solo tenemos 5 percentiles válidos
+    // Verificar que los valores no sean null antes de usarlos
+    if (p3 === null || p15 === null || p85 === null || p97 === null) {
+      return {
+        diagnosis: "NORMAL",
+        percentile: "Datos incompletos",
+        zScore: "No disponible"
+      };
+    }
+
+    if (height < p3) {
+      diagnosis = "TALLA BAJA SEVERA";
+      percentile = "< P3";
+      zScore = "< -2 DE";
+    } else if (height < p15) {
+      diagnosis = "TALLA BAJA";
+      percentile = "P3 - P15";
+      zScore = "-2 DE a -1 DE";
+    } else if (height <= p85) {
+      diagnosis = "NORMAL";
+      percentile = "P15 - P85";
+      zScore = "-1 DE a +1 DE";
+    } else if (height <= p97) {
+      diagnosis = "NORMAL";
+      percentile = "P85 - P97";
+      zScore = "+1 DE a +2 DE";
+    } else {
+      diagnosis = "ALTA";
+      percentile = "> P97";
+      zScore = "> +2 DE";
+    }
+  } else {
+    // Antes del mes 59, tenemos todos los percentiles
+    // Verificar que los valores no sean null antes de usarlos
+    if (p3 === null || p15 === null || p85 === null || p97 === null) {
+      return {
+        diagnosis: "NORMAL",
+        percentile: "Datos incompletos",
+        zScore: "No disponible"
+      };
+    }
+
+    if (height < p01) {
+      diagnosis = "TALLA BAJA SEVERA";
+      percentile = "< P0.1";
+      zScore = "< -3 DE";
+    } else if (height < p3) {
+      diagnosis = "TALLA BAJA SEVERA";
+      percentile = "P0.1 - P3";
+      zScore = "-3 DE a -2 DE";
+    } else if (height < p15) {
+      diagnosis = "TALLA BAJA";
+      percentile = "P3 - P15";
+      zScore = "-2 DE a -1 DE";
+    } else if (height <= p85) {
+      diagnosis = "NORMAL";
+      percentile = "P15 - P85";
+      zScore = "-1 DE a +1 DE";
+    } else if (height <= p97) {
+      diagnosis = "NORMAL";
+      percentile = "P85 - P97";
+      zScore = "+1 DE a +2 DE";
+    } else {
+      diagnosis = "ALTA";
+      percentile = "> P97";
+      zScore = "> +2 DE";
+    }
+  }
+
+  return {
+    diagnosis,
+    percentile,
+    zScore
+  };
+}

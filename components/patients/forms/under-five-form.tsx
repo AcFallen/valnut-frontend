@@ -13,6 +13,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  calculateHeightForAge,
+  type HeightForAgeResult
+} from "@/constants/talla_edad";
+import {
   FileText,
   Save,
   Weight,
@@ -64,6 +68,10 @@ export function UnderFiveForm({
   const [calculatedGET, setCalculatedGET] = useState<number>(0);
   const [ageSpecificFactors, setAgeSpecificFactors] =
     useState<AgeSpecificFactors | null>(null);
+
+  // Estado para el diagnóstico de Talla/Edad
+  const [heightForAgeResult, setHeightForAgeResult] =
+    useState<HeightForAgeResult | null>(null);
 
   // Función para calcular la edad en meses
   const calculateAgeInMonths = () => {
@@ -158,6 +166,21 @@ export function UnderFiveForm({
       setCalculatedGET(0);
     }
   }, [useGETCalculation, calculatedBMR, selectedActivityFactor, ageInMonths]);
+
+  // Efecto para calcular el diagnóstico de Talla/Edad
+  useEffect(() => {
+    if (height && ageInMonths > 0) {
+      const heightNum = parseFloat(height);
+      if (!isNaN(heightNum) && heightNum > 0) {
+        const result = calculateHeightForAge(heightNum, ageInMonths, gender);
+        setHeightForAgeResult(result);
+      } else {
+        setHeightForAgeResult(null);
+      }
+    } else {
+      setHeightForAgeResult(null);
+    }
+  }, [height, ageInMonths, gender]);
 
   // Función para obtener la descripción de la fórmula seleccionada
   const getSelectedFormulaDescription = () => {
@@ -315,11 +338,32 @@ export function UnderFiveForm({
                 >
                   Longitud-talla/Edad:
                 </Label>
-                <Input
-                  id="longitudTallaEdad"
-                  placeholder="TALLA BAJA SEVERA"
-                  className="flex-1"
-                />
+                <div className="flex flex-1 gap-2">
+                  <Input
+                    id="longitudTallaEdad"
+                    value={heightForAgeResult?.diagnosis || ""}
+                    placeholder="TALLA BAJA SEVERA"
+                    readOnly
+                    className={`flex-1 font-medium ${
+                      heightForAgeResult?.diagnosis === "TALLA BAJA SEVERA"
+                        ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300"
+                        : heightForAgeResult?.diagnosis === "TALLA BAJA"
+                        ? "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300"
+                        : heightForAgeResult?.diagnosis === "NORMAL"
+                        ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-300"
+                        : heightForAgeResult?.diagnosis === "ALTA"
+                        ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300"
+                        : "bg-gray-50 dark:bg-gray-800"
+                    }`}
+                  />
+                  {heightForAgeResult && (
+                    <div className="flex items-center text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 rounded border">
+                      <span title={`Percentil: ${heightForAgeResult.percentile}, Z-Score: ${heightForAgeResult.zScore}`}>
+                        {heightForAgeResult.percentile}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-4">
@@ -355,6 +399,33 @@ export function UnderFiveForm({
                     IMC/Edad:
                   </Label>
                   <Input id="imcEdad" placeholder="NORMAL" className="flex-1" />
+                </div>
+              )}
+
+              {/* Información detallada del diagnóstico */}
+              {heightForAgeResult && (
+                <div className="bg-slate-50 dark:bg-slate-900/20 p-3 rounded-md border border-slate-200 dark:border-slate-800">
+                  <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">
+                    Detalle del Diagnóstico Talla/Edad:
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                    <div>
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Edad:</span>
+                      <span className="ml-1">{ageInMonths} meses</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Talla:</span>
+                      <span className="ml-1">{height} cm</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">Género:</span>
+                      <span className="ml-1">{gender === "male" ? "Masculino" : "Femenino"}</span>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs">
+                    <span className="text-slate-600 dark:text-slate-400 font-medium">Z-Score:</span>
+                    <span className="ml-1">{heightForAgeResult.zScore}</span>
+                  </div>
                 </div>
               )}
 
