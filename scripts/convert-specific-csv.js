@@ -8,14 +8,21 @@ const FILES_CONFIG = {
     description: "Peso/Longitud-Talla",
     unit: "kg",
     ageUnit: "cm",
-    structure: "7col", // 7 columnas por género
+    structure: "8col", // 8 columnas por género (incluyendo 3SD)
+    boyColumns: { start: 1, end: 7 }, // columnas 1-7 para niños (7 percentiles)
+    girlColumns: { ageCol: 9, start: 10, end: 16 }, // columnas 10-16 para niñas (7 percentiles)
+    percentiles: 7, // número de percentiles por género
   },
   "talla_edad.csv": {
     name: "HEIGHT_FOR_AGE_PERCENTILES",
     description: "Talla/Edad",
     unit: "cm",
     ageUnit: "meses",
-    structure: "7col", // 7 columnas por género, datos vacíos después del mes 59
+    structure: "7col", // 7 columnas por género, SD3neg vacío después del mes 59
+    boyColumns: { start: 1, end: 7 }, // columnas 1-7 para niños
+    girlColumns: { ageCol: 8, start: 9, end: 15 }, // columnas 9-15 para niñas
+    percentiles: 6, // número de percentiles por género (6 percentiles OMS)
+    maxAge: 228, // datos hasta el mes 228
   },
 };
 
@@ -37,7 +44,7 @@ function processCSV(fileName, config) {
   // Examinar las primeras líneas para entender la estructura
   console.log("\n📋 Estructura del archivo:");
   for (let i = 0; i < Math.min(5, lines.length); i++) {
-    const columns = lines[i].split(";");
+    const columns = lines[i].split(",");
     console.log(`Línea ${i + 1}: ${columns.length} columnas`);
     if (i < 3) {
       console.log(
@@ -57,34 +64,59 @@ function processCSV(fileName, config) {
   dataLines.forEach((line) => {
     if (!line.trim()) return;
 
-    const columns = line.split(";");
+    const columns = line.split(",");
 
-    // Para peso_talla.csv: columna 0 es cm, para talla_edad.csv: columna 0 es meses
+    // Columna 0 es la edad (cm para peso_talla, meses para talla_edad)
     const ageValue = parseNumber(columns[0]);
 
     if (ageValue !== null) {
-      // Datos de niños: columnas 1-6 (6 percentiles: -3SD, -2SD, -1SD, Median, +1SD, +2SD)
-      if (columns.length > 6) {
+      // Verificar límite de edad para talla_edad.csv
+      if (config.maxAge && ageValue > config.maxAge) {
+        return;
+      }
+
+      // Procesar datos de niños
+      if (columns.length > config.boyColumns.end) {
         const boyValues = [];
-        for (let i = 1; i <= 6; i++) {
+        for (let i = config.boyColumns.start; i <= config.boyColumns.end; i++) {
           const value = parseNumber(columns[i]);
-          if (value !== null) boyValues.push(value);
+          if (value !== null) {
+            boyValues.push(value);
+          }
         }
-        if (boyValues.length === 6) {
+
+        // Para talla_edad, aceptar datos incluso si SD3neg está vacío (después del mes 59)
+        const expectedValues = config.percentiles;
+        if (boyValues.length === expectedValues ||
+            (fileName === "talla_edad.csv" && boyValues.length >= expectedValues - 1)) {
+          // Si falta SD3neg en talla_edad, rellenar al inicio
+          if (fileName === "talla_edad.csv" && boyValues.length === expectedValues - 1) {
+            boyValues.unshift(null); // Agregar null al inicio para SD3neg
+          }
           boys[ageValue] = boyValues;
         }
       }
 
-      // Datos de niñas: verificar si hay datos en las columnas de niñas
-      if (columns.length > 14) {
-        const girlAgeValue = parseNumber(columns[8]); // Columna 8 para edad de niñas
+      // Procesar datos de niñas
+      if (columns.length > config.girlColumns.end) {
+        const girlAgeValue = parseNumber(columns[config.girlColumns.ageCol]);
         if (girlAgeValue !== null) {
           const girlValues = [];
-          for (let i = 9; i <= 14; i++) {
+          for (let i = config.girlColumns.start; i <= config.girlColumns.end; i++) {
             const value = parseNumber(columns[i]);
-            if (value !== null) girlValues.push(value);
+            if (value !== null) {
+              girlValues.push(value);
+            }
           }
-          if (girlValues.length === 6) {
+
+          // Para talla_edad, aceptar datos incluso si SD3neg está vacío
+          const expectedValues = config.percentiles;
+          if (girlValues.length === expectedValues ||
+              (fileName === "talla_edad.csv" && girlValues.length >= expectedValues - 1)) {
+            // Si falta SD3neg en talla_edad, rellenar al inicio
+            if (fileName === "talla_edad.csv" && girlValues.length === expectedValues - 1) {
+              girlValues.unshift(null); // Agregar null al inicio para SD3neg
+            }
             girls[girlAgeValue] = girlValues;
           }
         }
@@ -132,17 +164,23 @@ function generateTypeScriptFile(data, fileName) {
 
 export const ${config.name} = {
   boys: {
-    // ${config.ageUnit}: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
+    // ${config.ageUnit}: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)${config.percentiles === 7 ? ', P99.9(+3SD)' : ''}]
 ${Object.entries(boys)
   .sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
-  .map(([age, values]) => `    ${age}: [${values.join(", ")}],`)
+  .map(([age, values]) => {
+    const formattedValues = values.map(v => v === null ? 'null' : v).join(", ");
+    return `    ${age}: [${formattedValues}],`;
+  })
   .join("\n")}
   },
   girls: {
-    // ${config.ageUnit}: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
+    // ${config.ageUnit}: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)${config.percentiles === 7 ? ', P99.9(+3SD)' : ''}]
 ${Object.entries(girls)
   .sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
-  .map(([age, values]) => `    ${age}: [${values.join(", ")}],`)
+  .map(([age, values]) => {
+    const formattedValues = values.map(v => v === null ? 'null' : v).join(", ");
+    return `    ${age}: [${formattedValues}],`;
+  })
   .join("\n")}
   }
 };
