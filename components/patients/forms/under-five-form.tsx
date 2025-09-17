@@ -25,6 +25,10 @@ import {
   type WeightForHeightResult
 } from "@/constants/peso_talla";
 import {
+  calculateBMIForAge,
+  type BMIForAgeResult
+} from "@/constants/bmi";
+import {
   FileText,
   Save,
   Weight,
@@ -88,6 +92,10 @@ export function UnderFiveForm({
   // Estado para el diagnóstico de Peso/Talla
   const [weightForHeightResult, setWeightForHeightResult] =
     useState<WeightForHeightResult | null>(null);
+
+  // Estado para el diagnóstico de IMC/Edad
+  const [bmiForAgeResult, setBmiForAgeResult] =
+    useState<BMIForAgeResult | null>(null);
 
   // Función para calcular la edad en meses
   const calculateAgeInMonths = () => {
@@ -222,6 +230,21 @@ export function UnderFiveForm({
       setWeightForHeightResult(null);
     }
   }, [height, netWeight, gender]);
+
+  // Efecto para calcular el diagnóstico de IMC/Edad (solo para niños > 24 meses)
+  useEffect(() => {
+    if (shouldShowBMIField && height && netWeight > 0 && ageInMonths >= 24) {
+      const heightNum = parseFloat(height);
+      if (!isNaN(heightNum) && heightNum > 0) {
+        const result = calculateBMIForAge(netWeight, heightNum, ageInMonths, gender);
+        setBmiForAgeResult(result);
+      } else {
+        setBmiForAgeResult(null);
+      }
+    } else {
+      setBmiForAgeResult(null);
+    }
+  }, [shouldShowBMIField, height, netWeight, ageInMonths, gender]);
 
   // Función para obtener la descripción de la fórmula seleccionada
   const getSelectedFormulaDescription = () => {
@@ -485,7 +508,34 @@ export function UnderFiveForm({
                   >
                     IMC/Edad:
                   </Label>
-                  <Input id="imcEdad" placeholder="NORMAL" className="flex-1" />
+                  <div className="flex flex-1 gap-2">
+                    <Input
+                      id="imcEdad"
+                      value={bmiForAgeResult?.diagnosis || ""}
+                      placeholder="NORMAL"
+                      readOnly
+                      className={`flex-1 font-medium ${
+                        bmiForAgeResult?.diagnosis === "DELGADEZ SEVERA"
+                          ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300"
+                          : bmiForAgeResult?.diagnosis === "DELGADEZ"
+                          ? "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300"
+                          : bmiForAgeResult?.diagnosis === "NORMAL"
+                          ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-300"
+                          : bmiForAgeResult?.diagnosis === "SOBREPESO"
+                          ? "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-300"
+                          : bmiForAgeResult?.diagnosis === "OBESIDAD"
+                          ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300"
+                          : "bg-gray-50 dark:bg-gray-800"
+                      }`}
+                    />
+                    {bmiForAgeResult && (
+                      <div className="flex items-center text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 rounded border">
+                        <span title={`Percentil: ${bmiForAgeResult.percentile}, Z-Score: ${bmiForAgeResult.zScore}`}>
+                          {bmiForAgeResult.percentile}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 

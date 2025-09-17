@@ -3,6 +3,21 @@
 // Edad en: meses
 // Fuente: Organización Mundial de la Salud
 
+// Tipos de resultado para el diagnóstico de IMC/Edad
+export type BMIForAgeDiagnosis =
+  | "DELGADEZ SEVERA"
+  | "DELGADEZ"
+  | "NORMAL"
+  | "SOBREPESO"
+  | "OBESIDAD";
+
+// Interfaz para el resultado del diagnóstico
+export interface BMIForAgeResult {
+  diagnosis: BMIForAgeDiagnosis;
+  percentile: string;
+  zScore: string;
+}
+
 export const BMI_FOR_AGE_PERCENTILES = {
   boys: {
     // meses: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
@@ -421,3 +436,89 @@ export const BMI_FOR_AGE_PERCENTILES = {
     228: [14.724, 16.497, 18.681, 21.427, 24.965, 29.67],
   }
 };
+
+/**
+ * Calcula el diagnóstico nutricional de IMC/Edad según los percentiles de la OMS
+ * @param weight - Peso en kilogramos
+ * @param height - Talla en centímetros
+ * @param ageInMonths - Edad en meses (24-228 meses, 2-19 años)
+ * @param gender - Género del paciente ("male" | "female")
+ * @returns Resultado del diagnóstico con clasificación, percentil y Z-score
+ */
+export function calculateBMIForAge(
+  weight: number,
+  height: number,
+  ageInMonths: number,
+  gender: "male" | "female"
+): BMIForAgeResult {
+  // Validar parámetros de entrada
+  if (weight <= 0 || height <= 0 || ageInMonths < 24 || ageInMonths > 228) {
+    return {
+      diagnosis: "NORMAL",
+      percentile: "Fuera de rango",
+      zScore: "No disponible"
+    };
+  }
+
+  // Calcular IMC
+  const heightInMeters = height / 100;
+  const bmi = weight / (heightInMeters * heightInMeters);
+
+  // Redondear la edad al mes más cercano
+  const roundedAge = Math.round(ageInMonths);
+
+  // Obtener los datos según el género
+  const genderData = gender === "male"
+    ? BMI_FOR_AGE_PERCENTILES.boys
+    : BMI_FOR_AGE_PERCENTILES.girls;
+
+  // Verificar si tenemos datos para esta edad
+  if (!genderData[roundedAge as keyof typeof genderData]) {
+    return {
+      diagnosis: "NORMAL",
+      percentile: "Edad fuera de rango",
+      zScore: "No disponible"
+    };
+  }
+
+  const percentiles = genderData[roundedAge as keyof typeof genderData];
+
+  // Los percentiles están en el orden: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD)]
+  const [p01, p3, p15, , p85, p97] = percentiles;
+
+  let diagnosis: BMIForAgeDiagnosis;
+  let percentile: string;
+  let zScore: string;
+
+  if (bmi < p01) {
+    diagnosis = "DELGADEZ SEVERA";
+    percentile = "< P0.1";
+    zScore = "< -3 DE";
+  } else if (bmi < p3) {
+    diagnosis = "DELGADEZ SEVERA";
+    percentile = "P0.1 - P3";
+    zScore = "-3 DE a -2 DE";
+  } else if (bmi < p15) {
+    diagnosis = "DELGADEZ";
+    percentile = "P3 - P15";
+    zScore = "-2 DE a -1 DE";
+  } else if (bmi <= p85) {
+    diagnosis = "NORMAL";
+    percentile = "P15 - P85";
+    zScore = "-1 DE a +1 DE";
+  } else if (bmi <= p97) {
+    diagnosis = "SOBREPESO";
+    percentile = "P85 - P97";
+    zScore = "+1 DE a +2 DE";
+  } else {
+    diagnosis = "OBESIDAD";
+    percentile = "> P97";
+    zScore = "> +2 DE";
+  }
+
+  return {
+    diagnosis,
+    percentile,
+    zScore
+  };
+}
