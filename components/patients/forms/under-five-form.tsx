@@ -542,9 +542,9 @@ export function UnderFiveForm({
                         value={calculatedGET ? calculatedGET.toFixed(2) : ""}
                         placeholder="0.00"
                         readOnly
-                        className="rounded-r-none bg-green-100 dark:bg-green-800 font-semibold"
+                        className="rounded-r-none bg-violet-100 dark:bg-violet-800 font-semibold"
                       />
-                      <div className="px-3 py-1 bg-green-100 dark:bg-green-800 border border-l-0 rounded-r-md text-sm font-semibold flex items-center">
+                      <div className="px-3 py-1 bg-violet-100 dark:bg-violet-800 border border-l-0 rounded-r-md text-sm font-semibold flex items-center">
                         <span>kcal/día</span>
                       </div>
                     </div>
