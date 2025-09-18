@@ -369,40 +369,36 @@ export function calculateWeightForHeight(
 
   const percentiles = genderData[roundedHeight as keyof typeof genderData];
 
-  // Los percentiles están en el orden: [P0.1(-3SD), P3(-2SD), P15(-1SD), P50(Median), P85(+1SD), P97(+2SD), P99.9(+3SD)]
-  const [p01, p3, p15, , p85, p97, p999] = percentiles;
+  // Los percentiles están en el orden: [-3DE, -2DE, -1DE, Median, +1DE, +2DE, +3DE]
+  // Usamos clasificación simplificada de 4 categorías con valores específicos
+  const minus3SD = percentiles[0]; // -3DE (índice 0)
+  const minus2SD = percentiles[1]; // -2DE (índice 1)
+  const plus2SD = percentiles[5];  // +2DE (índice 5)
+  const plus3SD = percentiles[6];  // +3DE (índice 6)
 
   let diagnosis: WeightForHeightDiagnosis;
   let percentile: string;
   let zScore: string;
 
-  if (weight < p01) {
+  if (weight < minus3SD) {
     diagnosis = "DESNUTRIDO SEVERO";
-    percentile = "< P0.1";
+    percentile = "< -3DE";
     zScore = "< -3 DE";
-  } else if (weight < p3) {
-    diagnosis = "DESNUTRIDO SEVERO";
-    percentile = "P0.1 - P3";
-    zScore = "-3 DE a -2 DE";
-  } else if (weight < p15) {
+  } else if (weight < minus2SD) {
     diagnosis = "DESNUTRIDO";
-    percentile = "P3 - P15";
-    zScore = "-2 DE a -1 DE";
-  } else if (weight <= p85) {
+    percentile = "-3DE a -2DE";
+    zScore = "-3 DE a -2 DE";
+  } else if (weight <= plus2SD) {
     diagnosis = "NORMAL";
-    percentile = "P15 - P85";
-    zScore = "-1 DE a +1 DE";
-  } else if (weight <= p97) {
+    percentile = "-2DE a +2DE";
+    zScore = "-2 DE a +2 DE";
+  } else if (weight <= plus3SD) {
     diagnosis = "SOBREPESO";
-    percentile = "P85 - P97";
-    zScore = "+1 DE a +2 DE";
-  } else if (weight <= p999) {
-    diagnosis = "OBESIDAD";
-    percentile = "P97 - P99.9";
+    percentile = "+2DE a +3DE";
     zScore = "+2 DE a +3 DE";
   } else {
     diagnosis = "OBESIDAD";
-    percentile = "> P99.9";
+    percentile = "> +3DE";
     zScore = "> +3 DE";
   }
 
