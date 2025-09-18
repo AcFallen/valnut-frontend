@@ -70,6 +70,7 @@ export function NewConsultationDialog({
         <UnderFiveForm
           patientId={patient.id}
           dateOfBirth={patient.dateOfBirth}
+          gender={patient.gender as "male" | "female"}
         />
       );
     }
