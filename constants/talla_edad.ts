@@ -481,7 +481,7 @@ export const HEIGHT_FOR_AGE_PERCENTILES = {
     226: [null, 150.047, 156.599, 163.151, 169.703, 176.255],
     227: [null, 150.062, 156.608, 163.153, 169.699, 176.245],
     228: [null, 150.073, 156.614, 163.155, 169.696, 176.237],
-  }
+  },
 };
 
 /**
@@ -501,7 +501,7 @@ export function calculateHeightForAge(
     return {
       diagnosis: "NORMAL",
       percentile: "No disponible",
-      zScore: "No disponible"
+      zScore: "No disponible",
     };
   }
 
@@ -509,16 +509,17 @@ export function calculateHeightForAge(
   const roundedAge = Math.round(ageInMonths);
 
   // Obtener los datos según el género
-  const genderData = gender === "male"
-    ? HEIGHT_FOR_AGE_PERCENTILES.boys
-    : HEIGHT_FOR_AGE_PERCENTILES.girls;
+  const genderData =
+    gender === "male"
+      ? HEIGHT_FOR_AGE_PERCENTILES.boys
+      : HEIGHT_FOR_AGE_PERCENTILES.girls;
 
   // Verificar si tenemos datos para esta edad
   if (!genderData[roundedAge as keyof typeof genderData]) {
     return {
       diagnosis: "NORMAL",
       percentile: "Edad fuera de rango",
-      zScore: "No disponible"
+      zScore: "No disponible",
     };
   }
 
@@ -535,11 +536,16 @@ export function calculateHeightForAge(
   if (neg3DE === null) {
     // Después del mes 59, solo tenemos 5 percentiles válidos (desde -2DE)
     // Verificar que los valores no sean null antes de usarlos
-    if (neg2DE === null || neg1DE === null || pos1DE === null || pos2DE === null) {
+    if (
+      neg2DE === null ||
+      neg1DE === null ||
+      pos1DE === null ||
+      pos2DE === null
+    ) {
       return {
         diagnosis: "NORMAL",
         percentile: "Datos incompletos",
-        zScore: "No disponible"
+        zScore: "No disponible",
       };
     }
 
@@ -559,23 +565,28 @@ export function calculateHeightForAge(
   } else {
     // Antes del mes 59, tenemos todos los percentiles
     // Verificar que los valores no sean null antes de usarlos
-    if (neg2DE === null || neg1DE === null || pos1DE === null || pos2DE === null) {
+    if (
+      neg2DE === null ||
+      neg1DE === null ||
+      pos1DE === null ||
+      pos2DE === null
+    ) {
       return {
         diagnosis: "NORMAL",
         percentile: "Datos incompletos",
-        zScore: "No disponible"
+        zScore: "No disponible",
       };
     }
 
-    if (height <= neg3DE) {
+    if (height < neg3DE) {
       diagnosis = "TALLA BAJA SEVERA";
       percentile = "≤ -3DE";
       zScore = "≤ -3 DE";
-    } else if (height > neg3DE && height <= neg2DE) {
+    } else if (height >= neg3DE && height < neg2DE) {
       diagnosis = "TALLA BAJA";
       percentile = "-3DE a -2DE";
       zScore = "-3 DE a -2 DE";
-    } else if (height > neg2DE && height <= pos2DE) {
+    } else if (height >= neg2DE && height <= pos2DE) {
       diagnosis = "NORMAL";
       percentile = "-2DE a +2DE";
       zScore = "-2 DE a +2 DE";
@@ -589,6 +600,6 @@ export function calculateHeightForAge(
   return {
     diagnosis,
     percentile,
-    zScore
+    zScore,
   };
 }
