@@ -910,35 +910,26 @@ export function calculateWeightForAge(
   const percentiles = genderData[roundedAge as keyof typeof genderData];
 
   // Los percentiles están en el orden: [-2SD, -1SD, Mediana, +1SD, +2SD]
-  const [p3, p15, p50, p85, p97] = percentiles;
+  // Usamos solo el primer valor (-2DE) y el último valor (+2DE) para clasificación simplificada
+  const minus2SD = percentiles[0]; // Primer valor: -2DE
+  const plus2SD = percentiles[4];  // Último valor: +2DE
 
-  // Clasificar según los rangos de la OMS para Peso/Edad
+  // Clasificar según la lógica simplificada de 3 categorías
   let diagnosis: WeightForAgeDiagnosis;
   let percentile: string;
   let zScore: string;
 
-  if (weight < p3) {
+  if (weight < minus2SD) {
     diagnosis = "DESNUTRIDO";
-    percentile = "< P3";
+    percentile = "< -2DE";
     zScore = "< -2 DE";
-  } else if (weight <= p97) {
+  } else if (weight <= plus2SD) {
     diagnosis = "NORMAL";
-    if (weight < p15) {
-      percentile = "P3 - P15";
-      zScore = "-2 DE a -1 DE";
-    } else if (weight <= p50) {
-      percentile = "P15 - P50";
-      zScore = "-1 DE a 0 DE";
-    } else if (weight <= p85) {
-      percentile = "P50 - P85";
-      zScore = "0 DE a +1 DE";
-    } else {
-      percentile = "P85 - P97";
-      zScore = "+1 DE a +2 DE";
-    }
+    percentile = "-2DE a +2DE";
+    zScore = "-2 DE a +2 DE";
   } else {
     diagnosis = "SOBREPESO";
-    percentile = "> P97";
+    percentile = "> +2DE";
     zScore = "> +2 DE";
   }
 
