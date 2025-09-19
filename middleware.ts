@@ -43,6 +43,14 @@ export default withAuth(
         return NextResponse.redirect(new URL("/login", req.url))
       }
     }
+
+    // Checkout routes are accessible to all authenticated users
+    if (pathname.startsWith("/checkout")) {
+      const allowedUserTypes = ["system_admin", "tenant_owner", "tenant_user"]
+      if (!token?.userType || !allowedUserTypes.includes(token.userType as string)) {
+        return NextResponse.redirect(new URL("/login", req.url))
+      }
+    }
   },
   {
     callbacks: {
@@ -58,6 +66,7 @@ export const config = {
     "/tenants/:path*",
     "/settings/:path*",
     "/patients/:path*",
-    "/appointments/:path*"
+    "/appointments/:path*",
+    "/checkout/:path*"
   ]
 }

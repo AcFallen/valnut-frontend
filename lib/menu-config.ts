@@ -7,6 +7,7 @@ import {
   Package,
   Building2,
   Calendar,
+  CreditCard,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -53,6 +54,14 @@ export const menuItems: MenuItem[] = [
     icon: Calendar,
     description: "Gestión de citas",
     allowedUserTypes: ["tenant_owner", "tenant_user"],
+  },
+  {
+    id: "checkout",
+    label: "Pagos",
+    href: "/checkout",
+    icon: CreditCard,
+    description: "Gestión de pagos y suscripciones",
+    allowedUserTypes: ["system_admin", "tenant_owner", "tenant_user"],
   },
   {
     id: "settings",
