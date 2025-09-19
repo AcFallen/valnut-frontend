@@ -16,12 +16,40 @@ export default function SuccessPage() {
     const status = searchParams.get("status");
     const external_reference = searchParams.get("external_reference");
 
-    setPaymentData({
+    // Datos básicos de la URL
+    const basicData = {
       payment_id,
       status,
       external_reference,
-    });
+    };
+
+    setPaymentData(basicData);
+
+    // Si tenemos payment_id, consultar detalles completos
+    if (payment_id) {
+      fetchPaymentDetails(payment_id);
+    }
   }, [searchParams]);
+
+  const fetchPaymentDetails = async (paymentId: string) => {
+    try {
+      const response = await fetch(`/api/mercadopago/check-payment?payment_id=${paymentId}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Detalles completos del pago:", data.payment);
+
+        // Actualizar con información detallada
+        setPaymentData(prev => ({
+          ...prev,
+          ...data.payment,
+          detailsLoaded: true
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching payment details:", error);
+    }
+  };
 
   return (
     <div className="container mx-auto py-8 max-w-2xl">

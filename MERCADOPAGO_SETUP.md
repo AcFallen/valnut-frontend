@@ -121,6 +121,57 @@ Para testing completo, puedes descargar las apps de MercadoPago en modo sandbox:
 - **iOS**: Configurar ambiente de desarrollo
 - **Web**: `sandbox.mercadopago.com.pe`
 
+## 🔄 Testing de Webhooks en Desarrollo
+
+### **Información que YA obtienes (sin webhooks):**
+Cuando el usuario regresa de MercadoPago, automáticamente recibes:
+- `payment_id` - ID único del pago
+- `status` - Estado: approved, rejected, pending
+- `external_reference` - Tu referencia personalizada
+
+### **Opciones para testing completo:**
+
+#### **Opción A: ngrok (Webhooks reales)**
+```bash
+# Terminal 1: Aplicación
+npm run dev
+
+# Terminal 2: Túnel público
+ngrok http 3000
+
+# Configurar en .env
+NGROK_URL=https://abc123.ngrok.io
+```
+✅ Webhooks reales de MercadoPago
+✅ Testing completo del flujo
+
+#### **Opción B: Simulador de webhook**
+```bash
+# Probar webhook manualmente
+curl -X POST http://localhost:3000/api/mercadopago/test-webhook \
+  -H "Content-Type: application/json" \
+  -d '{"payment_id":"123","status":"approved","external_reference":"order_123"}'
+```
+✅ Testing inmediato
+✅ No requiere configuración adicional
+
+#### **Opción C: Consulta directa (Implementado)**
+La página de éxito ahora consulta automáticamente el estado completo del pago desde MercadoPago API.
+
+```javascript
+// Automático en /checkout/success
+GET /api/mercadopago/check-payment?payment_id=123456
+```
+✅ Información completa del pago
+✅ Sin configuración de webhooks
+✅ Funciona en desarrollo y producción
+
+### **Endpoints disponibles para testing:**
+
+- `GET /api/mercadopago/check-payment?payment_id=123` - Consultar estado
+- `POST /api/mercadopago/test-webhook` - Simular webhook
+- `GET /api/mercadopago/test-webhook?status=approved` - Test rápido
+
 ## 💡 Tips importantes
 
 1. **Saldo mínimo**: El usuario debe tener al menos el monto del plan + comisiones
@@ -128,3 +179,4 @@ Para testing completo, puedes descargar las apps de MercadoPago en modo sandbox:
 3. **Verificación**: Algunas funciones requieren cuentas "verificadas" incluso en sandbox
 4. **Cache**: Limpiar cookies/cache si no aparecen opciones actualizadas
 5. **Tiempo**: Los depósitos de prueba pueden tardar unos minutos en aparecer
+6. **Webhooks**: Para desarrollo usa ngrok o consulta directa, para producción configura webhooks reales
